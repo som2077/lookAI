@@ -1,0 +1,413 @@
+import { useSignIn, useSignUp } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+type EmailFlow = "sign-in" | "sign-up";
+
+const RESEND_COOLDOWN_SECONDS = 30;
+
+const formatMissingField = (field: string) =>
+  field.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+
+const getMissingFields = (resource: unknown) => {
+  if (
+    typeof resource === "object" &&
+    resource !== null &&
+    "missingFields" in resource &&
+    Array.isArray(resource.missingFields)
+  ) {
+    return resource.missingFields.filter(
+      (field): field is string => typeof field === "string",
+    );
+  }
+
+  return [];
+};
+
+const getProfileFromEmail = (emailAddress: string) => {
+  const [localPart] = emailAddress.trim().split("@");
+  const nameParts = localPart
+    .split(/[._-]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const firstName = nameParts[0] || "User";
+  const lastName = nameParts.slice(1).join(" ") || "Account";
+  const username = localPart.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 32);
+
+  return { firstName, lastName, username };
+};
+
+const getSupportedProfileUpdate = (missingFields: string[], emailAddress: string) => {
+  const profile = getProfileFromEmail(emailAddress);
+  const update: Record<string, string> = {};
+
+  if (missingFields.includes("first_name")) {
+    update.firstName = profile.firstName;
+  }
+
+  if (missingFields.includes("last_name")) {
+    update.lastName = profile.lastName;
+  }
+
+  if (missingFields.includes("username")) {
+    update.username = profile.username;
+  }
+
+  return update;
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "errors" in error &&
+    Array.isArray(error.errors) &&
+    error.errors[0]?.message
+  ) {
+    return error.errors[0].message;
+  }
+
+  return "Something went wrong. Please try again.";
+};
+
+const getVerificationErrorMessage = (error: unknown) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "errors" in error &&
+    Array.isArray(error.errors)
+  ) {
+    const clerkError = error.errors[0];
+    const code = clerkError?.code;
+    const message = clerkError?.message;
+
+    if (
+      typeof code === "string" &&
+      (code.includes("verification") || code.includes("code"))
+    ) {
+      return "Code expired or invalid.";
+    }
+
+    if (
+      typeof message === "string" &&
+      (message.toLowerCase().includes("code") ||
+        message.toLowerCase().includes("expired") ||
+        message.toLowerCase().includes("invalid"))
+    ) {
+      return "Code expired or invalid.";
+    }
+  }
+
+  return getErrorMessage(error);
+};
+
+const isUnknownEmailError = (error: unknown) => {
+  if (
+    typeof error !== "object" ||
+    error === null ||
+    !("errors" in error) ||
+    !Array.isArray(error.errors)
+  ) {
+    return false;
+  }
+
+  const code = error.errors[0]?.code;
+
+  return (
+    typeof code === "string" &&
+    (code.includes("identifier_not_found") ||
+      code.includes("form_identifier_not_found"))
+  );
+};
+
+export default function EmailAuthScreen() {
+  const { isLoaded: isSignInLoaded, signIn, setActive } = useSignIn();
+  const { isLoaded: isSignUpLoaded, signUp } = useSignUp();
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [flow, setFlow] = useState<EmailFlow | null>(null);
+  const [emailAddressId, setEmailAddressId] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [resendSeconds, setResendSeconds] = useState(0);
+  const [error, setError] = useState("");
+  const verifiedCode = useRef("");
+
+  const isLoaded = isSignInLoaded && isSignUpLoaded;
+  const hasSentCode = flow !== null;
+  const isResendDisabled = resendSeconds > 0 || isSending || isVerifying;
+
+  const activateSession = useCallback(async (sessionId: string) => {
+    if (!setActive) {
+      setError("Unable to activate session. Please try again.");
+      return;
+    }
+
+    await setActive({ session: sessionId });
+    router.replace("/(root)/(tabs)");
+  }, [router, setActive]);
+
+  useEffect(() => {
+    if (resendSeconds <= 0) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setResendSeconds((seconds) => Math.max(seconds - 1, 0));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [resendSeconds]);
+
+  const resetCodeInput = () => {
+    setCode("");
+    verifiedCode.current = "";
+  };
+
+  const sendCode = async () => {
+    if (!isLoaded || isSending) {
+      return;
+    }
+
+    setError("");
+    resetCodeInput();
+    setFlow(null);
+    setEmailAddressId("");
+    setIsSending(true);
+    setResendSeconds(0);
+
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: email.trim(),
+      });
+      const emailCodeFactor = signInAttempt.supportedFirstFactors?.find(
+        (factor) => factor.strategy === "email_code",
+      );
+
+      if (!emailCodeFactor || !("emailAddressId" in emailCodeFactor)) {
+        setError("Email code sign-in is not available for this account.");
+        return;
+      }
+
+      await signIn.prepareFirstFactor({
+        strategy: "email_code",
+        emailAddressId: emailCodeFactor.emailAddressId,
+      });
+      setEmailAddressId(emailCodeFactor.emailAddressId);
+      setFlow("sign-in");
+      setResendSeconds(RESEND_COOLDOWN_SECONDS);
+    } catch (err) {
+      if (!isUnknownEmailError(err)) {
+        setError(getErrorMessage(err));
+        return;
+      }
+
+      try {
+        await signUp.create({
+          emailAddress: email.trim(),
+        });
+        await signUp.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
+        setFlow("sign-up");
+        setResendSeconds(RESEND_COOLDOWN_SECONDS);
+      } catch (signUpError) {
+        setError(getErrorMessage(signUpError));
+      }
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const resendCode = async () => {
+    if (!isLoaded || !flow || isResendDisabled) {
+      return;
+    }
+
+    setError("");
+    resetCodeInput();
+    setIsSending(true);
+
+    try {
+      if (flow === "sign-in") {
+        if (!emailAddressId) {
+          setError("Unable to resend code. Please try again.");
+          return;
+        }
+
+        await signIn.prepareFirstFactor({
+          strategy: "email_code",
+          emailAddressId,
+        });
+      } else {
+        await signUp.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
+      }
+
+      setResendSeconds(RESEND_COOLDOWN_SECONDS);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  useEffect(() => {
+    const verifyCode = async () => {
+      if (!isLoaded || !flow || code.trim().length < 6 || isVerifying) {
+        return;
+      }
+
+      const trimmedCode = code.trim();
+
+      if (verifiedCode.current === trimmedCode) {
+        return;
+      }
+
+      verifiedCode.current = trimmedCode;
+      setError("");
+      setIsVerifying(true);
+
+      try {
+        const result =
+          flow === "sign-in"
+            ? await signIn.attemptFirstFactor({
+                strategy: "email_code",
+                code: trimmedCode,
+              })
+            : await signUp.attemptEmailAddressVerification({
+                code: trimmedCode,
+              });
+
+        const sessionId =
+          result.createdSessionId ||
+          (flow === "sign-in"
+            ? signIn.createdSessionId
+            : signUp.createdSessionId);
+
+        if (sessionId) {
+          await activateSession(sessionId);
+          return;
+        }
+
+        if (flow === "sign-up" && result.status === "missing_requirements") {
+          const missingFields = getMissingFields(result);
+          const update = getSupportedProfileUpdate(missingFields, email);
+
+          if (Object.keys(update).length > 0) {
+            const updatedSignUp = await signUp.update(update);
+            const updatedSessionId =
+              updatedSignUp.createdSessionId || signUp.createdSessionId;
+
+            if (updatedSessionId) {
+              await activateSession(updatedSessionId);
+              return;
+            }
+          }
+
+          const remainingFields = getMissingFields(signUp);
+
+          setError(
+            remainingFields.includes("password")
+              ? "Passwordless email sign-up is not enabled in Clerk."
+              : `Missing required field: ${remainingFields
+                  .map(formatMissingField)
+                  .join(", ")}`,
+          );
+          return;
+        }
+
+        setError(
+          result.status === "missing_requirements"
+            ? "Email verified, but this Clerk app requires another sign-up field."
+            : "Verification could not be completed.",
+        );
+      } catch (err) {
+        setError(getVerificationErrorMessage(err));
+      } finally {
+        setIsVerifying(false);
+      }
+    };
+
+    void verifyCode();
+  }, [activateSession, code, email, flow, isLoaded, isVerifying, signIn, signUp]);
+
+  return (
+    <ScrollView
+      className="flex-1 bg-white"
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View className="flex-1 justify-center px-6 py-12">
+        <Text className="text-3xl font-bold text-gray-800 mb-6">
+          Enter your email
+        </Text>
+
+        <TextInput
+          className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4"
+          placeholder="Email address"
+          placeholderTextColor="#9CA3AF"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          editable={!hasSentCode && !isSending && !isVerifying}
+        />
+
+        <TouchableOpacity
+          onPress={hasSentCode ? resendCode : sendCode}
+          disabled={
+            hasSentCode
+              ? isResendDisabled
+              : !email.trim() || isSending || isVerifying
+          }
+          className="w-full bg-blue-600 py-4 rounded-xl items-center mb-6"
+        >
+          {isSending ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-bold text-base">
+              {hasSentCode
+                ? resendSeconds > 0
+                  ? `Resend Code (${resendSeconds}s)`
+                  : "Resend Code"
+                : "Continue"}
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        {hasSentCode ? (
+          <View>
+            <Text className="text-xl font-bold text-gray-800 mb-3">
+              Enter verification code
+            </Text>
+            <TextInput
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4"
+              placeholder="Verification code"
+              placeholderTextColor="#9CA3AF"
+              value={code}
+              onChangeText={setCode}
+              keyboardType="number-pad"
+              autoCapitalize="none"
+              editable={!isVerifying}
+            />
+            {isVerifying ? <ActivityIndicator color="#2563EB" /> : null}
+          </View>
+        ) : null}
+
+        {error ? <Text className="text-red-500 mt-4">{error}</Text> : null}
+      </View>
+    </ScrollView>
+  );
+}
