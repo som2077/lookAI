@@ -1,23 +1,20 @@
-import { useAuth } from "@clerk/clerk-expo";
-import { Href, Redirect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Index() {
-  const { isLoaded, isSignedIn } = useAuth();
+export default function GetStartedScreen() {
   const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
 
-  if (!isLoaded) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator color="#2563EB" />
-      </View>
-    );
-  }
+  const onGetStartedPress = async () => {
+    if (isSaving) {
+      return;
+    }
 
-  if (isSignedIn) {
-    return <Redirect href="/(root)/(tabs)" />;
-  }
+    setIsSaving(true);
+    router.replace("/(root)/(tabs)");
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -27,10 +24,15 @@ export default function Index() {
         </Text>
 
         <TouchableOpacity
-          onPress={() => router.push("/(auth)/sign-in" as Href)}
+          onPress={onGetStartedPress}
+          disabled={isSaving}
           className="w-full bg-blue-600 py-4 rounded-xl items-center"
         >
-          <Text className="text-white font-bold text-base">Get Started</Text>
+          {isSaving ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-bold text-base">Get Started</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
