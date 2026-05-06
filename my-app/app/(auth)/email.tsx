@@ -13,6 +13,7 @@ import {
 type EmailFlow = "sign-in" | "sign-up";
 
 const RESEND_COOLDOWN_SECONDS = 30;
+const VERIFICATION_CODE_LENGTH = 6;
 
 const formatMissingField = (field: string) =>
   field.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -62,6 +63,51 @@ const getSupportedProfileUpdate = (missingFields: string[], emailAddress: string
   }
 
   return update;
+};
+
+const getMissingRequirementsMessage = (missingFields: string[]) => {
+  if (missingFields.length === 0) {
+    return "Email verified, but this Clerk app requires another sign-up field.";
+  }
+
+  if (missingFields.includes("password")) {
+    return "Passwordless email sign-up is not enabled in Clerk.";
+  }
+
+  return `Missing required field: ${missingFields
+    .map(formatMissingField)
+    .join(", ")}`;
+};
+
+const getIncompleteVerificationMessage = (
+  flow: EmailFlow,
+  status: string | null | undefined,
+) => {
+  if (flow === "sign-in") {
+    switch (status) {
+      case "needs_second_factor":
+        return "This account requires a second verification step.";
+      case "needs_new_password":
+        return "This account requires a new password before sign-in can finish.";
+      case "needs_first_factor":
+        return "Code was accepted, but Clerk still needs a first sign-in factor.";
+      case "needs_identifier":
+        return "Please enter your email again and request a new code.";
+      case "complete":
+        return "Sign-in completed, but Clerk did not return a session.";
+      default:
+        return "Verification could not be completed.";
+    }
+  }
+
+  switch (status) {
+    case "abandoned":
+      return "This sign-up attempt expired. Please request a new code.";
+    case "complete":
+      return "Email verified, but Clerk did not return a session.";
+    default:
+      return "Verification could not be completed.";
+  }
 };
 
 const getErrorMessage = (error: unknown) => {
@@ -173,6 +219,12 @@ export default function EmailAuthScreen() {
     verifiedCode.current = "";
   };
 
+  const handleCodeChange = (value: string) => {
+    const nextCode = value.replace(/\D/g, "").slice(0, VERIFICATION_CODE_LENGTH);
+
+    setCode(nextCode);
+  };
+
   const sendCode = async () => {
     if (!isLoaded || isSending) {
       return;
@@ -264,7 +316,12 @@ export default function EmailAuthScreen() {
 
   useEffect(() => {
     const verifyCode = async () => {
-      if (!isLoaded || !flow || code.trim().length < 6 || isVerifying) {
+      if (
+        !isLoaded ||
+        !flow ||
+        code.trim().length < VERIFICATION_CODE_LENGTH ||
+        isVerifying
+      ) {
         return;
       }
 
@@ -313,25 +370,18 @@ export default function EmailAuthScreen() {
               await activateSession(updatedSessionId);
               return;
             }
+
+            if (updatedSignUp.status === "missing_requirements") {
+              setError(getMissingRequirementsMessage(getMissingFields(updatedSignUp)));
+              return;
+            }
           }
 
-          const remainingFields = getMissingFields(signUp);
-
-          setError(
-            remainingFields.includes("password")
-              ? "Passwordless email sign-up is not enabled in Clerk."
-              : `Missing required field: ${remainingFields
-                  .map(formatMissingField)
-                  .join(", ")}`,
-          );
+          setError(getMissingRequirementsMessage(getMissingFields(result)));
           return;
         }
 
-        setError(
-          result.status === "missing_requirements"
-            ? "Email verified, but this Clerk app requires another sign-up field."
-            : "Verification could not be completed.",
-        );
+        setError(getIncompleteVerificationMessage(flow, result.status));
       } catch (err) {
         setError(getVerificationErrorMessage(err));
       } finally {
@@ -397,8 +447,9 @@ export default function EmailAuthScreen() {
               placeholder="Verification code"
               placeholderTextColor="#9CA3AF"
               value={code}
-              onChangeText={setCode}
+              onChangeText={handleCodeChange}
               keyboardType="number-pad"
+              maxLength={VERIFICATION_CODE_LENGTH}
               autoCapitalize="none"
               editable={!isVerifying}
             />
