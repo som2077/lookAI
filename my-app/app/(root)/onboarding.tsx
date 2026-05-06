@@ -25,7 +25,7 @@ const styles = [
   "Smart Casual",
 ];
 
-const onboardingKey = (userId: string) => `onboarding_completed:${userId}`;
+const onboardingKey = (userId: string) => `onboarding_completed_${userId}`;
 
 export default function OnboardingScreen() {
   const { user } = useUser();

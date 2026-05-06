@@ -4,7 +4,7 @@ import { Redirect, Slot, useSegments } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
-const onboardingKey = (userId: string) => `onboarding_completed:${userId}`;
+const onboardingKey = (userId: string) => `onboarding_completed_${userId}`;
 
 export default function RootLayout() {
   const { isSignedIn, isLoaded } = useAuth();
