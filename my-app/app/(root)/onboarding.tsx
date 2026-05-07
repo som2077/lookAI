@@ -56,7 +56,7 @@ export default function OnboardingScreen() {
 
   const onContinue = async () => {
     if (step < 6) {
-      setStep((prev) => prev + 1);
+      setStep((prev: number) => prev + 1);
       return;
     }
 
@@ -71,9 +71,9 @@ export default function OnboardingScreen() {
   };
 
   const toggleStyle = (style: string) => {
-    setStylePreferences((prev) => {
+    setStylePreferences((prev: string[]) => {
       if (prev.includes(style)) {
-        return prev.filter((item) => item !== style);
+        return prev.filter((item: string) => item !== style);
       }
       if (prev.length >= 3) {
         return prev;
