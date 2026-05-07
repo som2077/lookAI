@@ -7,24 +7,36 @@ export default function GetStartedScreen() {
   const router = useRouter();
 
   return (
-    <AppGradientBackground>
-      <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-center px-6">
-          <Text className="text-3xl font-bold text-gray-800 mb-6">Get Started</Text>
+    <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
+      <View className="flex-1 px-6 pb-6 pt-2">
+        <View className="flex-1 items-center justify-center">
+          <Image source={getStartedLogo} className="h-16 w-56" resizeMode="contain" />
 
-          <TouchableOpacity
-            onPress={() => router.push("/(auth)/sign-in" as Href)}
-            className="w-full bg-[#1E1A24] py-4 rounded-xl items-center"
-          >
-            <Text className="text-white font-bold text-base">Get Started</Text>
-          </TouchableOpacity>
+          <Text className="mt-3 text-4xl font-semibold tracking-tight text-[#1D1A27]">Look AI</Text>
 
-          <Text>
-            By continuing, you accept our Terms of Service and acknowledge our Privacy Policy. You can tap
-            them to view details.
+          <Text className="mt-10 text-center text-[44px] font-semibold leading-[52px] tracking-tight text-[#1D1A27]">
+            Not trends. Your style.
+          </Text>
+
+          <Text className="mt-4 text-center text-lg font-medium text-[#5A5566]">
+            Your perfect look, every time.
           </Text>
         </View>
-      </SafeAreaView>
-    </AppGradientBackground>
+
+        <View className="w-full">
+          <TouchableOpacity
+            onPress={() => router.push("/(auth)/sign-in" as Href)}
+            activeOpacity={0.9}
+            className="w-full items-center rounded-2xl bg-[#1E1A24] py-4 shadow-sm"
+          >
+            <Text className="text-base font-semibold text-white">Get Started</Text>
+          </TouchableOpacity>
+
+          <Text className="mt-4 px-3 text-center text-xs leading-5 text-[#6A6574]">
+            By continuing, you accept our Terms of Service and acknowledge our Privacy Policy.
+          </Text>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
