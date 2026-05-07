@@ -9,10 +9,15 @@ const onboardingKey = (userId: string) => `onboarding_completed_${userId}`;
 export default function RootLayout() {
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
-  const segments = useSegments();
-  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
+  const segments: string[] = useSegments();
+  const [onboardingCompleted, setOnboardingCompleted] = useState<
+    boolean | null
+  >(null);
 
-  const isOnboardingRoute = useMemo(() => segments.includes("onboarding"), [segments]);
+  const isOnboardingRoute = useMemo(
+    () => segments.includes("onboarding"),
+    [segments],
+  );
 
   useEffect(() => {
     let isMounted = true;
