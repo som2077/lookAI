@@ -81,13 +81,13 @@ export function CustomTabBar({
     >
       <View className="flex-row items-center justify-between">
         <View
-          className="mr-5 ml-7 h-[62px] flex-1 flex-row items-center justify-between rounded-full bg-[#ffffff] px-4"
+          className="mr-5 ml-7 h-[62px]  border border-[#D8D8D8] flex-1 flex-row opacity-80 items-center justify-between rounded-full bg-[#ffffff] px-4"
           style={{
-            shadowColor: "#000",
-            shadowOpacity: 0.1,
+            shadowColor: "#000000",
+            shadowOpacity: 0.24,
             shadowRadius: 16,
             shadowOffset: { width: 0, height: 8 },
-            elevation: 8,
+            elevation: 23,
           }}
         >
           {state.routes.map((route, index) => {
@@ -140,7 +140,7 @@ export function CustomTabBar({
 
         <Pressable
           onPress={() => navigation.navigate("outfit")}
-          className=" ml-1 mr-6 h-[80px] w-[80px] items-center justify-center rounded-full bg-[#1A1827]"
+          className=" ml-1 mr-6 h-[80px] w-[80px] items-center justify-center  rounded-full bg-[#1A1827]"
           style={{
             shadowColor: "#000",
             shadowOpacity: 0.24,

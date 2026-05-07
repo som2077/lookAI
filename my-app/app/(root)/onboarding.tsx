@@ -13,7 +13,14 @@ import {
 } from "react-native";
 
 const bodyTypes = ["Slim", "Athletic", "Average", "Curvy", "Plus"];
-const skinTones = ["#FDE8D0", "#F8D5B3", "#E9B283", "#C98E63", "#9A603C", "#6E4024"];
+const skinTones = [
+  "#FDE8D0",
+  "#F8D5B3",
+  "#E9B283",
+  "#C98E63",
+  "#9A603C",
+  "#6E4024",
+];
 const styles = [
   "Casual",
   "Streetwear",
@@ -76,18 +83,31 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <ScrollView className="flex-1" contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ padding: 24, flexGrow: 1 }}
+    >
       {step === 1 && (
         <View className="flex-1 items-center justify-center gap-6">
-          <Image source={require("../../assets/images/kribb.png")} className="h-56 w-56 rounded-3xl" resizeMode="cover" />
-          <Text className="text-3xl font-bold text-gray-900">Welcome to LookAI</Text>
-          <Text className="text-base text-gray-500 text-center">Let&apos;s personalize your experience in a few quick steps.</Text>
+          <Image
+            source={require("../../assets/images/kribb.png")}
+            className="h-56 w-56 rounded-3xl"
+            resizeMode="cover"
+          />
+          <Text className="text-3xl font-bold text-gray-900">
+            Welcome to LookAI
+          </Text>
+          <Text className="text-base text-gray-500 text-center">
+            Let&apos;s personalize your experience in a few quick steps.
+          </Text>
         </View>
       )}
 
       {step === 2 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Select your age</Text>
+          <Text className="text-3xl font-bold text-gray-900">
+            Select your age
+          </Text>
           <TextInput
             keyboardType="number-pad"
             placeholder="Enter your age"
@@ -101,7 +121,9 @@ export default function OnboardingScreen() {
 
       {step === 3 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Select your gender</Text>
+          <Text className="text-3xl font-bold text-gray-900">
+            Select your gender
+          </Text>
           {["Male", "Female", "Other"].map((option) => (
             <Pressable
               key={option}
@@ -116,7 +138,9 @@ export default function OnboardingScreen() {
 
       {step === 4 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Select your body type</Text>
+          <Text className="text-3xl font-bold text-gray-900">
+            Select your body type
+          </Text>
           <View className="flex-row flex-wrap gap-3">
             {bodyTypes.map((type, idx) => (
               <Pressable
@@ -125,9 +149,13 @@ export default function OnboardingScreen() {
                 className={`w-[48%] rounded-2xl border p-3 ${bodyType === type ? "border-blue-600" : "border-gray-300"}`}
               >
                 <View className="h-24 items-center justify-center rounded-xl bg-gray-100">
-                  <Text className="text-4xl">{["🧍", "🏃", "🧑", "💃", "🕺"][idx]}</Text>
+                  <Text className="text-4xl">
+                    {["🧍", "🏃", "🧑", "💃", "🕺"][idx]}
+                  </Text>
                 </View>
-                <Text className="mt-2 text-center text-base text-gray-800">{type}</Text>
+                <Text className="mt-2 text-center text-base text-gray-800">
+                  {type}
+                </Text>
               </Pressable>
             ))}
           </View>
@@ -136,7 +164,9 @@ export default function OnboardingScreen() {
 
       {step === 5 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Select your skin tone</Text>
+          <Text className="text-3xl font-bold text-gray-900">
+            Select your skin tone
+          </Text>
           <View className="flex-row flex-wrap gap-3">
             {skinTones.map((tone) => (
               <Pressable
@@ -152,7 +182,9 @@ export default function OnboardingScreen() {
 
       {step === 6 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Style preferences</Text>
+          <Text className="text-3xl font-bold text-gray-900">
+            Style preferences
+          </Text>
           <Text className="text-sm text-gray-500">Choose exactly 3 styles</Text>
           <View className="flex-row flex-wrap gap-3">
             {styles.map((style) => {
@@ -173,8 +205,14 @@ export default function OnboardingScreen() {
 
       {step === 7 && (
         <View className="flex-1 items-center justify-center gap-4">
-          <Text className="text-2xl font-semibold text-gray-900">Setting up your account...</Text>
-          <ActivityIndicator size="large" color="#2563EB" animating={isFinishing} />
+          <Text className="text-2xl font-semibold text-gray-900">
+            Setting up your account...
+          </Text>
+          <ActivityIndicator
+            size="large"
+            color="#2563EB"
+            animating={isFinishing}
+          />
         </View>
       )}
 
