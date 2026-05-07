@@ -53,7 +53,7 @@ export default function RootLayout() {
 
   if (onboardingCompleted === null) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View className="flex-1 items-center justify-center bg-transparent">
         <ActivityIndicator color="#2563EB" />
       </View>
     );

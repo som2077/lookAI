@@ -76,7 +76,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white" contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
+    <ScrollView className="flex-1" contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
       {step === 1 && (
         <View className="flex-1 items-center justify-center gap-6">
           <Image source={require("../../assets/images/kribb.png")} className="h-56 w-56 rounded-3xl" resizeMode="cover" />
