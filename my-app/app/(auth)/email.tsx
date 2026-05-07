@@ -208,7 +208,7 @@ export default function EmailAuthScreen() {
     }
 
     const timer = setTimeout(() => {
-      setResendSeconds((seconds) => Math.max(seconds - 1, 0));
+      setResendSeconds((seconds: number) => Math.max(seconds - 1, 0));
     }, 1000);
 
     return () => clearTimeout(timer);
@@ -242,7 +242,7 @@ export default function EmailAuthScreen() {
         identifier: email.trim(),
       });
       const emailCodeFactor = signInAttempt.supportedFirstFactors?.find(
-        (factor) => factor.strategy === "email_code",
+        (factor: { strategy?: string; emailAddressId?: string }) => factor.strategy === "email_code",
       );
 
       if (!emailCodeFactor || !("emailAddressId" in emailCodeFactor)) {
