@@ -15,13 +15,24 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Search */}
+      {/* Wardrobe */}
       <Tabs.Screen
-        name="search"
+        name="wardrobe"
         options={{
-          title: "Search",
+          title: "Wardrobe",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
+          ),
+        }}
+      />
+
+      {/* Outfit */}
+      <Tabs.Screen
+        name="outfit"
+        options={{
+          title: "Outfit",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="bookmark" size={size} color={color} />
           ),
         }}
       />
@@ -32,7 +43,7 @@ export default function TabLayout() {
         options={{
           title: "Saved",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bookmark" size={size} color={color} />
+            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />
@@ -48,5 +59,6 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    
   );
 }

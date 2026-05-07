@@ -1,11 +1,11 @@
-import { Text } from "@react-navigation/elements";
+import { Text } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ProfileScreen() {
+export default function WardrobeScreen() {
   return (
     <SafeAreaView>
-      <Text>ProfileScreen</Text>
+      <Text>WardrobeScreen</Text>
     </SafeAreaView>
   );
 }
