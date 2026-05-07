@@ -1,11 +1,9 @@
 import { useAuth } from "@clerk/clerk-expo";
-import { Href, Redirect, useRouter } from "expo-router";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Redirect } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
   const { isLoaded, isSignedIn } = useAuth();
-  const router = useRouter();
 
   if (!isLoaded) {
     return (
@@ -19,20 +17,5 @@ export default function Index() {
     return <Redirect href="/(root)/(tabs)" />;
   }
 
-  return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-3xl font-bold text-gray-800 mb-6">
-          Get Started
-        </Text>
-
-        <TouchableOpacity
-          onPress={() => router.push("/(auth)/sign-in" as Href)}
-          className="w-full bg-blue-600 py-4 rounded-xl items-center"
-        >
-          <Text className="text-white font-bold text-base">Get Started</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
+  return <Redirect href="/get-started" />;
 }

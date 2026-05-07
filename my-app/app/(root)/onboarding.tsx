@@ -49,7 +49,7 @@ export default function OnboardingScreen() {
 
   const onContinue = async () => {
     if (step < 6) {
-      setStep((prev) => prev + 1);
+      setStep((prev: number) => prev + 1);
       return;
     }
 
@@ -64,9 +64,9 @@ export default function OnboardingScreen() {
   };
 
   const toggleStyle = (style: string) => {
-    setStylePreferences((prev) => {
+    setStylePreferences((prev: string[]) => {
       if (prev.includes(style)) {
-        return prev.filter((item) => item !== style);
+        return prev.filter((item: string) => item !== style);
       }
       if (prev.length >= 3) {
         return prev;
@@ -76,7 +76,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white" contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
+    <ScrollView className="flex-1" contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
       {step === 1 && (
         <View className="flex-1 items-center justify-center gap-6">
           <Image source={require("../../assets/images/kribb.png")} className="h-56 w-56 rounded-3xl" resizeMode="cover" />
