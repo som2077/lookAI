@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+// import { AppGradientBackground } from "@/components/ui/AppGradientBackground";
 
 export default function GetStartedScreen() {
   const router = useRouter();
@@ -17,7 +18,8 @@ export default function GetStartedScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    // <AppGradientBackground>
+    <SafeAreaView className="flex-1 ">
       <View className="flex-1 items-center justify-center px-6">
         <Text className="text-3xl font-bold text-gray-800 mb-6">
           Get Started
@@ -26,7 +28,7 @@ export default function GetStartedScreen() {
         <TouchableOpacity
           onPress={onGetStartedPress}
           disabled={isSaving}
-          className="w-full bg-blue-600 py-4 rounded-xl items-center"
+          className="w-full bg-red-900 py-4 rounded-xl items-center"
         >
           {isSaving ? (
             <ActivityIndicator color="white" />
@@ -36,5 +38,6 @@ export default function GetStartedScreen() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    // </AppGradientBackground>
   );
 }

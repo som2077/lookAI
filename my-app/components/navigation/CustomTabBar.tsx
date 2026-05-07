@@ -15,15 +15,35 @@ const TAB_CONFIG: TabConfig = {
   profile: "person",
 };
 
-function AnimatedTabButton({ focused, onPress, children, testID }: { focused: boolean; onPress: () => void; children: ReactNode; testID?: string }) {
+function AnimatedTabButton({
+  focused,
+  onPress,
+  children,
+  testID,
+}: {
+  focused: boolean;
+  onPress: () => void;
+  children: ReactNode;
+  testID?: string;
+}) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const animateIn = () => {
-    Animated.spring(scale, { toValue: focused ? 1.03 : 0.95, useNativeDriver: true, speed: 24, bounciness: 7 }).start();
+    Animated.spring(scale, {
+      toValue: focused ? 1.03 : 0.95,
+      useNativeDriver: true,
+      speed: 24,
+      bounciness: 7,
+    }).start();
   };
 
   const animateOut = () => {
-    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 24, bounciness: 5 }).start();
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 24,
+      bounciness: 5,
+    }).start();
   };
 
   return (
@@ -42,22 +62,43 @@ function AnimatedTabButton({ focused, onPress, children, testID }: { focused: bo
   );
 }
 
-export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+export function CustomTabBar({
+  state,
+  descriptors,
+  navigation,
+}: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottom = useMemo(() => Math.max(16, insets.bottom + 8), [insets.bottom]);
+  const bottom = useMemo(
+    () => Math.max(16, insets.bottom + 8),
+    [insets.bottom],
+  );
 
   return (
-    <View pointerEvents="box-none" className="absolute inset-x-0 px-3" style={{ bottom }}>
+    <View
+      pointerEvents="box-none"
+      className="absolute inset-x-0 px-3"
+      style={{ bottom }}
+    >
       <View className="flex-row items-center justify-between">
         <View
-          className="mr-5 h-[62px] flex-1 flex-row items-center justify-between rounded-full bg-[#F5F5F5] px-4"
-          style={{ shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 }}
+          className="mr-5 ml-7 h-[62px]  border border-[#D8D8D8] flex-1 flex-row opacity-80 items-center justify-between rounded-full bg-[#ffffff] px-4"
+          style={{
+            shadowColor: "#000000",
+            shadowOpacity: 0.24,
+            shadowRadius: 16,
+            shadowOffset: { width: 0, height: 8 },
+            elevation: 23,
+          }}
         >
-          {state.routes.map((route: (typeof state.routes)[number], index: number) => {
+          {state.routes.map((route, index) => {
             const focused = state.index === index;
             const options = descriptors[route.key]?.options;
             const onPress = () => {
-              const event = navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
+              const event = navigation.emit({
+                type: "tabPress",
+                target: route.key,
+                canPreventDefault: true,
+              });
               if (!focused && !event.defaultPrevented) {
                 navigation.navigate(route.name, route.params);
               }
@@ -65,9 +106,18 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
             if (route.name === "profile") {
               return (
-                <AnimatedTabButton key={route.key} focused={focused} onPress={onPress} testID={options.tabBarButtonTestID}>
+                <AnimatedTabButton
+                  key={route.key}
+                  focused={focused}
+                  onPress={onPress}
+                  testID={options.tabBarButtonTestID}
+                >
                   <View className="h-9 w-9 items-center justify-center rounded-full bg-[#141221]">
-                    <Image source={require("../../assets/images/kribb.png")} className="h-8 w-8 rounded-full" resizeMode="cover" />
+                    <Image
+                      source={require("../../assets/images/kribb.png")}
+                      className="h-8 w-8 rounded-full"
+                      resizeMode="cover"
+                    />
                   </View>
                 </AnimatedTabButton>
               );
@@ -76,7 +126,12 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
             const icon = TAB_CONFIG[route.name] ?? "ellipse-outline";
             const iconColor = focused ? "#161421" : "#5E5D67";
             return (
-              <AnimatedTabButton key={route.key} focused={focused} onPress={onPress} testID={options.tabBarButtonTestID}>
+              <AnimatedTabButton
+                key={route.key}
+                focused={focused}
+                onPress={onPress}
+                testID={options.tabBarButtonTestID}
+              >
                 <Ionicons name={icon} size={22} color={iconColor} />
               </AnimatedTabButton>
             );
@@ -85,8 +140,14 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
         <Pressable
           onPress={() => navigation.navigate("outfit")}
-          className="h-[82px] w-[82px] items-center justify-center rounded-full bg-[#1A1827]"
-          style={{ shadowColor: "#000", shadowOpacity: 0.24, shadowRadius: 16, shadowOffset: { width: 0, height: 10 }, elevation: 10 }}
+          className=" ml-1 mr-6 h-[80px] w-[80px] items-center justify-center  rounded-full bg-[#1A1827]"
+          style={{
+            shadowColor: "#000",
+            shadowOpacity: 0.24,
+            shadowRadius: 16,
+            shadowOffset: { width: 0, height: 10 },
+            elevation: 10,
+          }}
         >
           <Ionicons name="add" size={40} color="#FFFFFF" />
         </Pressable>
