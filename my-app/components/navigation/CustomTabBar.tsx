@@ -18,21 +18,11 @@ function AnimatedTabButton({ focused, onPress, children, testID }: { focused: bo
   const scale = useRef(new Animated.Value(1)).current;
 
   const animateIn = () => {
-    Animated.spring(scale, {
-      toValue: focused ? 1.03 : 0.95,
-      useNativeDriver: true,
-      speed: 26,
-      bounciness: 8,
-    }).start();
+    Animated.spring(scale, { toValue: focused ? 1.03 : 0.95, useNativeDriver: true, speed: 24, bounciness: 7 }).start();
   };
 
   const animateOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 26,
-      bounciness: 6,
-    }).start();
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 24, bounciness: 5 }).start();
   };
 
   return (
@@ -42,8 +32,8 @@ function AnimatedTabButton({ focused, onPress, children, testID }: { focused: bo
         onPress={onPress}
         onPressIn={animateIn}
         onPressOut={animateOut}
-        android_ripple={{ color: "#E5E5E5", borderless: true }}
-        className="h-12 w-12 items-center justify-center"
+        android_ripple={{ color: "#E9E9E9", borderless: true }}
+        className="h-11 w-11 items-center justify-center"
       >
         {children}
       </Pressable>
@@ -53,14 +43,14 @@ function AnimatedTabButton({ focused, onPress, children, testID }: { focused: bo
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottom = useMemo(() => Math.max(14, insets.bottom + 6), [insets.bottom]);
+  const bottom = useMemo(() => Math.max(16, insets.bottom + 8), [insets.bottom]);
 
   return (
-    <View pointerEvents="box-none" className="absolute inset-x-0 px-2" style={{ bottom }}>
-      <View className="flex-row items-end justify-between">
+    <View pointerEvents="box-none" className="absolute inset-x-0 px-3" style={{ bottom }}>
+      <View className="flex-row items-center justify-between">
         <View
-          className="mr-4 flex-1 flex-row items-center justify-between rounded-full bg-[#F5F5F5] px-4 py-3"
-          style={{ shadowColor: "#000", shadowOpacity: 0.09, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 7 }}
+          className="mr-5 h-[62px] flex-1 flex-row items-center justify-between rounded-full bg-[#F5F5F5] px-4"
+          style={{ shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 }}
         >
           {state.routes.map((route, index) => {
             const focused = state.index === index;
@@ -75,7 +65,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
             if (route.name === "profile") {
               return (
                 <AnimatedTabButton key={route.key} focused={focused} onPress={onPress} testID={options.tabBarButtonTestID}>
-                  <View className="h-9 w-9 items-center justify-center rounded-full bg-[#161222]">
+                  <View className="h-9 w-9 items-center justify-center rounded-full bg-[#141221]">
                     <Image source={require("../../assets/images/kribb.png")} className="h-8 w-8 rounded-full" resizeMode="cover" />
                   </View>
                 </AnimatedTabButton>
@@ -83,11 +73,10 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
             }
 
             const icon = TAB_CONFIG[route.name] ?? "ellipse-outline";
-            const iconColor = focused ? "#171421" : "#5B5A64";
-
+            const iconColor = focused ? "#161421" : "#5E5D67";
             return (
               <AnimatedTabButton key={route.key} focused={focused} onPress={onPress} testID={options.tabBarButtonTestID}>
-                <Ionicons name={icon} size={23} color={iconColor} />
+                <Ionicons name={icon} size={22} color={iconColor} />
               </AnimatedTabButton>
             );
           })}
@@ -95,10 +84,10 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
         <Pressable
           onPress={() => navigation.navigate("outfit")}
-          className="h-[76px] w-[76px] items-center justify-center rounded-full bg-[#1A1827]"
-          style={{ shadowColor: "#000", shadowOpacity: 0.22, shadowRadius: 16, shadowOffset: { width: 0, height: 10 }, elevation: 10 }}
+          className="h-[82px] w-[82px] items-center justify-center rounded-full bg-[#1A1827]"
+          style={{ shadowColor: "#000", shadowOpacity: 0.24, shadowRadius: 16, shadowOffset: { width: 0, height: 10 }, elevation: 10 }}
         >
-          <Ionicons name="add" size={38} color="#FFFFFF" />
+          <Ionicons name="add" size={40} color="#FFFFFF" />
         </Pressable>
       </View>
     </View>
