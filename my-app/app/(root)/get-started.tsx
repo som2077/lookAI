@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+// import { AppGradientBackground } from "@/components/ui/AppGradientBackground";
 
 const getStartedLogo = require("../../assets/images/kribb.png");
 
@@ -23,30 +24,27 @@ export default function GetStartedScreen() {
 
             <Text className="mt-3 text-[52px] font-semibold tracking-tight text-[#1D1A27]">Look AI</Text>
 
-            <Text className="mt-28 text-center text-[52px] font-semibold leading-[56px] tracking-tight text-[#8A8791]">
-              Not trends. Your style.
-            </Text>
+  return (
+    // <AppGradientBackground>
+    <SafeAreaView className="flex-1 ">
+      <View className="flex-1 items-center justify-center px-6">
+        <Text className="text-3xl font-bold text-gray-800 mb-6">
+          Get Started
+        </Text>
 
-            <Text className="mt-4 text-center text-[38px] font-semibold tracking-tight text-[#1D1A27]">
-              Your perfect look, every time.
-            </Text>
-          </View>
-
-          <View className="gap-6">
-            <TouchableOpacity
-              onPress={() => router.replace("/(auth)/sign-in")}
-              activeOpacity={0.9}
-              className="w-full items-center rounded-2xl bg-[#1A1827] py-5 shadow-sm"
-            >
-              <Text className="text-2xl font-semibold text-white">Get Started</Text>
-            </TouchableOpacity>
-
-            <Text className="text-center text-sm leading-5 text-[#4A4754]">
-              By continuing, you accept our <Text className="font-semibold">Terms of Service</Text> and acknowledge our <Text className="font-semibold">Privacy Policy</Text>. You can tap them to view details.
-            </Text>
-          </View>
-        </View>
-      </SafeAreaView>
-    </LinearGradient>
+        <TouchableOpacity
+          onPress={onGetStartedPress}
+          disabled={isSaving}
+          className="w-full bg-red-900 py-4 rounded-xl items-center"
+        >
+          {isSaving ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-bold text-base">Get Started</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+    // </AppGradientBackground>
   );
 }
