@@ -80,7 +80,7 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-transparent">
       <View className="flex-1 justify-center px-6 py-12">
         <Image
           source={require("../../assets/images/kribb.png")}
@@ -100,7 +100,7 @@ export default function SignIn() {
         <TouchableOpacity
           onPress={onGooglePress}
           disabled={isLoading}
-          className="w-full border border-gray-300 bg-white py-4 rounded-xl items-center"
+          className="w-full border border-white/60 bg-white/70 py-4 rounded-2xl items-center"
         >
           {isLoading ? (
             <ActivityIndicator color="#2563EB" />
@@ -114,7 +114,7 @@ export default function SignIn() {
         <TouchableOpacity
           onPress={() => router.push("/(auth)/email" as Href)}
           disabled={isLoading}
-          className="w-full bg-blue-600 py-4 rounded-xl items-center mt-3"
+          className="w-full bg-[#1A1827] py-4 rounded-2xl items-center mt-3"
         >
           <Text className="text-white font-bold text-base">
             Continue with Email
