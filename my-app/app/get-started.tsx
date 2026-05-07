@@ -1,8 +1,7 @@
 import { Href, useRouter } from "expo-router";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const getStartedLogo = require("../assets/images/getStartedLogo.png");
+import { AppGradientBackground } from "../components/ui/AppGradientBackground";
 
 export default function GetStartedScreen() {
   const router = useRouter();
