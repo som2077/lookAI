@@ -46,7 +46,10 @@ const getProfileFromEmail = (emailAddress: string) => {
   return { firstName, lastName, username };
 };
 
-const getSupportedProfileUpdate = (missingFields: string[], emailAddress: string) => {
+const getSupportedProfileUpdate = (
+  missingFields: string[],
+  emailAddress: string,
+) => {
   const profile = getProfileFromEmail(emailAddress);
   const update: Record<string, string> = {};
 
@@ -192,15 +195,18 @@ export default function EmailAuthScreen() {
   const hasSentCode = flow !== null;
   const isResendDisabled = resendSeconds > 0 || isSending || isVerifying;
 
-  const activateSession = useCallback(async (sessionId: string) => {
-    if (!setActive) {
-      setError("Unable to activate session. Please try again.");
-      return;
-    }
+  const activateSession = useCallback(
+    async (sessionId: string) => {
+      if (!setActive) {
+        setError("Unable to activate session. Please try again.");
+        return;
+      }
 
-    await setActive({ session: sessionId });
-    router.replace("/(root)/(tabs)");
-  }, [router, setActive]);
+      await setActive({ session: sessionId });
+      router.replace("/(root)/(tabs)");
+    },
+    [router, setActive],
+  );
 
   useEffect(() => {
     if (resendSeconds <= 0) {
@@ -220,7 +226,9 @@ export default function EmailAuthScreen() {
   };
 
   const handleCodeChange = (value: string) => {
-    const nextCode = value.replace(/\D/g, "").slice(0, VERIFICATION_CODE_LENGTH);
+    const nextCode = value
+      .replace(/\D/g, "")
+      .slice(0, VERIFICATION_CODE_LENGTH);
 
     setCode(nextCode);
   };
@@ -242,7 +250,8 @@ export default function EmailAuthScreen() {
         identifier: email.trim(),
       });
       const emailCodeFactor = signInAttempt.supportedFirstFactors?.find(
-        (factor: { strategy?: string; emailAddressId?: string }) => factor.strategy === "email_code",
+        (factor: { strategy?: string; emailAddressId?: string }) =>
+          factor.strategy === "email_code",
       );
 
       if (!emailCodeFactor || !("emailAddressId" in emailCodeFactor)) {
@@ -372,7 +381,9 @@ export default function EmailAuthScreen() {
             }
 
             if (updatedSignUp.status === "missing_requirements") {
-              setError(getMissingRequirementsMessage(getMissingFields(updatedSignUp)));
+              setError(
+                getMissingRequirementsMessage(getMissingFields(updatedSignUp)),
+              );
               return;
             }
           }
@@ -390,7 +401,16 @@ export default function EmailAuthScreen() {
     };
 
     void verifyCode();
-  }, [activateSession, code, email, flow, isLoaded, isVerifying, signIn, signUp]);
+  }, [
+    activateSession,
+    code,
+    email,
+    flow,
+    isLoaded,
+    isVerifying,
+    signIn,
+    signUp,
+  ]);
 
   return (
     <ScrollView
