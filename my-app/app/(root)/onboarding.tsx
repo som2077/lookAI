@@ -12,6 +12,7 @@ import {
   View,
   ViewToken,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const bodyTypes = ["Slim", "Athletic", "Average", "Curvy", "Plus"];
 const skinTones = ["#FDE8D0", "#F8D5B3", "#E9B283", "#C98E63", "#9A603C", "#6E4024"];
@@ -48,7 +49,7 @@ export default function OnboardingScreen() {
 
   const canContinue = useMemo(() => {
     if (step === 1) return true;
-    if (step === 2) return age > 0;
+    if (step === 2) return !!age;
     if (step === 3) return !!gender;
     if (step === 4) return !!bodyType;
     if (step === 5) return !!skinTone;
@@ -58,17 +59,13 @@ export default function OnboardingScreen() {
 
   const onContinue = async () => {
     if (step < 6) {
-      setStep((prev: number) => prev + 1);
+      setStep((p) => p + 1);
       return;
     }
-
     setStep(7);
     setIsFinishing(true);
-
-    if (user?.id) {
+    if (user?.id)
       await SecureStore.setItemAsync(onboardingKey(user.id), "true");
-    }
-
     router.replace("/(root)/(tabs)");
   };
 
@@ -216,11 +213,10 @@ export default function OnboardingScreen() {
                 <Pressable key={style} onPress={() => toggleStyle(style)} className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}>
                   <Text className="text-base text-gray-800">{style}</Text>
                 </Pressable>
-              );
-            })}
+              ))}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
       {step === 7 && (
         <View className="flex-1 items-center justify-center gap-4">
