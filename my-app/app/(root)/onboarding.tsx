@@ -13,6 +13,7 @@ import {
   View,
   ViewToken,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const bodyTypes = ["Slim", "Athletic", "Average", "Curvy", "Plus"];
 const skinTones = ["#FDE8D0", "#F8D5B3", "#E9B283", "#C98E63", "#9A603C", "#6E4024"];
@@ -74,12 +75,17 @@ export default function OnboardingScreen() {
 
     setStep(8);
     setIsFinishing(true);
-
-    if (user?.id) {
+    if (user?.id)
       await SecureStore.setItemAsync(onboardingKey(user.id), "true");
+    router.replace("/(root)/(tabs)");
+  };
+
+  const onBack = () => {
+    if (step <= 1) {
+      return;
     }
 
-    router.replace("/(root)/(tabs)");
+    setStep((prev) => prev - 1);
   };
 
   const onBack = () => {
