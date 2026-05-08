@@ -120,19 +120,40 @@ export default function OnboardingScreen() {
       )}
 
       {step === 3 && (
-        <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">
-            Select your gender
+        <View className="flex-1">
+          <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">
+            Choose your Gender
           </Text>
-          {["Male", "Female", "Other"].map((option) => (
-            <Pressable
-              key={option}
-              onPress={() => setGender(option as "Male" | "Female" | "Other")}
-              className={`rounded-xl border px-4 py-4 ${gender === option ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}
-            >
-              <Text className="text-lg text-gray-800">{option}</Text>
-            </Pressable>
-          ))}
+          <Text className="mt-3 text-xl text-[#5A5566]">
+            This will be used to calibrate your custom plan
+          </Text>
+
+          <View className="mt-16 items-center gap-8">
+            {[
+              { label: "Male", icon: "♂", bg: "#1E1A27", iconColor: "#FFFFFF" },
+              { label: "Female", icon: "♀", bg: "#DCE754", iconColor: "#1E1A27" },
+              { label: "Other", icon: "⚥", bg: "#5E59E6", iconColor: "#FFFFFF" },
+            ].map((option) => {
+              const selected = gender === option.label;
+              return (
+                <Pressable
+                  key={option.label}
+                  onPress={() => setGender(option.label as "Male" | "Female" | "Other")}
+                  className="items-center"
+                >
+                  <View
+                    className={`h-28 w-28 items-center justify-center rounded-full border-4 ${selected ? "border-[#1D1A27]" : "border-transparent"}`}
+                    style={{ backgroundColor: option.bg }}
+                  >
+                    <Text className="text-6xl font-semibold" style={{ color: option.iconColor }}>
+                      {option.icon}
+                    </Text>
+                  </View>
+                  <Text className="mt-2 text-base font-semibold text-[#1D1A27]">{option.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
       )}
 
@@ -220,7 +241,7 @@ export default function OnboardingScreen() {
         <Pressable
           onPress={onContinue}
           disabled={!canContinue}
-          className={`mt-auto rounded-xl py-4 items-center ${canContinue ? "bg-blue-600" : "bg-gray-300"}`}
+          className={`mt-auto items-center rounded-2xl py-4 ${canContinue ? "bg-[#1A1827]" : "bg-gray-300"}`}
         >
           <Text className="text-white font-semibold text-base">Continue</Text>
         </Pressable>
