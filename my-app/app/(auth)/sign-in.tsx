@@ -3,14 +3,7 @@ import { useSSO } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Image, Platform, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -57,11 +50,10 @@ export default function SignIn() {
     setError("");
 
     try {
-      const { createdSessionId, setActive, authSessionResult } =
-        await startSSOFlow({
-          strategy: "oauth_google",
-          redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
-        });
+      const { createdSessionId, setActive, authSessionResult } = await startSSOFlow({
+        strategy: "oauth_google",
+        redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
+      });
 
       if (authSessionResult?.type === "cancel") {
         return;
