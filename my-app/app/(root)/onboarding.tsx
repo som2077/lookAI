@@ -8,6 +8,7 @@ import {
   FlatList,
   Image,
   Pressable,
+  SafeAreaView,
   Text,
   View,
   ViewToken,
@@ -49,7 +50,7 @@ export default function OnboardingScreen() {
 
   const canContinue = useMemo(() => {
     if (step === 1) return true;
-    if (step === 2) return !!age;
+    if (step === 2) return age > 0;
     if (step === 3) return !!gender;
     if (step === 4) return !!bodyType;
     if (step === 5) return !!skinTone;
@@ -67,6 +68,14 @@ export default function OnboardingScreen() {
     if (user?.id)
       await SecureStore.setItemAsync(onboardingKey(user.id), "true");
     router.replace("/(root)/(tabs)");
+  };
+
+  const onBack = () => {
+    if (step <= 1) {
+      return;
+    }
+
+    setStep((prev) => prev - 1);
   };
 
   const toggleStyle = (style: string) => {
@@ -87,8 +96,13 @@ export default function OnboardingScreen() {
   ).current;
 
   return (
-    <SafeAreaView className="flex-1">
-    <View className="flex-1 px-6 py-6">
+    <SafeAreaView className="flex-1 bg-transparent">
+      <View className="flex-1 px-6 pb-6 pt-2">
+      {step >= 2 && step < 7 && (
+        <Pressable onPress={onBack} className="mb-3 h-9 w-9 items-start justify-center">
+          <Text className="text-3xl text-[#1D1A27]">‹</Text>
+        </Pressable>
+      )}
       {step === 1 && (
         <View className="flex-1 items-center justify-center gap-6">
           <Image source={require("../../assets/images/kribb.png")} className="h-56 w-56 rounded-3xl" resizeMode="cover" />
@@ -204,27 +218,21 @@ export default function OnboardingScreen() {
       )}
 
       {step === 6 && (
-  <View className="flex-1 gap-5">
-    <Text className="text-3xl font-bold text-gray-900">Style preferences</Text>
-    <Text className="text-sm text-gray-500">Choose exactly 3 styles</Text>
-    <View className="flex-row flex-wrap gap-3">
-      {styles.map((style) => {
-        const selected = stylePreferences.includes(style);
-        return (
-          <Pressable
-            key={style}
-            onPress={() => toggleStyle(style)}
-            className={`rounded-full border px-4 py-3 ${
-              selected ? "border-blue-600 bg-blue-50" : "border-gray-300"
-            }`}
-          >
-            <Text className="text-base text-gray-800">{style}</Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  </View>
-)}
+        <View className="flex-1 gap-5">
+          <Text className="text-3xl font-bold text-gray-900">Style preferences</Text>
+          <Text className="text-sm text-gray-500">Choose exactly 3 styles</Text>
+          <View className="flex-row flex-wrap gap-3">
+            {styles.map((style) => {
+              const selected = stylePreferences.includes(style);
+              return (
+                <Pressable key={style} onPress={() => toggleStyle(style)} className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}>
+                  <Text className="text-base text-gray-800">{style}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      )}
 
       {step === 7 && (
         <View className="flex-1 items-center justify-center gap-4">
@@ -242,7 +250,7 @@ export default function OnboardingScreen() {
           <Text className="text-white font-semibold text-base">Continue</Text>
         </Pressable>
       )}
-    </View>
+      </View>
     </SafeAreaView>
   );
 }
