@@ -8,7 +8,7 @@ import {
   FlatList,
   Image,
   Pressable,
-  SafeAreaView,
+  // SafeAreaView,
   Text,
   View,
   ViewToken,
