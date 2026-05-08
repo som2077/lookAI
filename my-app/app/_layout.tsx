@@ -2,7 +2,7 @@ import "../global.css";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { Slot } from "expo-router";
-import { AppGradientBackground } from "../components/ui/AppGradientBackground";
+// import { AppGradientBackground } from "../components/ui/AppGradientBackground";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -13,9 +13,9 @@ if (!publishableKey) {
 export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <AppGradientBackground>
+      {/* <AppGradientBackground> */}
         <Slot />
-      </AppGradientBackground>
+      {/* </AppGradientBackground> */}
     </ClerkProvider>
   );
 }

@@ -3,7 +3,14 @@ import { useSSO } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -50,10 +57,11 @@ export default function SignIn() {
     setError("");
 
     try {
-      const { createdSessionId, setActive, authSessionResult } = await startSSOFlow({
-        strategy: "oauth_google",
-        redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
-      });
+      const { createdSessionId, setActive, authSessionResult } =
+        await startSSOFlow({
+          strategy: "oauth_google",
+          redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
+        });
 
       if (authSessionResult?.type === "cancel") {
         return;
@@ -75,25 +83,33 @@ export default function SignIn() {
 
   return (
     <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-      <View className="flex-1 px-5 py-6">
+      <View className="flex-1 px-8 py-6">
         <View className="flex-1 justify-center">
-          <Image source={getStartedLogo} className="mb-16 h-16 w-52 self-center" resizeMode="contain" />
+          <Image
+            source={getStartedLogo}
+            className="mb-16 h-36 self-center"
+            resizeMode="contain"
+          />
 
-          <Text className="text-[48px] font-semibold tracking-tight text-[#1D1A27] self-center">Look AI</Text>
-
-          <Text className="mt-16 text-[46px] font-semibold leading-[54px] tracking-tight text-[#1D1A27]">
+          <Text className="mt-16 text-[40px] font-bold leading-[50px] bg-red-300 tracking-[-5.60px] text-[#1D1A27]">
             Welcome to Look AI 👋🏻
           </Text>
 
-          <Text className="mt-4 text-[30px] leading-[38px] text-[#4D4858]">
+          <Text className="mt-4 text-[38px] leading-[38px] text-[#4D4858]">
             Your personal AI stylist that helps you choose perfect outfits.
           </Text>
 
-          <Text className="mt-2 text-[30px] leading-[38px] text-[#4D4858]">Dress smart. Feel confident.</Text>
+          <Text className="mt-2 text-[30px] leading-[38px] text-[#4D4858]">
+            Dress smart. Feel confident.
+          </Text>
         </View>
 
         <View>
-          {error ? <Text className="mb-3 text-center text-sm text-red-500">{error}</Text> : null}
+          {error ? (
+            <Text className="mb-3 text-center text-sm text-red-500">
+              {error}
+            </Text>
+          ) : null}
 
           <TouchableOpacity
             onPress={onGooglePress}
@@ -103,7 +119,9 @@ export default function SignIn() {
             {isLoading ? (
               <ActivityIndicator color="#2563EB" />
             ) : (
-              <Text className="text-lg font-medium text-[#1D1A27]">🌈 Continue with Google</Text>
+              <Text className="text-lg font-medium text-[#1D1A27]">
+                 Continue with Google
+              </Text>
             )}
           </TouchableOpacity>
 
@@ -112,12 +130,17 @@ export default function SignIn() {
             disabled={isLoading}
             className="mt-3 w-full items-center rounded-2xl bg-[#1A1827] py-4"
           >
-            <Text className="text-lg font-medium text-white">Continue with Email</Text>
+            <Text className="text-lg font-medium text-white">
+              Continue with Email
+            </Text>
           </TouchableOpacity>
 
-          <Text className="mt-8 px-2 text-center text-xs leading-5 text-[#6A6574]">
-            By continuing, you accept our Terms of Service and acknowledge our Privacy Policy. You can tap
-            them to view details.
+          <Text className="mt-4 px-1 text-center font-semibold text-sm leading-5 text-[#191919]">
+            By continuing, you accept our{" "}
+            <Text className="underline font-black ">Terms of Service</Text> and
+            acknowledge our{" "}
+            <Text className="underline font-black ">Privacy Policy</Text>. You
+            can tap them to view details.
           </Text>
         </View>
       </View>

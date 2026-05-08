@@ -8,28 +8,28 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const bodyTypes = ["Slim", "Athletic", "Average", "Curvy", "Plus"];
 const skinTones = [
-  "#FDE8D0",
-  "#F8D5B3",
-  "#E9B283",
-  "#C98E63",
-  "#9A603C",
-  "#6E4024",
+  "#FDE8D0", "#F8D5B3", "#E9B283",
+  "#C98E63", "#9A603C", "#6E4024",
 ];
 const styles = [
-  "Casual",
-  "Streetwear",
-  "Minimal",
-  "Sporty",
-  "Formal",
-  "Vintage",
-  "Bohemian",
-  "Smart Casual",
+  "Casual", "Streetwear", "Minimal", "Sporty",
+  "Formal", "Vintage", "Bohemian", "Smart Casual",
+];
+
+const AGE_RANGES = [
+  "Under 20",
+  "20s",
+  "30s",
+  "40s",
+  "50s",
+  "60s",
+  "70 and Above",
 ];
 
 const onboardingKey = (userId: string) => `onboarding_completed_${userId}`;
@@ -46,7 +46,7 @@ export default function OnboardingScreen() {
 
   const canContinue = useMemo(() => {
     if (step === 1) return true;
-    if (step === 2) return Number(age) > 0;
+    if (step === 2) return !!age;
     if (step === 3) return !!gender;
     if (step === 4) return !!bodyType;
     if (step === 5) return !!skinTone;
@@ -55,48 +55,35 @@ export default function OnboardingScreen() {
   }, [step, age, gender, bodyType, skinTone, stylePreferences.length]);
 
   const onContinue = async () => {
-    if (step < 6) {
-      setStep((prev: number) => prev + 1);
-      return;
-    }
-
+    if (step < 6) { setStep((p) => p + 1); return; }
     setStep(7);
     setIsFinishing(true);
-
-    if (user?.id) {
-      await SecureStore.setItemAsync(onboardingKey(user.id), "true");
-    }
-
+    if (user?.id) await SecureStore.setItemAsync(onboardingKey(user.id), "true");
     router.replace("/(root)/(tabs)");
   };
 
   const toggleStyle = (style: string) => {
-    setStylePreferences((prev: string[]) => {
-      if (prev.includes(style)) {
-        return prev.filter((item: string) => item !== style);
-      }
-      if (prev.length >= 3) {
-        return prev;
-      }
+    setStylePreferences((prev) => {
+      if (prev.includes(style)) return prev.filter((i) => i !== style);
+      if (prev.length >= 3) return prev;
       return [...prev, style];
     });
   };
 
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{ padding: 24, flexGrow: 1 }}
-    >
-      {step === 1 && (
-        <View className="flex-1 items-center justify-center gap-6">
+    <SafeAreaView className="flex-1">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ padding: 24, flexGrow: 1 }}
+      >
+        {step === 1 && (
+          <View className="flex-1 items-center justify-center gap-6">
           <Image
             source={require("../../assets/images/kribb.png")}
             className="h-56 w-56 rounded-3xl"
             resizeMode="cover"
           />
-          <Text className="text-3xl font-bold text-gray-900">
-            Welcome to LookAI
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Welcome to LookAI</Text>
           <Text className="text-base text-gray-500 text-center">
             Let&apos;s personalize your experience in a few quick steps.
           </Text>
@@ -104,26 +91,33 @@ export default function OnboardingScreen() {
       )}
 
       {step === 2 && (
-        <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">
-            Select your age
-          </Text>
-          <TextInput
-            keyboardType="number-pad"
-            placeholder="Enter your age"
-            value={age}
-            onChangeText={setAge}
-            className="border border-gray-300 rounded-xl px-4 py-3 text-lg"
-            maxLength={2}
-          />
+        <View className="flex-1 gap-4">
+          <Text className="text-3xl font-bold text-gray-900">Select your age</Text>
+          <View className="gap-3 mt-2">
+            {AGE_RANGES.map((range) => (
+              <Pressable
+                key={range}
+                onPress={() => setAge(range)}
+                className={`rounded-2xl px-5 py-4 ${
+                  age === range ? "bg-[#EBEBF0]" : "bg-[#F5F5F8]"
+                }`}
+              >
+                <Text
+                  className={`text-base ${
+                    age === range ? "font-semibold text-gray-900" : "font-normal text-gray-700"
+                  }`}
+                >
+                  {range}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       )}
 
       {step === 3 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">
-            Select your gender
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Select your gender</Text>
           {["Male", "Female", "Other"].map((option) => (
             <Pressable
               key={option}
@@ -138,9 +132,7 @@ export default function OnboardingScreen() {
 
       {step === 4 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">
-            Select your body type
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Select your body type</Text>
           <View className="flex-row flex-wrap gap-3">
             {bodyTypes.map((type, idx) => (
               <Pressable
@@ -149,13 +141,9 @@ export default function OnboardingScreen() {
                 className={`w-[48%] rounded-2xl border p-3 ${bodyType === type ? "border-blue-600" : "border-gray-300"}`}
               >
                 <View className="h-24 items-center justify-center rounded-xl bg-gray-100">
-                  <Text className="text-4xl">
-                    {["🧍", "🏃", "🧑", "💃", "🕺"][idx]}
-                  </Text>
+                  <Text className="text-4xl">{["🧍","🏃","🧑","💃","🕺"][idx]}</Text>
                 </View>
-                <Text className="mt-2 text-center text-base text-gray-800">
-                  {type}
-                </Text>
+                <Text className="mt-2 text-center text-base text-gray-800">{type}</Text>
               </Pressable>
             ))}
           </View>
@@ -164,9 +152,7 @@ export default function OnboardingScreen() {
 
       {step === 5 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">
-            Select your skin tone
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Select your skin tone</Text>
           <View className="flex-row flex-wrap gap-3">
             {skinTones.map((tone) => (
               <Pressable
@@ -182,9 +168,7 @@ export default function OnboardingScreen() {
 
       {step === 6 && (
         <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">
-            Style preferences
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Style preferences</Text>
           <Text className="text-sm text-gray-500">Choose exactly 3 styles</Text>
           <View className="flex-row flex-wrap gap-3">
             {styles.map((style) => {
@@ -205,14 +189,8 @@ export default function OnboardingScreen() {
 
       {step === 7 && (
         <View className="flex-1 items-center justify-center gap-4">
-          <Text className="text-2xl font-semibold text-gray-900">
-            Setting up your account...
-          </Text>
-          <ActivityIndicator
-            size="large"
-            color="#2563EB"
-            animating={isFinishing}
-          />
+          <Text className="text-2xl font-semibold text-gray-900">Setting up your account...</Text>
+          <ActivityIndicator size="large" color="#2563EB" animating={isFinishing} />
         </View>
       )}
 
@@ -226,5 +204,6 @@ export default function OnboardingScreen() {
         </Pressable>
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
