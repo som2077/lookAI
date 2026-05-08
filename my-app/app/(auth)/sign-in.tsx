@@ -1,19 +1,14 @@
 import { Href, useRouter } from "expo-router";
+import { useSSO } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
-import { useSSO } from "@clerk/clerk-expo";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Image, Platform, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 WebBrowser.maybeCompleteAuthSession();
+
+const getStartedLogo = require("../../assets/images/getStartedLogo.png");
 
 const getErrorMessage = (error: unknown) => {
   if (
@@ -55,11 +50,10 @@ export default function SignIn() {
     setError("");
 
     try {
-      const { createdSessionId, setActive, authSessionResult } =
-        await startSSOFlow({
-          strategy: "oauth_google",
-          redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
-        });
+      const { createdSessionId, setActive, authSessionResult } = await startSSOFlow({
+        strategy: "oauth_google",
+        redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
+      });
 
       if (authSessionResult?.type === "cancel") {
         return;
@@ -80,46 +74,67 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-transparent">
-      <View className="flex-1 justify-center px-6 py-12">
-        <Image
-          source={require("../../assets/images/kribb.png")}
-          className="w-32 h-16 mb-8"
-          resizeMode="contain"
-        />
+    <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
+      <View className="flex-1 px-8 py-6">
+        <View className="flex-1 justify-center">
+          <Image
+            source={getStartedLogo}
+            className="mb-16 h-36 self-center"
+            resizeMode="contain"
+          />
 
-        <Text className="text-3xl font-bold text-gray-800 mb-2">
-          Welcome to Kribb
-        </Text>
-        <Text className="text-gray-500 mb-8">
-          Continue with your Google account.
-        </Text>
-
-        {error ? <Text className="text-red-500 mb-4">{error}</Text> : null}
-
-        <TouchableOpacity
-          onPress={onGooglePress}
-          disabled={isLoading}
-          className="w-full border border-white/60 bg-white/70 py-4 rounded-2xl items-center"
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#2563EB" />
-          ) : (
-            <Text className="text-gray-800 font-bold text-base">
-              Continue with Google
-            </Text>
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => router.push("/(auth)/email" as Href)}
-          disabled={isLoading}
-          className="w-full bg-[#1A1827] py-4 rounded-2xl items-center mt-3"
-        >
-          <Text className="text-white font-bold text-base">
-            Continue with Email
+          <Text className="mt-16 text-[40px] font-bold leading-[50px] bg-red-300 tracking-[-5.60px] text-[#1D1A27]">
+            Welcome to Look AI 👋🏻
           </Text>
-        </TouchableOpacity>
+
+          <Text className="mt-4 text-[38px] leading-[38px] text-[#4D4858]">
+            Your personal AI stylist that helps you choose perfect outfits.
+          </Text>
+
+          <Text className="mt-2 text-[30px] leading-[38px] text-[#4D4858]">
+            Dress smart. Feel confident.
+          </Text>
+        </View>
+
+        <View>
+          {error ? (
+            <Text className="mb-3 text-center text-sm text-red-500">
+              {error}
+            </Text>
+          ) : null}
+
+          <TouchableOpacity
+            onPress={onGooglePress}
+            disabled={isLoading}
+            className="w-full items-center rounded-2xl border border-[#D8D6DD] bg-white py-4"
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#2563EB" />
+            ) : (
+              <Text className="text-lg font-medium text-[#1D1A27]">
+                 Continue with Google
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(auth)/email" as Href)}
+            disabled={isLoading}
+            className="mt-3 w-full items-center rounded-2xl bg-[#1A1827] py-4"
+          >
+            <Text className="text-lg font-medium text-white">
+              Continue with Email
+            </Text>
+          </TouchableOpacity>
+
+          <Text className="mt-4 px-1 text-center font-semibold text-sm leading-5 text-[#191919]">
+            By continuing, you accept our{" "}
+            <Text className="underline font-black ">Terms of Service</Text> and
+            acknowledge our{" "}
+            <Text className="underline font-black ">Privacy Policy</Text>. You
+            can tap them to view details.
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );

@@ -12,6 +12,7 @@ import {
   View,
   ViewToken,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const bodyTypes = ["Slim", "Athletic", "Average", "Curvy", "Plus"];
 const skinTones = ["#FDE8D0", "#F8D5B3", "#E9B283", "#C98E63", "#9A603C", "#6E4024"];
@@ -48,7 +49,7 @@ export default function OnboardingScreen() {
 
   const canContinue = useMemo(() => {
     if (step === 1) return true;
-    if (step === 2) return age > 0;
+    if (step === 2) return !!age;
     if (step === 3) return !!gender;
     if (step === 4) return !!bodyType;
     if (step === 5) return !!skinTone;
@@ -58,23 +59,19 @@ export default function OnboardingScreen() {
 
   const onContinue = async () => {
     if (step < 6) {
-      setStep((prev: number) => prev + 1);
+      setStep((p) => p + 1);
       return;
     }
-
     setStep(7);
     setIsFinishing(true);
-
-    if (user?.id) {
+    if (user?.id)
       await SecureStore.setItemAsync(onboardingKey(user.id), "true");
-    }
-
     router.replace("/(root)/(tabs)");
   };
 
   const toggleStyle = (style: string) => {
-    setStylePreferences((prev: string[]) => {
-      if (prev.includes(style)) return prev.filter((item: string) => item !== style);
+    setStylePreferences((prev) => {
+      if (prev.includes(style)) return prev.filter((i) => i !== style);
       if (prev.length >= 3) return prev;
       return [...prev, style];
     });
@@ -216,28 +213,77 @@ export default function OnboardingScreen() {
                 <Pressable key={style} onPress={() => toggleStyle(style)} className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}>
                   <Text className="text-base text-gray-800">{style}</Text>
                 </Pressable>
-              );
-            })}
+              ))}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {step === 7 && (
-        <View className="flex-1 items-center justify-center gap-4">
-          <Text className="text-2xl font-semibold text-gray-900">Setting up your account...</Text>
-          <ActivityIndicator size="large" color="#2563EB" animating={isFinishing} />
-        </View>
-      )}
+        {step === 5 && (
+          <View className="flex-1 gap-5">
+            <Text className="text-3xl font-bold text-gray-900">
+              Select your skin tone
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {skinTones.map((tone) => (
+                <Pressable
+                  key={tone}
+                  onPress={() => setSkinTone(tone)}
+                  className={`h-16 w-16 rounded-full border-2 ${skinTone === tone ? "border-blue-600" : "border-transparent"}`}
+                  style={{ backgroundColor: tone }}
+                />
+              ))}
+            </View>
+          </View>
+        )}
 
-      {step < 7 && (
-        <Pressable
-          onPress={onContinue}
-          disabled={!canContinue}
-          className={`mt-auto items-center rounded-2xl py-4 ${canContinue ? "bg-[#1A1827]" : "bg-gray-300"}`}
-        >
-          <Text className="text-white font-semibold text-base">Continue</Text>
-        </Pressable>
-      )}
-    </View>
+        {step === 6 && (
+          <View className="flex-1 gap-5">
+            <Text className="text-3xl font-bold text-gray-900">
+              Style preferences
+            </Text>
+            <Text className="text-sm text-gray-500">
+              Choose exactly 3 styles
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {styles.map((style) => {
+                const selected = stylePreferences.includes(style);
+                return (
+                  <Pressable
+                    key={style}
+                    onPress={() => toggleStyle(style)}
+                    className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}
+                  >
+                    <Text className="text-base text-gray-800">{style}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        {step === 7 && (
+          <View className="flex-1 items-center justify-center gap-4">
+            <Text className="text-2xl font-semibold text-gray-900">
+              Setting up your account...
+            </Text>
+            <ActivityIndicator
+              size="large"
+              color="#2563EB"
+              animating={isFinishing}
+            />
+          </View>
+        )}
+
+        {step < 7 && (
+          <Pressable
+            onPress={onContinue}
+            disabled={!canContinue}
+            className={`mt-auto items-center rounded-2xl py-4 ${canContinue ? "bg-[#1A1827]" : "bg-gray-300"}`}
+          >
+            <Text className="text-white font-semibold text-base">Continue</Text>
+          </Pressable>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
