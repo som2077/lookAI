@@ -70,15 +70,15 @@ export default function OnboardingScreen() {
   };
 
   const toggleStyle = (style: string) => {
-    setStylePreferences((prev) => {
-      if (prev.includes(style)) return prev.filter((i) => i !== style);
+    setStylePreferences((prev: string[]) => {
+      if (prev.includes(style)) return prev.filter((item: string) => item !== style);
       if (prev.length >= 3) return prev;
       return [...prev, style];
     });
   };
 
   const onAgeViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken<number>[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       const centered = viewableItems.find((item) => item.isViewable && item.item != null);
       if (centered?.item) {
         setAge(centered.item);
@@ -218,72 +218,22 @@ export default function OnboardingScreen() {
           </View>
         )}
 
-        {step === 5 && (
-          <View className="flex-1 gap-5">
-            <Text className="text-3xl font-bold text-gray-900">
-              Select your skin tone
-            </Text>
-            <View className="flex-row flex-wrap gap-3">
-              {skinTones.map((tone) => (
-                <Pressable
-                  key={tone}
-                  onPress={() => setSkinTone(tone)}
-                  className={`h-16 w-16 rounded-full border-2 ${skinTone === tone ? "border-blue-600" : "border-transparent"}`}
-                  style={{ backgroundColor: tone }}
-                />
-              ))}
-            </View>
-          </View>
-        )}
+      {step === 7 && (
+        <View className="flex-1 items-center justify-center gap-4">
+          <Text className="text-2xl font-semibold text-gray-900">Setting up your account...</Text>
+          <ActivityIndicator size="large" color="#2563EB" animating={isFinishing} />
+        </View>
+      )}
 
-        {step === 6 && (
-          <View className="flex-1 gap-5">
-            <Text className="text-3xl font-bold text-gray-900">
-              Style preferences
-            </Text>
-            <Text className="text-sm text-gray-500">
-              Choose exactly 3 styles
-            </Text>
-            <View className="flex-row flex-wrap gap-3">
-              {styles.map((style) => {
-                const selected = stylePreferences.includes(style);
-                return (
-                  <Pressable
-                    key={style}
-                    onPress={() => toggleStyle(style)}
-                    className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}
-                  >
-                    <Text className="text-base text-gray-800">{style}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-        )}
-
-        {step === 7 && (
-          <View className="flex-1 items-center justify-center gap-4">
-            <Text className="text-2xl font-semibold text-gray-900">
-              Setting up your account...
-            </Text>
-            <ActivityIndicator
-              size="large"
-              color="#2563EB"
-              animating={isFinishing}
-            />
-          </View>
-        )}
-
-        {step < 7 && (
-          <Pressable
-            onPress={onContinue}
-            disabled={!canContinue}
-            className={`mt-auto items-center rounded-2xl py-4 ${canContinue ? "bg-[#1A1827]" : "bg-gray-300"}`}
-          >
-            <Text className="text-white font-semibold text-base">Continue</Text>
-          </Pressable>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+      {step < 7 && (
+        <Pressable
+          onPress={onContinue}
+          disabled={!canContinue}
+          className={`mt-auto items-center rounded-2xl py-4 ${canContinue ? "bg-[#1A1827]" : "bg-gray-300"}`}
+        >
+          <Text className="text-white font-semibold text-base">Continue</Text>
+        </Pressable>
+      )}
+    </View>
   );
 }
