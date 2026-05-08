@@ -203,20 +203,27 @@ export default function OnboardingScreen() {
       )}
 
       {step === 6 && (
-        <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Style preferences</Text>
-          <Text className="text-sm text-gray-500">Choose exactly 3 styles</Text>
-          <View className="flex-row flex-wrap gap-3">
-            {styles.map((style) => {
-              const selected = stylePreferences.includes(style);
-              return (
-                <Pressable key={style} onPress={() => toggleStyle(style)} className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}>
-                  <Text className="text-base text-gray-800">{style}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        )}
+  <View className="flex-1 gap-5">
+    <Text className="text-3xl font-bold text-gray-900">Style preferences</Text>
+    <Text className="text-sm text-gray-500">Choose exactly 3 styles</Text>
+    <View className="flex-row flex-wrap gap-3">
+      {styles.map((style) => {
+        const selected = stylePreferences.includes(style);
+        return (
+          <Pressable
+            key={style}
+            onPress={() => toggleStyle(style)}
+            className={`rounded-full border px-4 py-3 ${
+              selected ? "border-blue-600 bg-blue-50" : "border-gray-300"
+            }`}
+          >
+            <Text className="text-base text-gray-800">{style}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  </View>
+)}
 
       {step === 7 && (
         <View className="flex-1 items-center justify-center gap-4">
