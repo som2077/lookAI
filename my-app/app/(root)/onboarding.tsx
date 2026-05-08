@@ -12,7 +12,6 @@ import {
   View,
   ViewToken,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const bodyTypes = ["Slim", "Athletic", "Average", "Curvy", "Plus"];
 const skinTones = ["#FDE8D0", "#F8D5B3", "#E9B283", "#C98E63", "#9A603C", "#6E4024"];
