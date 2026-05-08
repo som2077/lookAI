@@ -14,12 +14,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const bodyTypes = ["Slim", "Athletic", "Average", "Curvy", "Plus"];
 const skinTones = [
-  "#FDE8D0", "#F8D5B3", "#E9B283",
-  "#C98E63", "#9A603C", "#6E4024",
+  "#FDE8D0",
+  "#F8D5B3",
+  "#E9B283",
+  "#C98E63",
+  "#9A603C",
+  "#6E4024",
 ];
 const styles = [
-  "Casual", "Streetwear", "Minimal", "Sporty",
-  "Formal", "Vintage", "Bohemian", "Smart Casual",
+  "Casual",
+  "Streetwear",
+  "Minimal",
+  "Sporty",
+  "Formal",
+  "Vintage",
+  "Bohemian",
+  "Smart Casual",
 ];
 
 const AGE_RANGES = [
@@ -55,10 +65,14 @@ export default function OnboardingScreen() {
   }, [step, age, gender, bodyType, skinTone, stylePreferences.length]);
 
   const onContinue = async () => {
-    if (step < 6) { setStep((p) => p + 1); return; }
+    if (step < 6) {
+      setStep((p) => p + 1);
+      return;
+    }
     setStep(7);
     setIsFinishing(true);
-    if (user?.id) await SecureStore.setItemAsync(onboardingKey(user.id), "true");
+    if (user?.id)
+      await SecureStore.setItemAsync(onboardingKey(user.id), "true");
     router.replace("/(root)/(tabs)");
   };
 
@@ -78,155 +92,201 @@ export default function OnboardingScreen() {
       >
         {step === 1 && (
           <View className="flex-1 items-center justify-center gap-6">
-          <Image
-            source={require("../../assets/images/kribb.png")}
-            className="h-56 w-56 rounded-3xl"
-            resizeMode="cover"
-          />
-          <Text className="text-3xl font-bold text-gray-900">Welcome to LookAI</Text>
-          <Text className="text-base text-gray-500 text-center">
-            Let&apos;s personalize your experience in a few quick steps.
-          </Text>
-        </View>
-      )}
+            <Image
+              source={require("../../assets/images/kribb.png")}
+              className="h-56 w-56 rounded-3xl"
+              resizeMode="cover"
+            />
+            <Text className="text-3xl font-bold text-gray-900">
+              Welcome to LookAI
+            </Text>
+            <Text className="text-base text-gray-500 text-center">
+              Let&apos;s personalize your experience in a few quick steps.
+            </Text>
+          </View>
+        )}
 
-      {step === 2 && (
-        <View className="flex-1 gap-4">
-          <Text className="text-3xl font-bold text-gray-900">Select your age</Text>
-          <View className="gap-3 mt-2">
-            {AGE_RANGES.map((range) => (
-              <Pressable
-                key={range}
-                onPress={() => setAge(range)}
-                className={`rounded-2xl px-5 py-4 ${
-                  age === range ? "bg-[#EBEBF0]" : "bg-[#F5F5F8]"
-                }`}
-              >
-                <Text
-                  className={`text-base ${
-                    age === range ? "font-semibold text-gray-900" : "font-normal text-gray-700"
+        {step === 2 && (
+          <View className="flex-1 gap-4">
+            <Text className="text-3xl font-bold text-gray-900">
+              Select your age
+            </Text>
+            <View className="gap-3 mt-2">
+              {AGE_RANGES.map((range) => (
+                <Pressable
+                  key={range}
+                  onPress={() => setAge(range)}
+                  className={`rounded-2xl px-5 py-4 ${
+                    age === range ? "bg-[#EBEBF0]" : "bg-[#F5F5F8]"
                   }`}
                 >
-                  {range}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      )}
-
-      {step === 3 && (
-        <View className="flex-1">
-          <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">
-            Choose your Gender
-          </Text>
-          <Text className="mt-3 text-xl text-[#5A5566]">
-            This will be used to calibrate your custom plan
-          </Text>
-
-          <View className="mt-16 items-center gap-8">
-            {[
-              { label: "Male", icon: "♂", bg: "#1E1A27", iconColor: "#FFFFFF" },
-              { label: "Female", icon: "♀", bg: "#DCE754", iconColor: "#1E1A27" },
-              { label: "Other", icon: "⚥", bg: "#5E59E6", iconColor: "#FFFFFF" },
-            ].map((option) => {
-              const selected = gender === option.label;
-              return (
-                <Pressable
-                  key={option.label}
-                  onPress={() => setGender(option.label as "Male" | "Female" | "Other")}
-                  className="items-center"
-                >
-                  <View
-                    className={`h-28 w-28 items-center justify-center rounded-full border-4 ${selected ? "border-[#1D1A27]" : "border-transparent"}`}
-                    style={{ backgroundColor: option.bg }}
+                  <Text
+                    className={`text-base ${
+                      age === range
+                        ? "font-semibold text-gray-900"
+                        : "font-normal text-gray-700"
+                    }`}
                   >
-                    <Text className="text-6xl font-semibold" style={{ color: option.iconColor }}>
-                      {option.icon}
+                    {range}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {step === 3 && (
+          <View className="flex-1">
+            <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">
+              Choose your Gender
+            </Text>
+            <Text className="mt-3 text-xl text-[#5A5566]">
+              This will be used to calibrate your custom plan
+            </Text>
+
+            <View className="mt-16 items-center gap-8">
+              {[
+                {
+                  label: "Male",
+                  icon: "♂",
+                  bg: "#1E1A27",
+                  iconColor: "#FFFFFF",
+                },
+                {
+                  label: "Female",
+                  icon: "♀",
+                  bg: "#DCE754",
+                  iconColor: "#1E1A27",
+                },
+                {
+                  label: "Other",
+                  icon: "⚥",
+                  bg: "#5E59E6",
+                  iconColor: "#FFFFFF",
+                },
+              ].map((option) => {
+                const selected = gender === option.label;
+                return (
+                  <Pressable
+                    key={option.label}
+                    onPress={() =>
+                      setGender(option.label as "Male" | "Female" | "Other")
+                    }
+                    className="items-center"
+                  >
+                    <View
+                      className={`h-28 w-28 items-center justify-center rounded-full border-4 ${selected ? "border-[#1D1A27]" : "border-transparent"}`}
+                      style={{ backgroundColor: option.bg }}
+                    >
+                      <Text
+                        className="text-6xl font-semibold"
+                        style={{ color: option.iconColor }}
+                      >
+                        {option.icon}
+                      </Text>
+                    </View>
+                    <Text className="mt-2 text-base font-semibold text-[#1D1A27]">
+                      {option.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        {step === 4 && (
+          <View className="flex-1 gap-5">
+            <Text className="text-3xl font-bold text-gray-900">
+              Select your body type
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {bodyTypes.map((type, idx) => (
+                <Pressable
+                  key={type}
+                  onPress={() => setBodyType(type)}
+                  className={`w-[48%] rounded-2xl border p-3 ${bodyType === type ? "border-blue-600" : "border-gray-300"}`}
+                >
+                  <View className="h-24 items-center justify-center rounded-xl bg-gray-100">
+                    <Text className="text-4xl">
+                      {["🧍", "🏃", "🧑", "💃", "🕺"][idx]}
                     </Text>
                   </View>
-                  <Text className="mt-2 text-base font-semibold text-[#1D1A27]">{option.label}</Text>
+                  <Text className="mt-2 text-center text-base text-gray-800">
+                    {type}
+                  </Text>
                 </Pressable>
-              );
-            })}
+              ))}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {step === 4 && (
-        <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Select your body type</Text>
-          <View className="flex-row flex-wrap gap-3">
-            {bodyTypes.map((type, idx) => (
-              <Pressable
-                key={type}
-                onPress={() => setBodyType(type)}
-                className={`w-[48%] rounded-2xl border p-3 ${bodyType === type ? "border-blue-600" : "border-gray-300"}`}
-              >
-                <View className="h-24 items-center justify-center rounded-xl bg-gray-100">
-                  <Text className="text-4xl">{["🧍","🏃","🧑","💃","🕺"][idx]}</Text>
-                </View>
-                <Text className="mt-2 text-center text-base text-gray-800">{type}</Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      )}
-
-      {step === 5 && (
-        <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Select your skin tone</Text>
-          <View className="flex-row flex-wrap gap-3">
-            {skinTones.map((tone) => (
-              <Pressable
-                key={tone}
-                onPress={() => setSkinTone(tone)}
-                className={`h-16 w-16 rounded-full border-2 ${skinTone === tone ? "border-blue-600" : "border-transparent"}`}
-                style={{ backgroundColor: tone }}
-              />
-            ))}
-          </View>
-        </View>
-      )}
-
-      {step === 6 && (
-        <View className="flex-1 gap-5">
-          <Text className="text-3xl font-bold text-gray-900">Style preferences</Text>
-          <Text className="text-sm text-gray-500">Choose exactly 3 styles</Text>
-          <View className="flex-row flex-wrap gap-3">
-            {styles.map((style) => {
-              const selected = stylePreferences.includes(style);
-              return (
+        {step === 5 && (
+          <View className="flex-1 gap-5">
+            <Text className="text-3xl font-bold text-gray-900">
+              Select your skin tone
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {skinTones.map((tone) => (
                 <Pressable
-                  key={style}
-                  onPress={() => toggleStyle(style)}
-                  className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}
-                >
-                  <Text className="text-base text-gray-800">{style}</Text>
-                </Pressable>
-              );
-            })}
+                  key={tone}
+                  onPress={() => setSkinTone(tone)}
+                  className={`h-16 w-16 rounded-full border-2 ${skinTone === tone ? "border-blue-600" : "border-transparent"}`}
+                  style={{ backgroundColor: tone }}
+                />
+              ))}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {step === 7 && (
-        <View className="flex-1 items-center justify-center gap-4">
-          <Text className="text-2xl font-semibold text-gray-900">Setting up your account...</Text>
-          <ActivityIndicator size="large" color="#2563EB" animating={isFinishing} />
-        </View>
-      )}
+        {step === 6 && (
+          <View className="flex-1 gap-5">
+            <Text className="text-3xl font-bold text-gray-900">
+              Style preferences
+            </Text>
+            <Text className="text-sm text-gray-500">
+              Choose exactly 3 styles
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {styles.map((style) => {
+                const selected = stylePreferences.includes(style);
+                return (
+                  <Pressable
+                    key={style}
+                    onPress={() => toggleStyle(style)}
+                    className={`rounded-full border px-4 py-3 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-300"}`}
+                  >
+                    <Text className="text-base text-gray-800">{style}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
 
-      {step < 7 && (
-        <Pressable
-          onPress={onContinue}
-          disabled={!canContinue}
-          className={`mt-auto items-center rounded-2xl py-4 ${canContinue ? "bg-[#1A1827]" : "bg-gray-300"}`}
-        >
-          <Text className="text-white font-semibold text-base">Continue</Text>
-        </Pressable>
-      )}
-    </ScrollView>
+        {step === 7 && (
+          <View className="flex-1 items-center justify-center gap-4">
+            <Text className="text-2xl font-semibold text-gray-900">
+              Setting up your account...
+            </Text>
+            <ActivityIndicator
+              size="large"
+              color="#2563EB"
+              animating={isFinishing}
+            />
+          </View>
+        )}
+
+        {step < 7 && (
+          <Pressable
+            onPress={onContinue}
+            disabled={!canContinue}
+            className={`mt-auto items-center rounded-2xl py-4 ${canContinue ? "bg-[#1A1827]" : "bg-gray-300"}`}
+          >
+            <Text className="text-white font-semibold text-base">Continue</Text>
+          </Pressable>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }
