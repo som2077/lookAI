@@ -15,6 +15,7 @@ export default function SetupAccountScreen() {
       const ok = await saveToSupabase(user.id);
       if (ok) router.replace("/(root)/(tabs)");
     };
+
     run();
   }, [saveToSupabase, user?.id]);
 
