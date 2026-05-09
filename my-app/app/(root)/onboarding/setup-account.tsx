@@ -13,7 +13,12 @@ export default function SetupAccountScreen() {
   useEffect(() => {
     const run = async () => {
       if (!user?.id) return;
-      const token = await getToken({ template: "supabase" });
+      let token: string | null = null;
+      try {
+        token = await getToken({ template: "supabase" });
+      } catch {
+        token = await getToken();
+      }
       if (!token) return;
       const ok = await saveToSupabase(user.id, token);
       if (ok) router.replace("/(root)/(tabs)");
