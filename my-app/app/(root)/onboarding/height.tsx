@@ -1,10 +1,11 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { SafeAreaView, Text, View } from "react-native";
-import { BackButton } from "./components/BackButton";
-import { ContinueButton } from "./components/ContinueButton";
-import { HeightPicker } from "./components/HeightPicker";
-import { ProgressIndicator } from "./components/ProgressIndicator";
-import { useOnboardingState } from "./state";
+import { Text, View } from "react-native";
+import { BackButton } from "@/components/onboarding/BackButton";
+import { ContinueButton } from "@/components/onboarding/ContinueButton";
+import { HeightPicker } from "@/components/onboarding/HeightPicker";
+import { ProgressIndicator } from "@/components/onboarding/ProgressIndicator";
+import { useOnboardingState } from "@/store/onboarding-store";
 
 export default function HeightScreen() {
   const { height, setHeight } = useOnboardingState();
