@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseWithAuth } from "@/lib/supabase";
 
 export type SaveOnboardingPayload = {
   userId: string;
@@ -10,7 +10,9 @@ export type SaveOnboardingPayload = {
   stylePreferences: string[];
 };
 
-export async function upsertOnboardingProfile(payload: SaveOnboardingPayload) {
+export async function upsertOnboardingProfile(payload: SaveOnboardingPayload, clerkJwt: string) {
+  const supabase = getSupabaseWithAuth(clerkJwt);
+
   const { error } = await supabase.from("onboarding_profiles").upsert(
     {
       user_id: payload.userId,

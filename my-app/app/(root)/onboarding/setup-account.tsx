@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -7,17 +7,20 @@ import { useOnboardingState } from "@/store/onboarding-store";
 
 export default function SetupAccountScreen() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { saveToSupabase, isSaving, error } = useOnboardingState();
 
   useEffect(() => {
     const run = async () => {
       if (!user?.id) return;
-      const ok = await saveToSupabase(user.id);
+      const token = await getToken({ template: "supabase" });
+      if (!token) return;
+      const ok = await saveToSupabase(user.id, token);
       if (ok) router.replace("/(root)/(tabs)");
     };
 
     run();
-  }, [saveToSupabase, user?.id]);
+  }, [getToken, saveToSupabase, user?.id]);
 
   return (
     <SafeAreaView className="flex-1">
