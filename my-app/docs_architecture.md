@@ -149,21 +149,25 @@ Add path aliases in `tsconfig.json` (recommended):
 ## 6) Refactor / Migration Plan (Low Risk)
 
 ### Phase 1 (Safe, no behavior change)
+
 - Create `src/` folders.
 - Move `components/navigation/CustomTabBar.tsx` -> `src/components/navigation/CustomTabBar.tsx`.
 - Update imports in route layouts.
 - Add alias config.
 
 ### Phase 2 (Feature modularization)
+
 - For each domain (`auth`, `wardrobe`, `planner`, `saved`, `profile`):
   - Create `src/features/<domain>/`.
   - Move domain UI + hooks + services there.
 
 ### Phase 3 (Infrastructure hardening)
+
 - Add API client layer, error handling, logging, analytics wrapper.
 - Add testing layers: unit/integration/e2e.
 
 ### Phase 4 (Quality gates)
+
 - Enforce lint + typecheck + tests in CI.
 - Add pre-commit hooks for lint-staged + formatting.
 
@@ -178,4 +182,3 @@ Add path aliases in `tsconfig.json` (recommended):
 - Prefer feature-based ownership over large global folders.
 - Standardize error/loading/empty states.
 - Add ADRs (`docs/adr/`) for important architecture decisions.
-

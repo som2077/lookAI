@@ -15,6 +15,7 @@ export default function SetupAccountScreen() {
       const ok = await completeOnboarding();
       if (ok) router.replace("/(root)/(tabs)");
     };
+
     run();
   }, [completeOnboarding, user?.id]);
 
