@@ -20,7 +20,7 @@ type OnboardingState = {
   setBodyType: (value: string) => void;
   setSkinTone: (value: string) => void;
   toggleStyle: (value: string) => void;
-  saveToSupabase: (userId: string) => Promise<boolean>;
+  saveToSupabase: (userId: string, clerkJwt: string) => Promise<boolean>;
 };
 
 const secureStorage = {
@@ -53,7 +53,7 @@ export const useOnboardingState = create<OnboardingState>()(
           if (state.stylePreferences.length >= 3) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
         }),
-      saveToSupabase: async (userId) => {
+      saveToSupabase: async (userId, clerkJwt) => {
         set({ isSaving: true, error: null });
         try {
           const s = get();
@@ -65,7 +65,7 @@ export const useOnboardingState = create<OnboardingState>()(
             bodyType: s.bodyType,
             skinTone: s.skinTone,
             stylePreferences: s.stylePreferences,
-          });
+          }, clerkJwt);
           set({ isSaving: false, error: null });
           return true;
         } catch (error) {
