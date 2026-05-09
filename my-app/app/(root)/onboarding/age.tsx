@@ -1,11 +1,11 @@
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 
-import { AgePicker } from "./components/AgePicker";
-import { BackButton } from "./components/BackButton";
-import { ContinueButton } from "./components/ContinueButton";
-import { ProgressIndicator } from "./components/ProgressIndicator";
-import { useOnboardingState } from "./state";
+import { AgePicker } from "@/components/onboarding/AgePicker";
+import { BackButton } from "@/components/onboarding/BackButton";
+import { ContinueButton } from "@/components/onboarding/ContinueButton";
+import { ProgressIndicator } from "@/components/onboarding/ProgressIndicator";
+import { useOnboardingState } from "@/store/onboarding-store";
 
 export default function AgeScreen() {
   const { age, setAge } = useOnboardingState();
