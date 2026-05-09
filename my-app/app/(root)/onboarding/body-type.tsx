@@ -1,28 +1,27 @@
-import { BodyTypeCard, type BodyTypeOption } from "@/components/onboarding/BodyTypeCard";
-import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";                          // ✅ router import hata, useRouter add kiya
+import { useMemo, useState } from "react";                         // ✅ useState, useMemo add kiye
+import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native"; // ✅ TouchableOpacity add kiya
 import { BackButton } from "./components/BackButton";
-import { ProgressIndicator } from "./components/ProgressIndicator";
+import { ProgressIndicator } from "./components/ProgressIndicator"; // ✅ ContinueButton hata diya (unused)
 import { useOnboardingState } from "./state";
 import { BodyTypeCard, type BodyTypeOption } from "@/components/onboarding/BodyTypeCard";
 
 const maleBodyTypes: BodyTypeOption[] = [
-  { id: "slim", title: "Slim", image: require("@/assets/bodytypes/male/slim.png") },
-  { id: "athletic", title: "Athletic", image: require("@/assets/bodytypes/male/athletic.png") },
-  { id: "average", title: "Average", image: require("@/assets/bodytypes/male/average.png") },
-  { id: "plus", title: "Plus", image: require("@/assets/bodytypes/male/plus.png") },
+  { id: "slim",     title: "Slim",     image: require("@/assets/bodytypes/male/slim.png")      },
+  { id: "athletic", title: "Athletic", image: require("@/assets/bodytypes/male/Athletic.png")  },
+  { id: "average",  title: "Average",  image: require("@/assets/bodytypes/male/Average.png")   },
+  { id: "plus",     title: "Plus",     image: require("@/assets/bodytypes/male/plus.png")       },
 ];
 
 const femaleBodyTypes: BodyTypeOption[] = [
-  { id: "slim", title: "Slim", image: require("@/assets/bodytypes/female/slim.png") },
-  { id: "curvy", title: "Curvy", image: require("@/assets/bodytypes/female/curvy.png") },
-  { id: "average", title: "Average", image: require("@/assets/bodytypes/female/average.png") },
-  { id: "plus", title: "Plus", image: require("@/assets/bodytypes/female/plus.png") },
+  { id: "slim",    title: "Slim",    image: require("@/assets/bodytypes/female/slim.png")   },
+  { id: "curvy",   title: "Curvy",   image: require("@/assets/bodytypes/female/Curvy.png")  },
+  { id: "average", title: "Average", image: require("@/assets/bodytypes/female/Average.png") },
+  { id: "plus",    title: "Plus",    image: require("@/assets/bodytypes/female/Plus.png")    },
 ];
 
 export default function BodyTypesScreen() {
-  const router = useRouter();
+  const router = useRouter();                                        // ✅ sirf yahan rakha
   const { gender, bodyType, setBodyType } = useOnboardingState();
   const [selectedBodyType, setSelectedBodyType] = useState<string | null>(bodyType || null);
 
@@ -68,7 +67,9 @@ export default function BodyTypesScreen() {
             activeOpacity={0.9}
             disabled={!selectedBodyType}
             onPress={handleContinue}
-            className={`items-center rounded-2xl py-4 ${selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"}`}
+            className={`items-center rounded-2xl py-4 ${
+              selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"
+            }`}
           >
             <Text className="text-base font-semibold text-white">Continue</Text>
           </TouchableOpacity>
