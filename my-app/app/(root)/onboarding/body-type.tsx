@@ -1,31 +1,44 @@
-import { router } from "expo-router";
-import { FlatList, SafeAreaView, Text, View } from "react-native";
+import { BodyTypeCard, type BodyTypeOption } from "@/components/onboarding/BodyTypeCard";
+import { useRouter } from "expo-router";
+import { useMemo, useState } from "react";
+import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { BackButton } from "./components/BackButton";
-import { ContinueButton } from "./components/ContinueButton";
 import { ProgressIndicator } from "./components/ProgressIndicator";
 import { useOnboardingState } from "./state";
 import { BodyTypeCard, type BodyTypeOption } from "@/components/onboarding/BodyTypeCard";
 
 const maleBodyTypes: BodyTypeOption[] = [
   { id: "slim", title: "Slim", image: require("@/assets/bodytypes/male/slim.png") },
-  { id: "athletic", title: "Athletic", image: require("@/assets/bodytypes/male/Athletic.png") },
-  { id: "average", title: "Average", image: require("@/assets/bodytypes/male/Average.png") },
+  { id: "athletic", title: "Athletic", image: require("@/assets/bodytypes/male/athletic.png") },
+  { id: "average", title: "Average", image: require("@/assets/bodytypes/male/average.png") },
   { id: "plus", title: "Plus", image: require("@/assets/bodytypes/male/plus.png") },
 ];
 
 const femaleBodyTypes: BodyTypeOption[] = [
   { id: "slim", title: "Slim", image: require("@/assets/bodytypes/female/slim.png") },
-  { id: "curvy", title: "Curvy", image: require("@/assets/bodytypes/female/Curvy.png") },
-  { id: "average", title: "Average", image: require("@/assets/bodytypes/female/Average.png") },
-  { id: "plus", title: "Plus", image: require("@/assets/bodytypes/female/Plus.png") },
+  { id: "curvy", title: "Curvy", image: require("@/assets/bodytypes/female/curvy.png") },
+  { id: "average", title: "Average", image: require("@/assets/bodytypes/female/average.png") },
+  { id: "plus", title: "Plus", image: require("@/assets/bodytypes/female/plus.png") },
 ];
 
 export default function BodyTypesScreen() {
+  const router = useRouter();
   const { gender, bodyType, setBodyType } = useOnboardingState();
-  const bodyTypes = gender === "Female" ? femaleBodyTypes : maleBodyTypes;
+  const [selectedBodyType, setSelectedBodyType] = useState<string | null>(bodyType || null);
+
+  const bodyTypes = useMemo(() => {
+    const normalizedGender = gender.toLowerCase();
+    return normalizedGender === "female" ? femaleBodyTypes : maleBodyTypes;
+  }, [gender]);
+
+  const handleContinue = () => {
+    if (!selectedBodyType) return;
+    setBodyType(selectedBodyType);
+    router.push("/(root)/onboarding/skin-tone");
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F8F7FB]">
+    <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 px-5 pb-6 pt-2">
         <BackButton onPress={() => router.back()} />
         <ProgressIndicator step={5} />
@@ -44,17 +57,21 @@ export default function BodyTypesScreen() {
             <BodyTypeCard
               item={item}
               index={index}
-              selected={bodyType === item.id}
-              onPress={() => setBodyType(item.id)}
+              selected={selectedBodyType === item.id}
+              onPress={() => setSelectedBodyType(item.id)}
             />
           )}
         />
 
         <View className="absolute inset-x-5 bottom-6">
-          <ContinueButton
-            disabled={!bodyType}
-            onPress={() => router.push("/(root)/onboarding/skin-tone")}
-          />
+          <TouchableOpacity
+            activeOpacity={0.9}
+            disabled={!selectedBodyType}
+            onPress={handleContinue}
+            className={`items-center rounded-2xl py-4 ${selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"}`}
+          >
+            <Text className="text-base font-semibold text-white">Continue</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
