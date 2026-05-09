@@ -1,8 +1,9 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, SafeAreaView, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 
 const onboardingKey = (userId: string) => `onboarding_completed_${userId}`;
 

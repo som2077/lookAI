@@ -1,9 +1,10 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { Pressable, SafeAreaView, Text, View } from "react-native";
-import { BackButton } from "./components/BackButton";
-import { ContinueButton } from "./components/ContinueButton";
-import { ProgressIndicator } from "./components/ProgressIndicator";
-import { useOnboardingState } from "./state";
+import { Pressable, Text, View } from "react-native";
+import { BackButton } from "@/components/onboarding/BackButton";
+import { ContinueButton } from "@/components/onboarding/ContinueButton";
+import { ProgressIndicator } from "@/components/onboarding/ProgressIndicator";
+import { useOnboardingState } from "@/store/onboarding-store";
 
 export default function GenderScreen() {
   const { gender, setGender } = useOnboardingState();
