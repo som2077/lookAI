@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import * as SecureStore from "expo-secure-store";
-import { upsertOnboardingProfile } from "@/services/onboarding";
 
 export type Gender = "Male" | "Female" | "Other" | "";
 
@@ -20,7 +19,7 @@ type OnboardingState = {
   setBodyType: (value: string) => void;
   setSkinTone: (value: string) => void;
   toggleStyle: (value: string) => void;
-  saveToSupabase: (userId: string, clerkJwt: string) => Promise<boolean>;
+  completeOnboarding: () => Promise<boolean>;
 };
 
 const secureStorage = {
@@ -31,7 +30,7 @@ const secureStorage = {
 
 export const useOnboardingState = create<OnboardingState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       age: 28,
       height: 165,
       gender: "",
@@ -53,26 +52,10 @@ export const useOnboardingState = create<OnboardingState>()(
           if (state.stylePreferences.length >= 3) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
         }),
-      saveToSupabase: async (userId, clerkJwt) => {
+      completeOnboarding: async () => {
         set({ isSaving: true, error: null });
-        try {
-          const s = get();
-          await upsertOnboardingProfile({
-            userId,
-            age: s.age,
-            height: s.height,
-            gender: s.gender,
-            bodyType: s.bodyType,
-            skinTone: s.skinTone,
-            stylePreferences: s.stylePreferences,
-          }, clerkJwt);
-          set({ isSaving: false, error: null });
-          return true;
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "Failed to save onboarding data";
-          set({ isSaving: false, error: message });
-          return false;
-        }
+        set({ isSaving: false, error: null });
+        return true;
       },
     }),
     {
