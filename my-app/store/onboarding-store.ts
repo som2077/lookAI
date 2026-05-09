@@ -1,8 +1,7 @@
-// store/onboarding-store.ts
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import * as SecureStore from "expo-secure-store";
-import { saveOnboardingProfile } from "@/db/queries";
+import { upsertOnboardingProfile } from "@/services/onboarding";
 
 export type Gender = "Male" | "Female" | "Other" | "";
 
@@ -22,13 +21,11 @@ type OnboardingState = {
   setSkinTone: (value: string) => void;
   toggleStyle: (value: string) => void;
   saveToSupabase: (userId: string) => Promise<boolean>;
-  clearError: () => void;
 };
 
 const secureStorage = {
   getItem: (name: string) => SecureStore.getItemAsync(name),
-  setItem: (name: string, value: string) =>
-    SecureStore.setItemAsync(name, value),
+  setItem: (name: string, value: string) => SecureStore.setItemAsync(name, value),
   removeItem: (name: string) => SecureStore.deleteItemAsync(name),
 };
 
@@ -51,23 +48,19 @@ export const useOnboardingState = create<OnboardingState>()(
       toggleStyle: (style) =>
         set((state) => {
           if (state.stylePreferences.includes(style)) {
-            return {
-              stylePreferences: state.stylePreferences.filter(
-                (s) => s !== style,
-              ),
-            };
+            return { stylePreferences: state.stylePreferences.filter((s) => s !== style) };
           }
           if (state.stylePreferences.length >= 3) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
         }),
-      clearError: () => set({ error: null }),
       saveToSupabase: async (userId) => {
         set({ isSaving: true, error: null });
         try {
           const s = get();
-          await saveOnboardingProfile({
+          await upsertOnboardingProfile({
             userId,
             age: s.age,
+            height: s.height,
             gender: s.gender,
             bodyType: s.bodyType,
             skinTone: s.skinTone,
@@ -76,11 +69,8 @@ export const useOnboardingState = create<OnboardingState>()(
           set({ isSaving: false, error: null });
           return true;
         } catch (error) {
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : "Failed to save onboarding data. Please check your connection and try again.";
-          set({ isSaving: false, error: errorMessage });
+          const message = error instanceof Error ? error.message : "Failed to save onboarding data";
+          set({ isSaving: false, error: message });
           return false;
         }
       },
@@ -93,8 +83,4 @@ export const useOnboardingState = create<OnboardingState>()(
   ),
 );
 
-export const OnboardingProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => children;
+export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => children;
