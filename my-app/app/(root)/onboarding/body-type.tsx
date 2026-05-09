@@ -9,16 +9,16 @@ import { useOnboardingState } from "@/store/onboarding-store";
 
 const maleBodyTypes: BodyTypeOption[] = [
   { id: "slim", title: "Slim", image: require("@/assets/bodytypes/male/slim.png") },
-  { id: "athletic", title: "Athletic", image: require("@/assets/bodytypes/male/Athletic.png") },
-  { id: "average", title: "Average", image: require("@/assets/bodytypes/male/Average.png") },
+  { id: "athletic", title: "Athletic", image: require("@/assets/bodytypes/male/athletic.png") },
+  { id: "average", title: "Average", image: require("@/assets/bodytypes/male/average.png") },
   { id: "plus", title: "Plus", image: require("@/assets/bodytypes/male/plus.png") },
 ];
 
 const femaleBodyTypes: BodyTypeOption[] = [
   { id: "slim", title: "Slim", image: require("@/assets/bodytypes/female/slim.png") },
-  { id: "curvy", title: "Curvy", image: require("@/assets/bodytypes/female/Curvy.png") },
-  { id: "average", title: "Average", image: require("@/assets/bodytypes/female/Average.png") },
-  { id: "plus", title: "Plus", image: require("@/assets/bodytypes/female/Plus.png") },
+  { id: "curvy", title: "Curvy", image: require("@/assets/bodytypes/female/curvy.png") },
+  { id: "average", title: "Average", image: require("@/assets/bodytypes/female/average.png") },
+  { id: "plus", title: "Plus", image: require("@/assets/bodytypes/female/plus.png") },
 ];
 
 export default function BodyTypesScreen() {
