@@ -1,11 +1,6 @@
 import { useEffect } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import { Image, Pressable, Text, View } from "react-native";
+import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 export type BodyTypeOption = {
   id: string;
@@ -25,30 +20,40 @@ export function BodyTypeCard({ item, selected, onPress, index }: BodyTypeCardPro
 
   useEffect(() => {
     scale.value = withSpring(selected ? 1.02 : 1, { damping: 14, stiffness: 180 });
-  }, [scale, selected]);
+  }, [selected, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
   return (
-    <Animated.View entering={FadeInDown.duration(350).delay(index * 70)} style={animatedStyle}>
-      <TouchableOpacity
-        activeOpacity={0.9}
+    <Animated.View entering={FadeInDown.duration(300).delay(index * 60)} style={animatedStyle}>
+      <Pressable
         onPress={onPress}
         onPressIn={() => {
-          scale.value = withSpring(0.98, { damping: 16, stiffness: 220 });
+          scale.value = withSpring(0.985, { damping: 14, stiffness: 220 });
         }}
         onPressOut={() => {
           scale.value = withSpring(selected ? 1.02 : 1, { damping: 14, stiffness: 180 });
         }}
-        className={`overflow-hidden rounded-3xl border bg-white ${selected ? "border-[#1B1623] shadow-xl" : "border-[#E8E6EE]"}`}
+        style={{
+          overflow: "hidden",
+          borderRadius: 24,
+          borderWidth: 1.5,
+          borderColor: selected ? "#1B1623" : "#E8E6EE",
+          backgroundColor: "#fff",
+          shadowColor: "#1B1623",
+          shadowOpacity: selected ? 0.2 : 0.05,
+          shadowRadius: selected ? 12 : 6,
+          shadowOffset: { width: 0, height: selected ? 6 : 3 },
+          elevation: selected ? 6 : 1,
+        }}
       >
         <View className="px-5 pb-4 pt-5">
           <Text className="text-lg font-semibold text-[#1D1A27]">{item.title}</Text>
         </View>
         <Image source={item.image} resizeMode="cover" className="h-[260px] w-full" />
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 }
