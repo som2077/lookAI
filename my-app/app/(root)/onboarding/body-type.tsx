@@ -1,29 +1,71 @@
-import { useRouter } from "expo-router";                          // ✅ router import hata, useRouter add kiya
-import { useMemo, useState } from "react";                         // ✅ useState, useMemo add kiye
-import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native"; // ✅ TouchableOpacity add kiya
+import {
+  BodyTypeCard,
+  type BodyTypeOption,
+} from "@/components/onboarding/BodyTypeCard";
+import { router } from "expo-router";
+import { useMemo, useState } from "react";
+import {
+  FlatList,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { BackButton } from "./components/BackButton";
-import { ProgressIndicator } from "./components/ProgressIndicator"; // ✅ ContinueButton hata diya (unused)
+import { ProgressIndicator } from "./components/ProgressIndicator";
 import { useOnboardingState } from "./state";
-import { BodyTypeCard, type BodyTypeOption } from "@/components/onboarding/BodyTypeCard";
 
 const maleBodyTypes: BodyTypeOption[] = [
-  { id: "slim",     title: "Slim",     image: require("@/assets/bodytypes/male/slim.png")      },
-  { id: "athletic", title: "Athletic", image: require("@/assets/bodytypes/male/Athletic.png")  },
-  { id: "average",  title: "Average",  image: require("@/assets/bodytypes/male/Average.png")   },
-  { id: "plus",     title: "Plus",     image: require("@/assets/bodytypes/male/plus.png")       },
+  {
+    id: "slim",
+    title: "Slim",
+    image: require("@/assets/bodytypes/male/slim.png"),
+  },
+  {
+    id: "athletic",
+    title: "Athletic",
+    image: require("@/assets/bodytypes/male/Athletic.png"),
+  },
+  {
+    id: "average",
+    title: "Average",
+    image: require("@/assets/bodytypes/male/Average.png"),
+  },
+  {
+    id: "plus",
+    title: "Plus",
+    image: require("@/assets/bodytypes/male/plus.png"),
+  },
 ];
 
 const femaleBodyTypes: BodyTypeOption[] = [
-  { id: "slim",    title: "Slim",    image: require("@/assets/bodytypes/female/slim.png")   },
-  { id: "curvy",   title: "Curvy",   image: require("@/assets/bodytypes/female/Curvy.png")  },
-  { id: "average", title: "Average", image: require("@/assets/bodytypes/female/Average.png") },
-  { id: "plus",    title: "Plus",    image: require("@/assets/bodytypes/female/Plus.png")    },
+  {
+    id: "slim",
+    title: "Slim",
+    image: require("@/assets/bodytypes/female/slim.png"),
+  },
+  {
+    id: "curvy",
+    title: "Curvy",
+    image: require("@/assets/bodytypes/female/Curvy.png"),
+  },
+  {
+    id: "average",
+    title: "Average",
+    image: require("@/assets/bodytypes/female/Average.png"),
+  },
+  {
+    id: "plus",
+    title: "Plus",
+    image: require("@/assets/bodytypes/female/Plus.png"),
+  },
 ];
 
 export default function BodyTypesScreen() {
-  const router = useRouter();                                        // ✅ sirf yahan rakha
   const { gender, bodyType, setBodyType } = useOnboardingState();
-  const [selectedBodyType, setSelectedBodyType] = useState<string | null>(bodyType || null);
+  const [selectedBodyType, setSelectedBodyType] = useState<string | null>(
+    bodyType || null,
+  );
 
   const bodyTypes = useMemo(() => {
     const normalizedGender = gender.toLowerCase();
@@ -41,9 +83,12 @@ export default function BodyTypesScreen() {
       <View className="flex-1 px-5 pb-6 pt-2">
         <BackButton onPress={() => router.back()} />
         <ProgressIndicator step={5} />
-        <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">Body types</Text>
+        <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">
+          Body types
+        </Text>
         <Text className="mt-3 text-base leading-6 text-[#5A5566]">
-          Select the range that best represents you to find fashion inspiration with you in mind.
+          Select the range that best represents you to find fashion inspiration
+          with you in mind.
         </Text>
 
         <FlatList
@@ -67,9 +112,7 @@ export default function BodyTypesScreen() {
             activeOpacity={0.9}
             disabled={!selectedBodyType}
             onPress={handleContinue}
-            className={`items-center rounded-2xl py-4 ${
-              selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"
-            }`}
+            className={`items-center rounded-2xl py-4 ${selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"}`}
           >
             <Text className="text-base font-semibold text-white">Continue</Text>
           </TouchableOpacity>
