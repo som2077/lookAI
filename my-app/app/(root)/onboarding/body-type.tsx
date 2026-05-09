@@ -5,6 +5,7 @@ import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-nati
 import { BackButton } from "./components/BackButton";
 import { ProgressIndicator } from "./components/ProgressIndicator";
 import { useOnboardingState } from "./state";
+import { BodyTypeCard, type BodyTypeOption } from "@/components/onboarding/BodyTypeCard";
 
 const maleBodyTypes: BodyTypeOption[] = [
   { id: "slim", title: "Slim", image: require("@/assets/bodytypes/male/slim.png") },
