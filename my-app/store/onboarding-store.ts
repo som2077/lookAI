@@ -1,3 +1,4 @@
+// store/onboarding-store.ts
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import * as SecureStore from "expo-secure-store";
@@ -21,11 +22,13 @@ type OnboardingState = {
   setSkinTone: (value: string) => void;
   toggleStyle: (value: string) => void;
   saveToSupabase: (userId: string) => Promise<boolean>;
+  clearError: () => void;
 };
 
 const secureStorage = {
   getItem: (name: string) => SecureStore.getItemAsync(name),
-  setItem: (name: string, value: string) => SecureStore.setItemAsync(name, value),
+  setItem: (name: string, value: string) =>
+    SecureStore.setItemAsync(name, value),
   removeItem: (name: string) => SecureStore.deleteItemAsync(name),
 };
 
@@ -48,11 +51,16 @@ export const useOnboardingState = create<OnboardingState>()(
       toggleStyle: (style) =>
         set((state) => {
           if (state.stylePreferences.includes(style)) {
-            return { stylePreferences: state.stylePreferences.filter((s) => s !== style) };
+            return {
+              stylePreferences: state.stylePreferences.filter(
+                (s) => s !== style,
+              ),
+            };
           }
           if (state.stylePreferences.length >= 3) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
         }),
+      clearError: () => set({ error: null }),
       saveToSupabase: async (userId) => {
         set({ isSaving: true, error: null });
         try {
@@ -68,7 +76,11 @@ export const useOnboardingState = create<OnboardingState>()(
           set({ isSaving: false, error: null });
           return true;
         } catch (error) {
-          set({ isSaving: false, error: error instanceof Error ? error.message : "Failed to save onboarding data" });
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to save onboarding data. Please check your connection and try again.";
+          set({ isSaving: false, error: errorMessage });
           return false;
         }
       },
@@ -81,4 +93,8 @@ export const useOnboardingState = create<OnboardingState>()(
   ),
 );
 
-export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => children;
+export const OnboardingProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => children;
