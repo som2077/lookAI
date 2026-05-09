@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { Image, Text, View } from "react-native";
 
-import { ContinueButton } from "./components/ContinueButton";
+import { ContinueButton } from "@/components/onboarding/ContinueButton";
 
 export default function OnboardingIndex() {
   return (
