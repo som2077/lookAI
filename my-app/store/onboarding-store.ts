@@ -68,12 +68,7 @@ export const useOnboardingState = create<OnboardingState>()(
           set({ isSaving: false, error: null });
           return true;
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Failed to save onboarding data";
-          if (message.includes("onboarding_profiles")) {
-            set({ isSaving: false, error: null });
-            return true;
-          }
-          set({ isSaving: false, error: message });
+          set({ isSaving: false, error: error instanceof Error ? error.message : "Failed to save onboarding data" });
           return false;
         }
       },
