@@ -54,8 +54,14 @@ export const useOnboardingState = create<OnboardingState>()(
         }),
       completeOnboarding: async () => {
         set({ isSaving: true, error: null });
-        set({ isSaving: false, error: null });
-        return true;
+        try {
+          await SecureStore.setItemAsync("onboarding_complete", "true");
+          set({ isSaving: false });
+          return true;
+        } catch {
+          set({ isSaving: false, error: "Failed to save onboarding" });
+          return false;
+        }
       },
     }),
     {
