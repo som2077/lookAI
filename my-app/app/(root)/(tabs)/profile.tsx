@@ -1,12 +1,10 @@
 import { useAuth } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const { signOut } = useAuth();
-  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const onLogoutPress = async () => {
@@ -18,7 +16,6 @@ export default function ProfileScreen() {
 
     try {
       await signOut();
-      router.replace("/get-started");
     } finally {
       setIsLoggingOut(false);
     }

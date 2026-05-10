@@ -9,13 +9,13 @@ export default function GetStartedScreen() {
   const router = useRouter();
 
   return (
-   <LinearGradient
-  colors={["#CACAD7", "#F5EBE7", "#FFFFFF"]}
-  locations={[0, 0.26, 0.53]}
-  start={{ x: 0.5, y: 0 }}
-  end={{ x: 0.32, y: 1 }}
-  className="flex-1"
->
+    <LinearGradient
+      colors={["#CACAD7", "#F5EBE7", "#FFFFFF"]}
+      locations={[0, 0.26, 0.53]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.32, y: 1 }}
+      className="flex-1"
+    >
       <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
         <View className="flex-1 px-8 pb-6 pt-0">
           {/* Logo + Title */}

@@ -3,7 +3,10 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { OnboardingProvider } from "@/store/onboarding-store";
+import {
+  OnboardingProvider,
+  useOnboardingState,
+} from "@/store/onboarding-store";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 
@@ -17,21 +20,31 @@ function RootNavigator() {
   const { isSignedIn, isLoaded, userId } = useAuth();
   const router = useRouter();
   const segments = useSegments();
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(
+    null,
+  );
+  const completionVersion = useOnboardingState((s) => s._completionVersion);
 
   useEffect(() => {
+    if (completionVersion > 0) {
+      setOnboardingComplete(true);
+      return;
+    }
+
     const loadOnboardingStatus = async () => {
       if (!userId) {
         setOnboardingComplete(null);
         return;
       }
 
-      const value = await SecureStore.getItemAsync(`onboarding_complete_${userId}`);
+      const value = await SecureStore.getItemAsync(
+        `onboarding_complete_${userId}`,
+      );
       setOnboardingComplete(value === "true");
     };
 
     void loadOnboardingStatus();
-  }, [isSignedIn, userId]);
+  }, [isSignedIn, userId, completionVersion]);
 
   useEffect(() => {
     if (!isLoaded || onboardingComplete === null) {

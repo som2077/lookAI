@@ -3,7 +3,14 @@ import { useSSO } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -50,10 +57,11 @@ export default function SignIn() {
     setError("");
 
     try {
-      const { createdSessionId, setActive, authSessionResult } = await startSSOFlow({
-        strategy: "oauth_google",
-        redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
-      });
+      const { createdSessionId, setActive, authSessionResult } =
+        await startSSOFlow({
+          strategy: "oauth_google",
+          redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
+        });
 
       if (authSessionResult?.type === "cancel") {
         return;
@@ -83,7 +91,7 @@ export default function SignIn() {
             resizeMode="contain"
           />
 
-          <Text className="mt-16 text-[40px] font-bold leading-[50px] bg-red-300 tracking-[-5.60px] text-[#1D1A27]">
+          <Text className="mt-16 text-[40px] font-bold leading-[50px] tracking-[-0.56px] text-[#1D1A27]">
             Welcome to Look AI 👋🏻
           </Text>
 
@@ -112,7 +120,7 @@ export default function SignIn() {
               <ActivityIndicator color="#2563EB" />
             ) : (
               <Text className="text-lg font-medium text-[#1D1A27]">
-                 Continue with Google
+                Continue with Google
               </Text>
             )}
           </TouchableOpacity>

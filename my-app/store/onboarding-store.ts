@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import * as SecureStore from "expo-secure-store";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type Gender = "Male" | "Female" | "Other" | "";
 
@@ -13,24 +14,29 @@ type OnboardingState = {
   stylePreferences: string[];
   isSaving: boolean;
   error: string | null;
+  _completionVersion: number;
   setAge: (value: number) => void;
   setHeight: (value: number) => void;
   setGender: (value: Gender) => void;
   setBodyType: (value: string) => void;
   setSkinTone: (value: string) => void;
   toggleStyle: (value: string) => void;
-  completeOnboarding: (userId: string) => Promise<boolean>;
+  completeOnboarding: (
+    userId: string,
+    supabase: SupabaseClient,
+  ) => Promise<boolean>;
 };
 
 const secureStorage = {
   getItem: (name: string) => SecureStore.getItemAsync(name),
-  setItem: (name: string, value: string) => SecureStore.setItemAsync(name, value),
+  setItem: (name: string, value: string) =>
+    SecureStore.setItemAsync(name, value),
   removeItem: (name: string) => SecureStore.deleteItemAsync(name),
 };
 
 export const useOnboardingState = create<OnboardingState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       age: 28,
       height: 165,
       gender: "",
@@ -39,6 +45,7 @@ export const useOnboardingState = create<OnboardingState>()(
       stylePreferences: [],
       isSaving: false,
       error: null,
+      _completionVersion: 0,
       setAge: (age) => set({ age }),
       setHeight: (height) => set({ height }),
       setGender: (gender) => set({ gender }),
@@ -47,19 +54,44 @@ export const useOnboardingState = create<OnboardingState>()(
       toggleStyle: (style) =>
         set((state) => {
           if (state.stylePreferences.includes(style)) {
-            return { stylePreferences: state.stylePreferences.filter((s) => s !== style) };
+            return {
+              stylePreferences: state.stylePreferences.filter(
+                (s) => s !== style,
+              ),
+            };
           }
           if (state.stylePreferences.length >= 3) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
         }),
-      completeOnboarding: async (userId: string) => {
+      completeOnboarding: async (userId: string, supabase: SupabaseClient) => {
         set({ isSaving: true, error: null });
         try {
-          await SecureStore.setItemAsync(`onboarding_complete_${userId}`, "true");
-          set({ isSaving: false });
+          const state = get();
+
+          const { error } = await supabase.from("user_profiles").upsert({
+            user_id: userId,
+            age: state.age,
+            height: state.height,
+            gender: state.gender,
+            body_type: state.bodyType,
+            skin_tone: state.skinTone,
+            style_preferences: state.stylePreferences,
+          });
+
+          if (error) throw error;
+
+          await SecureStore.setItemAsync(
+            `onboarding_complete_${userId}`,
+            "true",
+          );
+          set({
+            isSaving: false,
+            _completionVersion: get()._completionVersion + 1,
+          });
           return true;
-        } catch {
-          set({ isSaving: false, error: "Failed to save onboarding" });
+        } catch (e) {
+          console.error("Onboarding completion failed:", e);
+          set({ isSaving: false, error: "Failed to save onboarding data" });
           return false;
         }
       },
@@ -67,9 +99,13 @@ export const useOnboardingState = create<OnboardingState>()(
     {
       name: "onboarding-state",
       storage: createJSONStorage(() => secureStorage),
-      partialize: ({ isSaving, error, ...state }) => state,
+      partialize: ({ isSaving, error, _completionVersion, ...state }) => state,
     },
   ),
 );
 
-export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => children;
+export const OnboardingProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => children;

@@ -1,12 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-import type { PostgrestError, PostgrestFilterBuilder } from "@supabase/supabase-js";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { PostgrestError } from "@supabase/supabase-js";
 import { useSupabase } from "@/hooks/useSupabase";
+
+type QueryBuilder = ReturnType<
+  ReturnType<
+    ReturnType<typeof import("@supabase/supabase-js").createClient>["from"]
+  >["select"]
+>;
 
 type UseSupabaseQueryOptions = {
   select?: string;
-  apply?: (
-    query: PostgrestFilterBuilder<any, any, any>,
-  ) => PostgrestFilterBuilder<any, any, any>;
+  apply?: (query: QueryBuilder) => QueryBuilder;
   enabled?: boolean;
 };
 
@@ -18,9 +22,13 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<PostgrestError | Error | null>(null);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   const fetchData = useCallback(async () => {
-    if (options?.enabled === false || isInitializing) {
+    const opts = optionsRef.current;
+
+    if (opts?.enabled === false || isInitializing) {
       return;
     }
 
@@ -28,10 +36,10 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
     setError(null);
 
     try {
-      let query = supabase.from(table).select(options?.select ?? "*");
+      let query = supabase.from(table).select(opts?.select ?? "*");
 
-      if (options?.apply) {
-        query = options.apply(query);
+      if (opts?.apply) {
+        query = opts.apply(query);
       }
 
       const { data: rows, error: queryError } = await query;
@@ -42,7 +50,7 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
         return;
       }
 
-      setData((rows ?? []) as T[]);
+      setData((rows ?? []) as unknown as T[]);
     } catch (unknownError) {
       setError(
         unknownError instanceof Error
@@ -52,7 +60,7 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
     } finally {
       setLoading(false);
     }
-  }, [isInitializing, options?.apply, options?.enabled, options?.select, supabase, table]);
+  }, [isInitializing, supabase, table]);
 
   useEffect(() => {
     void fetchData();

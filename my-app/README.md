@@ -1,50 +1,230 @@
-# Welcome to your Expo app 👋
+# LookAI — Your Personal AI Stylist
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile app built with Expo that helps users discover their personal style through AI-powered outfit recommendations.
 
-## Get started
+---
 
-1. Install dependencies
+## Tech Stack
 
-   ```bash
-   npm install
-   ```
+| Layer          | Technology                                   |
+| -------------- | -------------------------------------------- |
+| **Framework**  | Expo SDK 54 + React Native 0.81.5            |
+| **Language**   | TypeScript                                   |
+| **Routing**    | Expo Router (file-based)                     |
+| **Auth**       | Clerk (Google SSO + Email OTP)               |
+| **Backend**    | Supabase (PostgreSQL + Row Level Security)   |
+| **State**      | Zustand v5 (persisted via expo-secure-store) |
+| **Styling**    | NativeWind v4 + TailwindCSS 3                |
+| **Animations** | React Native Reanimated                      |
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## Getting Started
 
-In the output, you'll find options to open the app in a
+### Prerequisites
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Node.js 18+
+- Expo CLI (`npx expo`)
+- Clerk account (for auth keys)
+- Supabase project (for database)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Install Dependencies
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Set Up Environment Variables
 
-## Learn more
+Create a `.env` file in the project root:
 
-To learn more about developing your project with Expo, look at the following resources:
+```env
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxxxx
+EXPO_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJxxxxx
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 3. Set Up Supabase Database
 
-## Join the community
+Run this SQL in the Supabase SQL Editor:
 
-Join our community of developers creating universal apps.
+```sql
+CREATE TABLE user_profiles (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id TEXT UNIQUE NOT NULL,
+  age INTEGER,
+  height INTEGER,
+  gender TEXT,
+  body_type TEXT,
+  skin_tone TEXT,
+  style_preferences TEXT[],
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "insert_own" ON user_profiles FOR INSERT
+WITH CHECK (auth.jwt() ->> 'sub' = user_id);
+
+CREATE POLICY "select_own" ON user_profiles FOR SELECT
+USING (auth.jwt() ->> 'sub' = user_id);
+
+CREATE POLICY "update_own" ON user_profiles FOR UPDATE
+USING (auth.jwt() ->> 'sub' = user_id);
+```
+
+### 4. Start the App
+
+```bash
+npx expo start
+```
+
+Open in:
+
+- **Development build** — recommended for full native module support
+- **Android emulator** — via Android Studio
+- **iOS simulator** — via Xcode (macOS only)
+- **Expo Go** — for quick testing (limited features)
+
+---
+
+## How the App Works
+
+### App Flow
+
+```
+App Launch
+  │
+  ├── Not Signed In ──→ Get Started Screen ──→ Sign In
+  │                                              ├── Google SSO
+  │                                              └── Email OTP
+  │
+  ├── Signed In + Onboarding Incomplete ──→ Onboarding (7 steps)
+  │                                           1. Welcome
+  │                                           2. Age
+  │                                           3. Height
+  │                                           4. Gender
+  │                                           5. Body Type
+  │                                           6. Skin Tone
+  │                                           7. Style Preferences
+  │                                           └── Saves to Supabase → Home
+  │
+  └── Signed In + Onboarding Complete ──→ Home (Tabs)
+                                           ├── Home
+                                           ├── Wardrobe
+                                           ├── AI Outfit Planner
+                                           ├── Saved
+                                           └── Profile (+ Logout)
+```
+
+### Authentication
+
+- **Clerk** handles all authentication
+- **Google SSO** — one-tap sign-in via `expo-auth-session`
+- **Email OTP** — passwordless sign-in with 6-digit code, auto-verification, 30s resend cooldown
+- **Auth Guard** — root layout (`app/_layout.tsx`) automatically redirects users based on auth + onboarding status
+
+### Onboarding
+
+A 7-step wizard that collects user profile data:
+
+| Step | Screen            | Data Collected                                |
+| ---- | ----------------- | --------------------------------------------- |
+| 1    | Welcome           | —                                             |
+| 2    | Age Picker        | `age` (horizontal scroll wheel)               |
+| 3    | Height Picker     | `height` in cm (vertical scroll wheel)        |
+| 4    | Gender            | `gender` (Male / Female / Other)              |
+| 5    | Body Type         | `bodyType` (gender-aware card selection)      |
+| 6    | Skin Tone         | `skinTone` (6 color swatches)                 |
+| 7    | Style Preferences | `stylePreferences` (exactly 3 from 8 options) |
+
+On completion:
+
+1. Data is **upserted** to Supabase `user_profiles` table
+2. Completion flag saved to `SecureStore`
+3. Root auth guard detects completion and redirects to Home tabs
+
+### State Management
+
+- **Zustand v5** with `persist` middleware
+- Storage: `expo-secure-store` (encrypted local storage)
+- Single store: `useOnboardingState` — holds all onboarding data + actions
+- `_completionVersion` counter signals the root layout to refresh onboarding status
+
+### Backend Integration
+
+- **Supabase** client is created with Clerk JWT token for RLS
+- `useSupabase()` hook — returns an authenticated Supabase client
+- `useSupabaseQuery()` hook — generic table query with loading/error states
+- Clerk JWT is injected as `Authorization: Bearer <token>` header
+
+### Navigation
+
+- **Expo Router** — file-based routing under `app/`
+- **Custom Tab Bar** — floating pill-shaped bar with animated press feedback
+- **FAB Button** — center "+" button navigates to AI Outfit Planner
+- **Auth Guard** — automatic redirects based on sign-in and onboarding state
+
+---
+
+## Project Structure
+
+```
+my-app/
+├── app/                        # All routes (file-based routing)
+│   ├── _layout.tsx             # Root: Clerk + auth guard + onboarding check
+│   ├── index.tsx               # Entry redirect
+│   ├── get-started.tsx         # Landing page
+│   ├── (auth)/                 # Auth screens (sign-in, email OTP)
+│   └── (root)/                 # Authenticated screens
+│       ├── (tabs)/             # Main tab screens (Home, Wardrobe, Outfit, Saved, Profile)
+│       └── onboarding/         # 7-step onboarding wizard
+├── components/
+│   ├── navigation/             # CustomTabBar
+│   ├── onboarding/             # AgePicker, HeightPicker, BodyTypeCard, etc.
+│   └── ui/                     # AppGradientBackground
+├── hooks/
+│   ├── useSupabase.ts          # Clerk-authenticated Supabase client
+│   └── useSupabaseQuery.ts     # Generic table query hook
+├── lib/
+│   └── supabase.ts             # Supabase client factory
+├── store/
+│   └── onboarding-store.ts     # Zustand store (onboarding state + Supabase save)
+├── screens/
+│   └── PostsScreen.tsx         # Demo CRUD screen (not routed)
+├── assets/                     # Images + body type PNGs
+├── docs_changes.md             # Code changes log
+└── scan.md                     # Codebase scan report with issues
+```
+
+---
+
+## Key Files
+
+| File                                     | Purpose                                                         |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| `app/_layout.tsx`                        | Root layout — Clerk provider, auth guard, onboarding redirect   |
+| `store/onboarding-store.ts`              | Zustand store — onboarding data + Supabase upsert on completion |
+| `lib/supabase.ts`                        | Supabase client factory (injects Clerk token)                   |
+| `hooks/useSupabase.ts`                   | Hook that creates authenticated Supabase client                 |
+| `components/navigation/CustomTabBar.tsx` | Animated floating bottom tab bar                                |
+
+---
+
+## Scripts
+
+```bash
+npm start          # Start Expo dev server
+npm run android    # Run on Android
+npm run ios        # Run on iOS
+npm run web        # Run on web
+npm run lint       # Run ESLint
+npm run reset-project  # Reset to blank project
+```
+
+---
+
+## Documentation
+
+- **`scan.md`** — Full codebase scan report with current issues and warnings
+- **`docs_changes.md`** — Log of all code changes made during development

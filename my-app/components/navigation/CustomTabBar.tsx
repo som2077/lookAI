@@ -110,7 +110,7 @@ export function CustomTabBar({
                   key={route.key}
                   focused={focused}
                   onPress={onPress}
-                  testID={options.tabBarButtonTestID}
+                  testID={options?.tabBarButtonTestID}
                 >
                   <View className="h-9 w-9 items-center justify-center rounded-full bg-[#141221]">
                     <Image
@@ -130,7 +130,7 @@ export function CustomTabBar({
                 key={route.key}
                 focused={focused}
                 onPress={onPress}
-                testID={options.tabBarButtonTestID}
+                testID={options?.tabBarButtonTestID}
               >
                 <Ionicons name={icon} size={22} color={iconColor} />
               </AnimatedTabButton>
