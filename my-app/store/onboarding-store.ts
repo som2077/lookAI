@@ -19,7 +19,7 @@ type OnboardingState = {
   setBodyType: (value: string) => void;
   setSkinTone: (value: string) => void;
   toggleStyle: (value: string) => void;
-  completeOnboarding: () => Promise<boolean>;
+  completeOnboarding: (userId: string) => Promise<boolean>;
 };
 
 const secureStorage = {
@@ -52,10 +52,16 @@ export const useOnboardingState = create<OnboardingState>()(
           if (state.stylePreferences.length >= 3) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
         }),
-      completeOnboarding: async () => {
+      completeOnboarding: async (userId: string) => {
         set({ isSaving: true, error: null });
-        set({ isSaving: false, error: null });
-        return true;
+        try {
+          await SecureStore.setItemAsync(`onboarding_complete_${userId}`, "true");
+          set({ isSaving: false });
+          return true;
+        } catch {
+          set({ isSaving: false, error: "Failed to save onboarding" });
+          return false;
+        }
       },
     }),
     {
