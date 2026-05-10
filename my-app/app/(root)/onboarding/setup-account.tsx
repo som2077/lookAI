@@ -12,7 +12,7 @@ export default function SetupAccountScreen() {
   useEffect(() => {
     const run = async () => {
       if (!user?.id) return;
-      const ok = await completeOnboarding();
+      const ok = await completeOnboarding(user.id);
       if (ok) router.replace("/(root)/(tabs)");
     };
 

@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type {
-  PostgrestError,
-  PostgrestFilterBuilder,
-} from "@supabase/supabase-js";
+import type { PostgrestError, PostgrestFilterBuilder } from "@supabase/supabase-js";
 import { useSupabase } from "@/hooks/useSupabase";
 
 type UseSupabaseQueryOptions = {
@@ -55,14 +52,7 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
     } finally {
       setLoading(false);
     }
-  }, [
-    isInitializing,
-    options?.apply,
-    options?.enabled,
-    options?.select,
-    supabase,
-    table,
-  ]);
+  }, [isInitializing, options?.apply, options?.enabled, options?.select, supabase, table]);
 
   useEffect(() => {
     void fetchData();

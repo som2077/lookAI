@@ -1,5 +1,6 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useAuth } from "@clerk/clerk-expo";
 import { Pressable, Text, View } from "react-native";
 import { BackButton } from "@/components/onboarding/BackButton";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
@@ -10,10 +11,13 @@ const styles = ["Casual", "Streetwear", "Minimal", "Sporty", "Formal", "Vintage"
 
 export default function StylePreferenceScreen() {
   const router = useRouter();
+  const { userId } = useAuth();
   const { stylePreferences, toggleStyle, completeOnboarding, isSaving } = useOnboardingState();
 
   const handleContinue = async () => {
-    const success = await completeOnboarding();
+    if (!userId) return;
+
+    const success = await completeOnboarding(userId);
     if (success) {
       router.replace("/(root)/(tabs)");
     }

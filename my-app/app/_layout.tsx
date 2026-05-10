@@ -14,19 +14,24 @@ if (!publishableKey) {
 }
 
 function RootNavigator() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, userId } = useAuth();
   const router = useRouter();
   const segments = useSegments();
   const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
 
   useEffect(() => {
     const loadOnboardingStatus = async () => {
-      const value = await SecureStore.getItemAsync("onboarding_complete");
+      if (!userId) {
+        setOnboardingComplete(null);
+        return;
+      }
+
+      const value = await SecureStore.getItemAsync(`onboarding_complete_${userId}`);
       setOnboardingComplete(value === "true");
     };
 
     void loadOnboardingStatus();
-  }, [isSignedIn]);
+  }, [isSignedIn, userId]);
 
   useEffect(() => {
     if (!isLoaded || onboardingComplete === null) {
@@ -35,7 +40,7 @@ function RootNavigator() {
 
     const inAuth = segments[0] === "(auth)";
     const inRoot = segments[0] === "(root)";
-    const inOnboarding = inRoot && segments.some((segment) => segment === "onboarding");
+    const inOnboarding = inRoot && segments.includes("onboarding");
 
     if (!isSignedIn) {
       if (!inAuth) {
