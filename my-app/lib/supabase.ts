@@ -17,7 +17,7 @@ export const createSupabaseClient = (clerkToken?: string | null): SupabaseClient
     ? {
         Authorization: `Bearer ${clerkToken}`,
       }
-    : {};
+    : undefined;
 
   return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {

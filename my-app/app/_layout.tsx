@@ -35,7 +35,7 @@ function RootNavigator() {
 
     const inAuth = segments[0] === "(auth)";
     const inRoot = segments[0] === "(root)";
-    const inOnboarding = inRoot && segments.includes("onboarding");
+    const inOnboarding = inRoot && segments.some((segment) => segment === "onboarding");
 
     if (!isSignedIn) {
       if (!inAuth) {
