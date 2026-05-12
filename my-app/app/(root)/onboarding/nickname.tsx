@@ -20,10 +20,10 @@ export default function NicknameScreen() {
     <View className="flex-1 px-6 pb-6 pt-2">
       <OnboardingHeader step={7} />
 
-      <Text className="mt-6 text-3xl font-bold text-[#1D1A27]">
+      <Text className="text-4xl font-semibold tracking-tight px-3 text-[#1D1A27]">
         Create nickname
       </Text>
-      <Text className="mt-3 text-base leading-6 text-[#5A5566]">
+      <Text className="mt-2 px-3 text-xl leading-6 text-[#000000]">
         This can be anything you like and can be changed later.
       </Text>
 
@@ -33,12 +33,12 @@ export default function NicknameScreen() {
           if (text.length <= MAX_LENGTH) setNickname(text);
         }}
         placeholder="Add your nickname"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor="#5A5566"
         maxLength={MAX_LENGTH}
-        className="mt-8 rounded-xl border border-gray-200 px-4 py-4 text-base text-[#1D1A27]"
+        className="mt-8 rounded-xl border  bg-[#F3F4F6] border-gray-200 px-5 py-5 text-base text-[#1D1A27]"
       />
 
-      <Text className="mt-2 text-sm text-[#5A5566]">
+      <Text className="mt-2 text-base px-2 text-[#000000]">
         {nickname.length}/{MAX_LENGTH}
       </Text>
 

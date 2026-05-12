@@ -12,21 +12,28 @@ const maleBodyTypes: BodyTypeOption[] = [
   {
     id: "slim",
     title: "Slim",
+    description: "Slim body type has a lean frame with low body fat.",
     image: require("@/assets/bodytypes/male/slim.png"),
   },
   {
     id: "athletic",
     title: "Athletic",
+    description:
+      "Athletic body type has toned muscles, balanced proportions, and a strong appearance.",
     image: require("@/assets/bodytypes/male/athletic.png"),
   },
   {
     id: "average",
     title: "Average",
+    description:
+      "Average body type has balanced proportions with moderate body fat and muscle.",
     image: require("@/assets/bodytypes/male/average.png"),
   },
   {
     id: "plus",
     title: "Plus",
+    description:
+      "A plus-size body looks strong, confident, and naturally curvier overall.",
     image: require("@/assets/bodytypes/male/plus.png"),
   },
 ];
@@ -35,21 +42,28 @@ const femaleBodyTypes: BodyTypeOption[] = [
   {
     id: "slim",
     title: "Slim",
+    description: "Slim body type has a lean frame with low body fat.",
     image: require("@/assets/bodytypes/female/slim.png"),
   },
   {
     id: "curvy",
     title: "Curvy",
+    description:
+      "Curvy body type has defined curves with fuller hips, waist, and chest.",
     image: require("@/assets/bodytypes/female/curvy.png"),
   },
   {
     id: "average",
     title: "Average",
+    description:
+      "Average body type has balanced proportions with moderate body fat and muscle.",
     image: require("@/assets/bodytypes/female/average.png"),
   },
   {
     id: "plus",
     title: "Plus",
+    description:
+      "A plus-size body looks strong, confident, and naturally curvier overall.",
     image: require("@/assets/bodytypes/female/plus.png"),
   },
 ];
@@ -59,6 +73,7 @@ export default function BodyTypesScreen() {
   const [selectedBodyType, setSelectedBodyType] = useState<string | null>(
     bodyType || null,
   );
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const bodyTypes = useMemo(() => {
     if (!gender) return maleBodyTypes;
@@ -75,12 +90,11 @@ export default function BodyTypesScreen() {
     // <SafeAreaView className="flex-1 bg-white">
     <View className="flex-1 px-5 pb-6 pt-2">
       <OnboardingHeader step={4} />
-      <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">
+      <Text className="text-4xl font-semibold px-3 tracking-tight text-[#1D1A27]">
         Body types
       </Text>
-      <Text className="mt-3 text-base leading-6 text-[#5A5566]">
-        Select the range that best represents you to find fashion inspiration
-        with you in mind.
+      <Text className="mt-2 text-left text-xl px-3 text-[#000000]">
+        This will be used to calibrate your custom plan
       </Text>
 
       <FlatList
@@ -94,7 +108,16 @@ export default function BodyTypesScreen() {
             item={item}
             index={index}
             selected={selectedBodyType === item.id}
-            onPress={() => setSelectedBodyType(item.id)}
+            expanded={expandedId === item.id}
+            onPress={() => {
+              if (expandedId === item.id) {
+                // Already expanded, select it
+                setSelectedBodyType(item.id);
+              } else {
+                // Expand it
+                setExpandedId(item.id);
+              }
+            }}
           />
         )}
       />
@@ -104,7 +127,7 @@ export default function BodyTypesScreen() {
           activeOpacity={0.9}
           disabled={!selectedBodyType}
           onPress={handleContinue}
-          className={`items-center rounded-2xl py-4 ${selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"}`}
+          className={`items-center rounded-2xl py-5 ${selectedBodyType ? "bg-[#000000]" : "bg-[#1B1623]/40"}`}
         >
           <Text className="text-base font-semibold text-white">Continue</Text>
         </TouchableOpacity>

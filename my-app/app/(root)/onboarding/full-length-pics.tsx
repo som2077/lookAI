@@ -16,64 +16,51 @@ export default function FullLengthPicsScreen() {
 
   return (
     // <SafeAreaView className="flex-1 bg-white">
-    <View className="flex-1 px-6 pb-6 pt-2">
+    <View className="flex-1 px-5 pb-6 pt-2">
       <OnboardingHeader step={6} />
 
-      <Text className="mt-4 text-center text-3xl font-bold text-[#1D1A27]">
-        2 full-lenght pics
+      <Text className="text-4xl font-semibold tracking-tight px-3 text-[#1D1A27]">
+        Full length pics
       </Text>
-      <Text className="mt-3 text-center text-base leading-6 text-[#5A5566]">
-        In order to understand your body shape, we need two full-lenght photos
-        of you.
+      <Text className="mt-2 text-xl px-3 text-[#000000]">
+        This helps AI understand your body shape and styling needs.
       </Text>
 
       {/* Example images */}
-      <View className="mt-8 flex-row items-center justify-center gap-4">
+      <View className="mt-5 flex-1 items-center   justify-center">
         <Image
-          source={require("@/assets/images/two-full-lenght1.png")}
-          className="h-48 w-36 rounded-2xl"
-          resizeMode="cover"
-        />
-        <Image
-          source={require("@/assets/images/two-full-lenght2.png")}
-          className="h-48 w-36 rounded-2xl"
+          source={require("@/assets/images/full-lenght.png")}
+          className="h-[370px] w-[370px] "
           resizeMode="cover"
         />
       </View>
 
       {/* Tips */}
-      <View className="mt-10 items-center gap-2">
-        <Text className="text-base font-semibold text-[#1D1A27]">
-          For Best Results
-        </Text>
-        <Text className="text-sm text-[#5A5566]">Just you, no friends</Text>
-        <Text className="text-sm text-[#5A5566]">
-          Full-length, but close-up
-        </Text>
-        <Text className="text-sm text-[#5A5566]">No bags, pets or phones</Text>
-        <Text className="text-sm text-[#5A5566]">
-          No glasses, hats, or airpods
+      <View className="mt-3 items-center gap-2">
+        <Text className="text-sm font-medium text-center text-[#000000]">
+          Please upload a clear full-length photo with no close-ups, glasses,
+          hats, AirPods, bags, pets, or phones.
         </Text>
       </View>
 
       {/* Buttons */}
-      <View className="mt-auto gap-4">
+      <View className="mt-14 gap-4">
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={handleSkip}
+          className="items-center rounded-2xl bg-[#ECEDF9] py-5"
+        >
+          <Text className="text-lg font-bold text-[#000000]">Skip now</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={handleUpload}
-          className="items-center rounded-2xl bg-[#1B1623] py-4"
+          className="items-center rounded-2xl bg-[#000000] py-5"
         >
           <Text className="text-base font-semibold text-white">
             Upload Image
           </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={handleSkip}
-          className="items-center py-2"
-        >
-          <Text className="text-sm font-medium text-[#5A5566]">Skip now →</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -1,33 +1,56 @@
 import { useRef } from "react";
-import { Dimensions, FlatList, Text, View, ViewToken } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  Text,
+  View,
+  ViewToken,
+} from "react-native";
 
 const AGE_MIN = 13;
 const AGE_MAX = 70;
-const AGE_ITEM_WIDTH = 96;
-const ages = Array.from({ length: AGE_MAX - AGE_MIN + 1 }, (_, idx) => AGE_MIN + idx);
+const ages = Array.from(
+  { length: AGE_MAX - AGE_MIN + 1 },
+  (_, idx) => AGE_MIN + idx,
+);
 
-export function AgePicker({ age, onChange }: { age: number; onChange: (value: number) => void }) {
+export function AgePicker({
+  age,
+  onChange,
+}: {
+  age: number;
+  onChange: (value: number) => void;
+}) {
   const { width } = Dimensions.get("window");
-  const sideSpacer = (width - AGE_ITEM_WIDTH) / 2;
+  const AGE_ITEM_WIDTH = Math.floor(width / 3); // sirf 3 items visible
+  const sideSpacer = AGE_ITEM_WIDTH; // left+right padding = 1 item width
 
-  const onViewable = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    const centered = viewableItems.find((item) => item.isViewable && item.item != null);
-    if (centered?.item != null) onChange(centered.item as number);
-  }).current;
+  const onViewable = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      const centered = viewableItems.find(
+        (item) => item.isViewable && item.item != null,
+      );
+      if (centered?.item != null) onChange(centered.item as number);
+    },
+  ).current;
 
   return (
     <>
-      {/* Big number + arrow above picker */}
+      {/* Big number + arrow */}
       <View className="items-center">
-        <Text style={{ fontSize: 80, fontWeight: "700", color: "#1D1A27", lineHeight: 88 }}>
+        <Text className="text-[70px] font-bold leading-[80px] text-[#1D1A27]">
           {age}
         </Text>
-        {/* ▲ arrow pointing down toward the picker strip */}
-        <Text style={{ fontSize: 14, color: "#C8D44A", marginTop: 4, lineHeight: 16 }}>▲</Text>
+        <Image
+          source={require("@/assets/images/polygon.png")}
+          className="mt-3 h-10 w-10"
+          resizeMode="contain"
+        />
       </View>
 
-      {/* Picker strip — full width, no horizontal padding */}
-      <View style={{ marginTop: 8, backgroundColor: "#B8ADEE", paddingVertical: 18, overflow: "hidden" }}>
+      {/* Picker strip — black background */}
+      <View className="mt-8 overflow-hidden bg-[#000000] py-[30px]">
         <FlatList
           data={ages}
           keyExtractor={(item) => item.toString()}
@@ -48,12 +71,16 @@ export function AgePicker({ age, onChange }: { age: number; onChange: (value: nu
           renderItem={({ item }) => {
             const isSelected = item === age;
             return (
-              <View style={{ width: AGE_ITEM_WIDTH, alignItems: "center", justifyContent: "center" }}>
+              <View
+                style={{ width: AGE_ITEM_WIDTH }}
+                className="items-center justify-center"
+              >
                 <Text
                   style={{
-                    fontSize: isSelected ? 34 : 26,
+                    fontSize: isSelected ? 45 : 35,
                     fontWeight: isSelected ? "700" : "500",
-                    color: isSelected ? "#FFFFFF" : "#7B6EC4",
+                    // selected → white, others → muted gray
+                    color: isSelected ? "#FFFFFF" : "#A3A3A3",
                   }}
                 >
                   {item}
@@ -63,7 +90,7 @@ export function AgePicker({ age, onChange }: { age: number; onChange: (value: nu
           }}
         />
 
-        {/* Selected cell highlight */}
+        {/* Selected cell highlight — dark border left/right */}
         <View
           pointerEvents="none"
           style={{
@@ -72,10 +99,10 @@ export function AgePicker({ age, onChange }: { age: number; onChange: (value: nu
             bottom: 0,
             left: sideSpacer,
             width: AGE_ITEM_WIDTH,
-            backgroundColor: "rgba(255,255,255,0.18)",
-            borderLeftWidth: 1,
-            borderRightWidth: 1,
-            borderColor: "rgba(255,255,255,0.5)",
+            backgroundColor: "rgba(255,255,255,0.06)",
+            borderLeftWidth: 3,
+            borderRightWidth: 3,
+            borderColor: "rgba(255,255,255)",
           }}
         />
       </View>

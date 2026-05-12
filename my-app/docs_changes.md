@@ -284,3 +284,5 @@ New: Welcome → Gender → Age → Height → Body Type → Style Preference
 | `store/onboarding-store.ts`                   | Added Supabase upsert + `_completionVersion`, removed skinTone |
 | `tailwind.config.js`                          | Added screens/ to content glob                                 |
 | `components/onboarding/ProgressIndicator.tsx` | Updated from 7 steps to 6 steps                                |
+| `components/onboarding/BodyTypeCard.tsx`      | Rewritten as accordion with title, description, chevron icons  |
+| `app/(root)/onboarding/body-type.tsx`         | Added descriptions, expanded state for accordion UI            |

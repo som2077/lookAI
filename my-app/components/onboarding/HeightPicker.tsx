@@ -1,14 +1,15 @@
 import { useRef } from "react";
-import { Dimensions, FlatList, Text, View, ViewToken } from "react-native";
+import { FlatList, Image, Text, View, ViewToken } from "react-native";
 
 const HEIGHT_MIN = 140;
 const HEIGHT_MAX = 210;
-const HEIGHT_ITEM_HEIGHT = 40;
-const VISIBLE_ITEMS = 7; // kitne items ek waqt dikhenge
-const RULER_HEIGHT = HEIGHT_ITEM_HEIGHT * VISIBLE_ITEMS;
+const ITEM_H = 28; // ← kam kiya: lines paas paas
+const VISIBLE = 13; // ← zyada items visible
+const RULER_H = ITEM_H * VISIBLE; // 392px
+
 const values = Array.from(
   { length: HEIGHT_MAX - HEIGHT_MIN + 1 },
-  (_, idx) => HEIGHT_MAX - idx // upar se neeche: bada se chhota
+  (_, idx) => HEIGHT_MAX - idx,
 );
 
 export function HeightPicker({
@@ -21,113 +22,129 @@ export function HeightPicker({
   const onViewable = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       const centered = viewableItems.find(
-        (item) => item.isViewable && item.item != null
+        (item) => item.isViewable && item.item != null,
       );
       if (centered?.item != null) onChange(centered.item as number);
-    }
+    },
   ).current;
 
+  const labelValues = [
+    // height + 15,
+    height + 10,
+    height + 5,
+    (height = HEIGHT_MAX ? height : height),
+    height - 5,
+    height - 10,
+    // height - 15,
+  ];
+
   return (
-    <View style={{ flex: 1, alignItems: "center" }}>
-      {/* Big number display */}
-      <View style={{ flexDirection: "row", alignItems: "flex-end", marginTop: 32 }}>
-        <Text style={{ fontSize: 72, fontWeight: "800", color: "#1D1A27", lineHeight: 80 }}>
+    <View className="flex-1 items-center">
+      {/* Big number + Cm */}
+      <View className="mt-16 flex-row items-end">
+        <Text className="text-[70px] font-bold leading-[80px] text-[#1D1A27]">
           {height}
         </Text>
-        <Text style={{ fontSize: 22, fontWeight: "600", color: "#6E6A79", marginBottom: 10, marginLeft: 4 }}>
-          cm
+        <Text className="mb-3 ml-1 text-[20px] font-semibold text-[#6E6A79]">
+          Cm
         </Text>
       </View>
 
-      {/* Ruler + labels row */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginTop: 32,
-        }}
-      >
-        {/* Left: number labels */}
-        <View style={{ width: 52, height: RULER_HEIGHT, justifyContent: "space-between", alignItems: "flex-end", paddingRight: 10 }}>
-          {[height + Math.floor(VISIBLE_ITEMS / 2), height + Math.floor(VISIBLE_ITEMS / 2) - 1, height, height - 1, height - Math.floor(VISIBLE_ITEMS / 2)].map((val, i) => (
-            <Text
-              key={i}
-              style={{
-                fontSize: val === height ? 20 : 14,
-                fontWeight: val === height ? "700" : "400",
-                color: val === height ? "#1D1A27" : "#9B97A6",
-                lineHeight: HEIGHT_ITEM_HEIGHT,
-              }}
-            >
-              {val}
-            </Text>
-          ))}
+      {/* Ruler row */}
+      <View className="mt-10 flex-row items-center">
+        {/* Left labels */}
+        <View
+          style={{ width: 80, height: RULER_H }}
+          className="items-end justify-between pr-4"
+        >
+          {labelValues.map((val, i) => {
+            const isSelected = val === height;
+            const inRange = val >= HEIGHT_MIN && val <= HEIGHT_MAX;
+            // Index 2 = center (selected), 0/4 = top/bottom (smallest)
+            const fontSize = isSelected
+              ? 30
+              : i === 1 || i === 3
+                ? 26
+                : i === 0 || i === 4
+                  ? 20
+                  : 25;
+            const fontWeight = isSelected
+              ? "700"
+              : i === 1 || i === 3
+                ? "500"
+                : "400";
+            const color = isSelected
+              ? "#1D1A27"
+              : i === 1 || i === 3
+                ? "#6B7280"
+                : "#9CA3AF";
+            return (
+              <Text key={i} style={{ fontSize, fontWeight, color }}>
+                {inRange ? val : ""}
+              </Text>
+            );
+          })}
         </View>
 
-        {/* Purple ruler column */}
+        {/* Dark ruler */}
         <View
-          style={{
-            width: 80,
-            height: RULER_HEIGHT,
-            backgroundColor: "#B8ADEE",
-            borderRadius: 16,
-            overflow: "hidden",
-          }}
+          style={{ width: 90, height: RULER_H }}
+          className="overflow-hidden rounded-2xl bg-black"
         >
           <FlatList
             data={values}
             keyExtractor={(item) => item.toString()}
             showsVerticalScrollIndicator={false}
-            snapToInterval={HEIGHT_ITEM_HEIGHT}
+            snapToInterval={ITEM_H}
             decelerationRate="fast"
             bounces={false}
             contentContainerStyle={{
-              paddingVertical: HEIGHT_ITEM_HEIGHT * Math.floor(VISIBLE_ITEMS / 2),
+              paddingVertical: ITEM_H * Math.floor(VISIBLE / 2),
             }}
             getItemLayout={(_, index) => ({
-              length: HEIGHT_ITEM_HEIGHT,
-              offset: HEIGHT_ITEM_HEIGHT * index,
+              length: ITEM_H,
+              offset: ITEM_H * index,
               index,
             })}
             initialScrollIndex={HEIGHT_MAX - height}
             viewabilityConfig={{ itemVisiblePercentThreshold: 65 }}
             onViewableItemsChanged={onViewable}
-            renderItem={({ item }) => (
-              <View
-                style={{
-                  height: HEIGHT_ITEM_HEIGHT,
-                  alignItems: "flex-end",
-                  justifyContent: "center",
-                  paddingRight: 10,
-                }}
-              >
-                {/* Tick marks — longer for selected */}
+            renderItem={({ item }) => {
+              const isSelected = item === height;
+              const isMajor = item % 5 === 0;
+              return (
                 <View
-                  style={{
-                    height: item === height ? 2 : 1,
-                    width: item === height ? 28 : item % 5 === 0 ? 20 : 14,
-                    backgroundColor:
-                      item === height
+                  style={{ height: ITEM_H, width: "100%" }}
+                  className="items-center justify-center"
+                >
+                  <View
+                    style={{
+                      height: isSelected ? 2.5 : 1.5,
+                      width: isSelected ? 50 : isMajor ? 40 : 35,
+                      backgroundColor: isSelected
                         ? "#D4DD56"
-                        : "rgba(255,255,255,0.75)",
-                    borderRadius: 2,
-                  }}
-                />
-              </View>
-            )}
+                        : isMajor
+                          ? "rgba(255,255,255,0.8)"
+                          : "rgba(255,255,255,0.3)",
+                      borderRadius: 2,
+                    }}
+                  />
+                </View>
+              );
+            }}
           />
         </View>
 
-        {/* Arrow pointing left at selected line */}
-        <Text
+        {/* Yellow polygon arrow */}
+        <Image
+          source={require("@/assets/images/polygon.png")}
+          className="ml-2 h-[30px] w-[30px]"
           style={{
-            fontSize: 20,
-            color: "#D4DD56",
-            marginLeft: 6,
+            transform: [{ rotate: "270deg" }],
+            tintColor: "#000000",
           }}
-        >
-          ◀
-        </Text>
+          resizeMode="contain"
+        />
       </View>
     </View>
   );

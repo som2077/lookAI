@@ -10,41 +10,27 @@ export default function AgeScreen() {
   const { age, setAge } = useOnboardingState();
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#FFFFFF",
-        paddingBottom: 24,
-        paddingTop: 8,
-      }}
-    >
+    <View className="flex-1 pb-10 pt-2">
       {/* Header */}
-      <View style={{ paddingHorizontal: 24 }}>
+      <View className="px-6">
         <OnboardingHeader step={2} />
       </View>
 
       {/* Title */}
-      <Text
-        style={{
-          marginTop: 24,
-          textAlign: "center",
-          fontSize: 36,
-          fontWeight: "600",
-          letterSpacing: -0.5,
-          color: "#1D1A27",
-          paddingHorizontal: 24,
-        }}
-      >
+      <Text className="px-9 text-left text-4xl  font-semibold tracking-tight text-[#1D1A27]">
         How old are you?
+      </Text>
+      <Text className="px-9 mt-2 text-left text-xl text-[#000000]">
+        This will be used to calibrate your custom plan
       </Text>
 
       {/* AgePicker vertically centered in remaining space */}
-      <View style={{ flex: 1, justifyContent: "center" }}>
+      <View className="flex-1 justify-center mb-12">
         <AgePicker age={age} onChange={setAge} />
       </View>
 
       {/* Continue button pinned to bottom */}
-      <View style={{ paddingHorizontal: 24 }}>
+      <View className="px-6">
         <ContinueButton
           onPress={() => router.push("/(root)/onboarding/height")}
         />

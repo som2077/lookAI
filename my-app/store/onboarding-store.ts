@@ -60,7 +60,7 @@ export const useOnboardingState = create<OnboardingState>()(
               ),
             };
           }
-          if (state.stylePreferences.length >= 3) return state;
+          if (state.stylePreferences.length >= 5) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
         }),
       completeOnboarding: async (userId: string, supabase: SupabaseClient) => {
