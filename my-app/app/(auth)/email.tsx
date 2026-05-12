@@ -3,12 +3,15 @@ import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
+const getStartedLogo = require("@/assets/images/getStartedLogo.png");
 
 type EmailFlow = "sign-in" | "sign-up";
 
@@ -414,18 +417,34 @@ export default function EmailAuthScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-white"
+      className="flex-1 "
       contentContainerStyle={{ flexGrow: 1 }}
       keyboardShouldPersistTaps="handled"
     >
-      <View className="flex-1 justify-center px-6 py-12">
-        <Text className="text-3xl font-bold text-gray-800 mb-6">
-          Enter your email
+      <View className="flex-1 px-6 mt-12">
+        {/* Logo */}
+        <View className="items-center mt-12">
+          <Image
+            source={getStartedLogo}
+            className="h-24 w-full"
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* Heading */}
+        <Text className="text-center text-4xl font-bold leading-10 text-[#000000] mt-16 mb-16">
+          Discover what to wear,{"\n"}instantly and effortlessly.
         </Text>
 
+        {/* Subtext */}
+        <Text className="text-center text-xl font-medium text-[#000000] mb-2">
+          Enter your email address to get started
+        </Text>
+
+        {/* Email Input */}
         <TextInput
-          className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4"
-          placeholder="Email address"
+          className="w-full rounded-2xl bg-[#F2F4F7] text-center border border-[#D1D5DB] px-5 py-5 text-base text-[#000000]"
+          placeholder="name@youremailaddress.com"
           placeholderTextColor="#9CA3AF"
           value={email}
           onChangeText={setEmail}
@@ -435,6 +454,7 @@ export default function EmailAuthScreen() {
           editable={!hasSentCode && !isSending && !isVerifying}
         />
 
+        {/* Continue Button */}
         <TouchableOpacity
           onPress={hasSentCode ? resendCode : sendCode}
           disabled={
@@ -442,12 +462,12 @@ export default function EmailAuthScreen() {
               ? isResendDisabled
               : !email.trim() || isSending || isVerifying
           }
-          className="w-full bg-blue-600 py-4 rounded-xl items-center mb-6"
+          className="w-full mt-3 rounded-2xl bg-[#1A1A1A] py-5 items-center"
         >
           {isSending ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text className="text-white font-bold text-base">
+            <Text className="text-base font-semibold text-white">
               {hasSentCode
                 ? resendSeconds > 0
                   ? `Resend Code (${resendSeconds}s)`
@@ -459,11 +479,11 @@ export default function EmailAuthScreen() {
 
         {hasSentCode ? (
           <View>
-            <Text className="text-xl font-bold text-gray-800 mb-3">
-              Enter verification code
+            <Text className="text-center text-xl font-medium text-[#000000] mb-2 mt-6">
+              Enter verification code we sent to your email...
             </Text>
             <TextInput
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4"
+              className="w-full rounded-2xl text-center bg-[#F2F4F7] border border-[#D1D5DB] px-5 py-5 text-base text-[#000000]"
               placeholder="Verification code"
               placeholderTextColor="#9CA3AF"
               value={code}
@@ -477,7 +497,22 @@ export default function EmailAuthScreen() {
           </View>
         ) : null}
 
-        {error ? <Text className="text-red-500 mt-4">{error}</Text> : null}
+        {error ? (
+          <Text className="text-red-500 text-center mt-4">{error}</Text>
+        ) : null}
+
+        {/* Terms Text */}
+        <Text className="mt-5 px-4 text-center text-sm leading-5 text-[#000000]">
+          By continuing, you accept our{" "}
+          <Text className="font-semibold text-[#000000] underline">
+            Terms of Service
+          </Text>{" "}
+          and acknowledge our{" "}
+          <Text className="font-semibold text-[#000000] underline">
+            Privacy Policy
+          </Text>
+          . You can tap them to view details.
+        </Text>
       </View>
     </ScrollView>
   );
