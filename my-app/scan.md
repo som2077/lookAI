@@ -54,8 +54,7 @@ my-app/
 │           ├── height.tsx        ← Height picker (step 3)
 │           ├── gender.tsx        ← Gender selector (step 4)
 │           ├── body-type.tsx     ← Body type cards (step 5)
-│           ├── skin-tone.tsx     ← Skin tone selector (step 6)
-│           ├── style-preference.tsx ← Style chips (step 7, completes onboarding)
+│           ├── style-preference.tsx ← Style chips (step 6, completes onboarding)
 │           └── setup-account.tsx ← Auto-save fallback screen
 ├── components/
 │   ├── navigation/
@@ -66,7 +65,7 @@ my-app/
 │   │   ├── BodyTypeCard.tsx      ← Animated selectable card (Reanimated)
 │   │   ├── ContinueButton.tsx    ← Shared continue button
 │   │   ├── HeightPicker.tsx      ← Vertical scroll height wheel
-│   │   └── ProgressIndicator.tsx ← 7-step bar
+│   │   └── ProgressIndicator.tsx ← 6-step bar
 │   └── ui/
 │       └── AppGradientBackground.tsx ← Reusable gradient overlay
 ├── hooks/
@@ -114,10 +113,9 @@ my-app/
 | 3    | `onboarding/height`           | `height` (default: 165)        | `HeightPicker` (vertical FlatList)     |
 | 4    | `onboarding/gender`           | `gender`                       | 3 circle buttons (Male/Female/Other)   |
 | 5    | `onboarding/body-type`        | `bodyType`                     | `BodyTypeCard` FlatList (gender-aware) |
-| 6    | `onboarding/skin-tone`        | `skinTone`                     | 6 color swatches                       |
-| 7    | `onboarding/style-preference` | `stylePreferences` (exactly 3) | 8 chip toggles                         |
+| 6    | `onboarding/style-preference` | `stylePreferences` (exactly 3) | 8 chip toggles                         |
 
-**Completion:** upserts profile data to Supabase `user_profiles` table, then writes `onboarding_complete_<userId> = "true"` to SecureStore. Root layout auth guard detects completion via `_completionVersion` and redirects to `/(root)/(tabs)` automatically.
+**Completion:** upserts profile data to Supabase `user_profiles` table (age, height, gender, body*type, style_preferences), then writes `onboarding_complete*<userId> = "true"`to SecureStore. Root layout auth guard detects completion via`\_completionVersion`and redirects to`/(root)/(tabs)` automatically.
 
 **Persistence:** Zustand `persist` middleware → `expo-secure-store` (key: `"onboarding-state"`). `isSaving` and `error` are excluded via `partialize`.
 
@@ -134,14 +132,14 @@ my-app/
 
 ## 6. Backend / Data Layer
 
-| Aspect               | Details                                                                                                        |
-| -------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **Client**           | `lib/supabase.ts` — factory function `createSupabaseClient(token?)`                                            |
-| **Auth integration** | Clerk JWT injected via global headers; Supabase's own auth is disabled (`autoRefreshToken: false`)             |
-| **Session storage**  | `AsyncStorage` (for Supabase internal session, though effectively unused)                                      |
-| **Query hook**       | `useSupabaseQuery<T>(table, options)` — generic select with `apply` filter builder                             |
-| **Demo**             | `screens/PostsScreen.tsx` — insert + list for a `posts` table; **not routed**                                  |
-| **Onboarding data**  | Upserted to `user_profiles` table on completion (age, height, gender, body_type, skin_tone, style_preferences) |
+| Aspect               | Details                                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------- |
+| **Client**           | `lib/supabase.ts` — factory function `createSupabaseClient(token?)`                                 |
+| **Auth integration** | Clerk JWT injected via global headers; Supabase's own auth is disabled (`autoRefreshToken: false`)  |
+| **Session storage**  | `AsyncStorage` (for Supabase internal session, though effectively unused)                           |
+| **Query hook**       | `useSupabaseQuery<T>(table, options)` — generic select with `apply` filter builder                  |
+| **Demo**             | `screens/PostsScreen.tsx` — insert + list for a `posts` table; **not routed**                       |
+| **Onboarding data**  | Upserted to `user_profiles` table on completion (age, height, gender, body_type, style_preferences) |
 
 ---
 
@@ -249,7 +247,7 @@ app/index.tsx (redirect)
     │   └── /profile (+ Logout)
     └── /onboarding
         ├── / (Welcome)
-        ├── /age → /height → /gender → /body-type → /skin-tone → /style-preference
+        ├── /age → /height → /gender → /body-type → /style-preference
         └── /setup-account (fallback)
 ```
 
@@ -273,7 +271,7 @@ app/index.tsx (redirect)
 
 ## 13. Summary
 
-**LookAI** is an Expo SDK 54 React Native app with Clerk authentication (Google SSO + email OTP), a 7-step onboarding flow, and a Supabase backend (currently used only in a demo screen). The app has a clean file-based routing structure and a polished custom tab bar.
+**LookAI** is an Expo SDK 54 React Native app with Clerk authentication (Google SSO + email OTP), a 6-step onboarding flow, and a Supabase backend. The app has a clean file-based routing structure and a polished custom tab bar.
 
 **Key risks (remaining):**
 

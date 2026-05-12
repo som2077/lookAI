@@ -141,20 +141,146 @@ USING (auth.jwt() ->> 'sub' = user_id);
 
 ---
 
+## Session 4: Remove Skin Tone from Onboarding & Database
+
+### Change 16 — `store/onboarding-store.ts`
+
+- **Removed** `skinTone: string` from state type
+- **Removed** `setSkinTone` action
+- **Removed** `skinTone: ""` default value
+- **Removed** `setSkinTone` setter
+- **Removed** `skin_tone: state.skinTone` from Supabase upsert payload
+
+### Change 17 — `app/(root)/onboarding/skin-tone.tsx`
+
+- **Deleted** entire file
+
+### Change 18 — `app/(root)/onboarding/body-type.tsx`
+
+- **Updated** navigation: `skin-tone` → `style-preference` (skip removed screen)
+
+### Change 19 — `app/(root)/onboarding/style-preference.tsx`
+
+- **Updated** `ProgressIndicator step={7}` → `step={6}`
+
+### Change 20 — `components/onboarding/ProgressIndicator.tsx`
+
+- **Updated** step array from `[1,2,3,4,5,6,7]` → `[1,2,3,4,5,6]`
+
+### Supabase SQL (Run Manually)
+
+```sql
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS skin_tone;
+```
+
+---
+
+## Session 5: Fix "Maximum update depth exceeded" Infinite Loop
+
+### Problem
+
+`useSegments()` returns a new array reference on every render, and `router` from `useRouter()` may also be unstable. Since both were in the navigation guard's dependency array, the effect re-fired every render → `router.replace()` → re-render → infinite loop.
+
+### Change 21 — `app/_layout.tsx`
+
+- **Added** `segmentKey = segments.join("/")` — converts array to stable string
+- **Replaced** `segments` with `segmentKey` in the navigation guard dependency array
+- **Removed** `router` from dependency array (conceptually stable, doesn't need tracking)
+- **Added** `as string[]` cast on `segments.includes("onboarding")` to fix TS typed routes lint
+- **Added** eslint-disable comment for `react-hooks/exhaustive-deps`
+
+---
+
+## Session 6: Remove "Other" Gender Option
+
+### Change 22 — `store/onboarding-store.ts`
+
+- **Updated** `Gender` type: `"Male" | "Female" | "Other" | ""` → `"Male" | "Female" | ""`
+
+### Change 23 — `app/(root)/onboarding/gender.tsx`
+
+- **Removed** `{ label: "Other", icon: "⚥", bg: "#5E59E6", iconColor: "#FFFFFF" }` from options array
+- Only Male and Female are now selectable
+
+---
+
+## Session 7: Fix "Maximum update depth" on Style Toggle
+
+### Problem
+
+Toggling style preferences triggered infinite re-render loop. Root cause: `getToken` from Clerk's `useAuth()` returns a **new function reference** every render. It was in the `useSupabase` effect's dependency array → store update → re-render → new `getToken` → effect fires → `setSupabase(newClient)` → re-render → infinite loop.
+
+### Change 24 — `hooks/useSupabase.ts`
+
+- **Added** `getTokenRef = useRef(getToken)` to hold stable reference
+- **Updated** effect to call `getTokenRef.current(...)` instead of `getToken(...)`
+- **Removed** `getToken` from dependency array — `isLoaded`, `isSignedIn`, `userId` already capture auth changes
+
+---
+
+## Session 8: Fix Duplicate Key Error on Upsert + Reorder Onboarding
+
+### Change 26 — Reorder Onboarding Flow
+
+Old: Welcome → Age → Height → Gender → Body Type → Style Preference
+New: Welcome → Gender → Age → Height → Body Type → Style Preference
+
+| File                    | Change                                           |
+| ----------------------- | ------------------------------------------------ |
+| `onboarding/index.tsx`  | Navigate to `gender` (was `age`)                 |
+| `onboarding/gender.tsx` | Step 4→2, navigate to `age` (was `body-type`)    |
+| `onboarding/age.tsx`    | Step 2→3                                         |
+| `onboarding/height.tsx` | Step 3→4, navigate to `body-type` (was `gender`) |
+
+### Change 29 — Add "2 full-length pics" onboarding screen (step 7)
+
+- **Created** `app/(root)/onboarding/full-length-pics.tsx` — new final onboarding screen
+  - Shows 2 example images (`two-full-lenght1.png`, `two-full-lenght2.png`)
+  - "For Best Results" tips section
+  - "Upload Image" button (completes onboarding, TODO: image picker)
+  - "Skip now →" button (also completes onboarding)
+- **Updated** `style-preference.tsx` — now navigates to `full-length-pics` instead of completing onboarding; removed Clerk/Supabase imports
+- **Updated** `ProgressIndicator.tsx` — 6 steps → 7 steps
+
+### Change 28 — Fix first-time login skipping onboarding
+
+**Problem:** `app/index.tsx` had `<Redirect href="/(root)/(tabs)" />` for signed-in users, which fired synchronously BEFORE the root layout could async-read onboarding status from SecureStore.
+
+**Fixes:**
+
+- `app/index.tsx` — removed all redirect logic, now shows only a loading spinner
+- `app/_layout.tsx` nav guard — restructured: check `!isSignedIn` BEFORE `onboardingComplete === null`, so unauthenticated users get redirected to sign-in immediately without waiting for onboarding status
+
+### Change 27 — `app/_layout.tsx` (Logout → Login flow fix)
+
+- **Moved** `!userId` check BEFORE `completionVersion > 0` check
+- On logout (`userId = null`) → always resets `onboardingComplete = null`
+- Prevents stale `_completionVersion` from giving wrong result if a different user logs in
+
+### Change 25 — `store/onboarding-store.ts`
+
+- **Added** `{ onConflict: "user_id" }` to `supabase.from("user_profiles").upsert()` call
+- Without this, Supabase couldn't resolve conflicts on existing `user_id` rows → error code `23505`
+
+---
+
 ## Files Modified (Summary)
 
-| File                                         | Changes                                                              |
-| -------------------------------------------- | -------------------------------------------------------------------- |
-| `app/_layout.tsx`                            | Added `_completionVersion` subscription + sync shortcut              |
-| `app/get-started.tsx`                        | Fixed indentation                                                    |
-| `app/(auth)/sign-in.tsx`                     | Removed debug styles, fixed tracking                                 |
-| `app/(root)/(tabs)/profile.tsx`              | Removed manual logout navigation                                     |
-| `app/(root)/onboarding/_layout.tsx`          | Removed duplicate OnboardingProvider                                 |
-| `app/(root)/onboarding/body-type.tsx`        | Added empty gender guard                                             |
-| `app/(root)/onboarding/setup-account.tsx`    | Added Supabase integration, removed direct navigation                |
-| `app/(root)/onboarding/skin-tone.tsx`        | Formatted JSX                                                        |
-| `app/(root)/onboarding/style-preference.tsx` | Added Supabase integration, formatted JSX, removed direct navigation |
-| `components/navigation/CustomTabBar.tsx`     | Added optional chaining on options                                   |
-| `hooks/useSupabaseQuery.ts`                  | Fixed infinite loop + TS lint errors                                 |
-| `store/onboarding-store.ts`                  | Added Supabase upsert + `_completionVersion`                         |
-| `tailwind.config.js`                         | Added screens/ to content glob                                       |
+| File                                          | Changes                                                        |
+| --------------------------------------------- | -------------------------------------------------------------- |
+| `app/_layout.tsx`                             | Completion subscription + segmentKey fix for infinite loop     |
+| `app/get-started.tsx`                         | Fixed indentation                                              |
+| `app/(auth)/sign-in.tsx`                      | Removed debug styles, fixed tracking                           |
+| `app/(root)/(tabs)/profile.tsx`               | Removed manual logout navigation                               |
+| `app/(root)/onboarding/_layout.tsx`           | Removed duplicate OnboardingProvider                           |
+| `app/(root)/onboarding/body-type.tsx`         | Added empty gender guard, updated nav to skip skin-tone        |
+| `app/(root)/onboarding/gender.tsx`            | Removed "Other" option, only Male/Female                       |
+| `app/(root)/onboarding/setup-account.tsx`     | Added Supabase integration, removed direct navigation          |
+| `app/(root)/onboarding/skin-tone.tsx`         | **DELETED**                                                    |
+| `app/(root)/onboarding/style-preference.tsx`  | Added Supabase integration, formatted JSX, step 7→6            |
+| `components/navigation/CustomTabBar.tsx`      | Added optional chaining on options                             |
+| `hooks/useSupabase.ts`                        | Stabilized getToken with useRef to fix infinite loop           |
+| `hooks/useSupabaseQuery.ts`                   | Fixed infinite loop + TS lint errors                           |
+| `store/onboarding-store.ts`                   | Added Supabase upsert + `_completionVersion`, removed skinTone |
+| `tailwind.config.js`                          | Added screens/ to content glob                                 |
+| `components/onboarding/ProgressIndicator.tsx` | Updated from 7 steps to 6 steps                                |

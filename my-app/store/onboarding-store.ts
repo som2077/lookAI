@@ -3,14 +3,14 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import * as SecureStore from "expo-secure-store";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export type Gender = "Male" | "Female" | "Other" | "";
+export type Gender = "Male" | "Female" | "";
 
 type OnboardingState = {
   age: number;
   height: number;
   gender: Gender;
   bodyType: string;
-  skinTone: string;
+  nickname: string;
   stylePreferences: string[];
   isSaving: boolean;
   error: string | null;
@@ -19,7 +19,7 @@ type OnboardingState = {
   setHeight: (value: number) => void;
   setGender: (value: Gender) => void;
   setBodyType: (value: string) => void;
-  setSkinTone: (value: string) => void;
+  setNickname: (value: string) => void;
   toggleStyle: (value: string) => void;
   completeOnboarding: (
     userId: string,
@@ -41,7 +41,7 @@ export const useOnboardingState = create<OnboardingState>()(
       height: 165,
       gender: "",
       bodyType: "",
-      skinTone: "",
+      nickname: "",
       stylePreferences: [],
       isSaving: false,
       error: null,
@@ -50,7 +50,7 @@ export const useOnboardingState = create<OnboardingState>()(
       setHeight: (height) => set({ height }),
       setGender: (gender) => set({ gender }),
       setBodyType: (bodyType) => set({ bodyType }),
-      setSkinTone: (skinTone) => set({ skinTone }),
+      setNickname: (nickname) => set({ nickname }),
       toggleStyle: (style) =>
         set((state) => {
           if (state.stylePreferences.includes(style)) {
@@ -68,15 +68,18 @@ export const useOnboardingState = create<OnboardingState>()(
         try {
           const state = get();
 
-          const { error } = await supabase.from("user_profiles").upsert({
-            user_id: userId,
-            age: state.age,
-            height: state.height,
-            gender: state.gender,
-            body_type: state.bodyType,
-            skin_tone: state.skinTone,
-            style_preferences: state.stylePreferences,
-          });
+          const { error } = await supabase.from("user_profiles").upsert(
+            {
+              user_id: userId,
+              age: state.age,
+              height: state.height,
+              gender: state.gender,
+              body_type: state.bodyType,
+              nickname: state.nickname,
+              style_preferences: state.stylePreferences,
+            },
+            { onConflict: "user_id" },
+          );
 
           if (error) throw error;
 

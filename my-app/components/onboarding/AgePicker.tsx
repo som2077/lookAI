@@ -7,19 +7,27 @@ const AGE_ITEM_WIDTH = 96;
 const ages = Array.from({ length: AGE_MAX - AGE_MIN + 1 }, (_, idx) => AGE_MIN + idx);
 
 export function AgePicker({ age, onChange }: { age: number; onChange: (value: number) => void }) {
-  const sideSpacer = (Dimensions.get("window").width - AGE_ITEM_WIDTH) / 2;
+  const { width } = Dimensions.get("window");
+  const sideSpacer = (width - AGE_ITEM_WIDTH) / 2;
+
   const onViewable = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     const centered = viewableItems.find((item) => item.isViewable && item.item != null);
-    if (centered?.item) onChange(centered.item as number);
+    if (centered?.item != null) onChange(centered.item as number);
   }).current;
 
   return (
     <>
-      <View className="mt-24 items-center">
-        <Text className="text-7xl font-semibold text-black">{age}</Text>
-        <Text className="mt-2 text-3xl text-[#D4DD56]">▲</Text>
+      {/* Big number + arrow above picker */}
+      <View className="items-center">
+        <Text style={{ fontSize: 80, fontWeight: "700", color: "#1D1A27", lineHeight: 88 }}>
+          {age}
+        </Text>
+        {/* ▲ arrow pointing down toward the picker strip */}
+        <Text style={{ fontSize: 14, color: "#C8D44A", marginTop: 4, lineHeight: 16 }}>▲</Text>
       </View>
-      <View className="mt-4 overflow-hidden rounded-2xl bg-[#A89AF4] py-5">
+
+      {/* Picker strip — full width, no horizontal padding */}
+      <View style={{ marginTop: 8, backgroundColor: "#B8ADEE", paddingVertical: 18, overflow: "hidden" }}>
         <FlatList
           data={ages}
           keyExtractor={(item) => item.toString()}
@@ -29,17 +37,47 @@ export function AgePicker({ age, onChange }: { age: number; onChange: (value: nu
           decelerationRate="fast"
           bounces={false}
           contentContainerStyle={{ paddingHorizontal: sideSpacer }}
-          getItemLayout={(_, index) => ({ length: AGE_ITEM_WIDTH, offset: AGE_ITEM_WIDTH * index, index })}
+          getItemLayout={(_, index) => ({
+            length: AGE_ITEM_WIDTH,
+            offset: AGE_ITEM_WIDTH * index,
+            index,
+          })}
           initialScrollIndex={age - AGE_MIN}
           viewabilityConfig={{ itemVisiblePercentThreshold: 70 }}
           onViewableItemsChanged={onViewable}
-          renderItem={({ item }) => (
-            <View className="items-center justify-center" style={{ width: AGE_ITEM_WIDTH }}>
-              <Text className={`font-semibold ${item === age ? "text-5xl text-white" : "text-4xl text-[#5F52A2]"}`}>{item}</Text>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            const isSelected = item === age;
+            return (
+              <View style={{ width: AGE_ITEM_WIDTH, alignItems: "center", justifyContent: "center" }}>
+                <Text
+                  style={{
+                    fontSize: isSelected ? 34 : 26,
+                    fontWeight: isSelected ? "700" : "500",
+                    color: isSelected ? "#FFFFFF" : "#7B6EC4",
+                  }}
+                >
+                  {item}
+                </Text>
+              </View>
+            );
+          }}
         />
-        <View pointerEvents="none" className="absolute inset-y-0 items-center justify-center border-x border-white/50" style={{ width: AGE_ITEM_WIDTH, left: sideSpacer }} />
+
+        {/* Selected cell highlight */}
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: sideSpacer,
+            width: AGE_ITEM_WIDTH,
+            backgroundColor: "rgba(255,255,255,0.18)",
+            borderLeftWidth: 1,
+            borderRightWidth: 1,
+            borderColor: "rgba(255,255,255,0.5)",
+          }}
+        />
       </View>
     </>
   );

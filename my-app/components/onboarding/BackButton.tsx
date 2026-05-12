@@ -1,9 +1,13 @@
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
+import { ChevronLeft } from "lucide-react-native";
 
 export function BackButton({ onPress }: { onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} className="mb-3 h-9 w-9 items-start justify-center">
-      <Text className="text-3xl text-[#1D1A27]">‹</Text>
+    <Pressable
+      onPress={onPress}
+      className="h-11 w-11 items-center justify-center rounded-full bg-[#F2F4F7]"
+    >
+      <ChevronLeft size={23} color="#1D1A27" strokeWidth={2.5} />
     </Pressable>
   );
 }

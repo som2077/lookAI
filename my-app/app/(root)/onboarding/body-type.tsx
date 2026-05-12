@@ -1,4 +1,3 @@
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   BodyTypeCard,
   type BodyTypeOption,
@@ -6,8 +5,7 @@ import {
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { BackButton } from "@/components/onboarding/BackButton";
-import { ProgressIndicator } from "@/components/onboarding/ProgressIndicator";
+import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/store/onboarding-store";
 
 const maleBodyTypes: BodyTypeOption[] = [
@@ -70,49 +68,48 @@ export default function BodyTypesScreen() {
   const handleContinue = () => {
     if (!selectedBodyType) return;
     setBodyType(selectedBodyType);
-    router.push("/(root)/onboarding/skin-tone");
+    router.push("/(root)/onboarding/style-preference");
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 px-5 pb-6 pt-2">
-        <BackButton onPress={() => router.back()} />
-        <ProgressIndicator step={5} />
-        <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">
-          Body types
-        </Text>
-        <Text className="mt-3 text-base leading-6 text-[#5A5566]">
-          Select the range that best represents you to find fashion inspiration
-          with you in mind.
-        </Text>
+    // <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 px-5 pb-6 pt-2">
+      <OnboardingHeader step={4} />
+      <Text className="text-5xl font-semibold tracking-tight text-[#1D1A27]">
+        Body types
+      </Text>
+      <Text className="mt-3 text-base leading-6 text-[#5A5566]">
+        Select the range that best represents you to find fashion inspiration
+        with you in mind.
+      </Text>
 
-        <FlatList
-          data={bodyTypes}
-          keyExtractor={(item) => item.id}
-          className="mt-8"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 120, gap: 16 }}
-          renderItem={({ item, index }) => (
-            <BodyTypeCard
-              item={item}
-              index={index}
-              selected={selectedBodyType === item.id}
-              onPress={() => setSelectedBodyType(item.id)}
-            />
-          )}
-        />
+      <FlatList
+        data={bodyTypes}
+        keyExtractor={(item) => item.id}
+        className="mt-8"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120, gap: 16 }}
+        renderItem={({ item, index }) => (
+          <BodyTypeCard
+            item={item}
+            index={index}
+            selected={selectedBodyType === item.id}
+            onPress={() => setSelectedBodyType(item.id)}
+          />
+        )}
+      />
 
-        <View className="absolute inset-x-5 bottom-6">
-          <TouchableOpacity
-            activeOpacity={0.9}
-            disabled={!selectedBodyType}
-            onPress={handleContinue}
-            className={`items-center rounded-2xl py-4 ${selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"}`}
-          >
-            <Text className="text-base font-semibold text-white">Continue</Text>
-          </TouchableOpacity>
-        </View>
+      <View className="absolute inset-x-5 bottom-6">
+        <TouchableOpacity
+          activeOpacity={0.9}
+          disabled={!selectedBodyType}
+          onPress={handleContinue}
+          className={`items-center rounded-2xl py-4 ${selectedBodyType ? "bg-[#1B1623]" : "bg-[#1B1623]/40"}`}
+        >
+          <Text className="text-base font-semibold text-white">Continue</Text>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
+    // </SafeAreaView>
   );
 }

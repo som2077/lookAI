@@ -15,22 +15,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 WebBrowser.maybeCompleteAuthSession();
 
-const getStartedLogo = require("../../assets/images/getStartedLogo.png");
+const authPhone = require("../../assets/images/auth-phone.png");
+
+const GOOGLE_LOGO =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png";
 
 const getErrorMessage = (error: unknown) => {
   if (
     typeof error === "object" &&
     error !== null &&
     "errors" in error &&
-    Array.isArray(error.errors) &&
-    error.errors[0]?.message
+    Array.isArray((error as any).errors) &&
+    (error as any).errors[0]?.message
   ) {
-    const firstError = error.errors[0];
+    const firstError = (error as any).errors[0];
     const field = firstError.meta?.paramName;
-
     return field ? `${field} ${firstError.message}` : firstError.message;
   }
-
   return "Google sign-in failed. Please try again.";
 };
 
@@ -41,12 +42,8 @@ export default function SignIn() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (Platform.OS !== "android") {
-      return;
-    }
-
+    if (Platform.OS !== "android") return;
     void WebBrowser.warmUpAsync();
-
     return () => {
       void WebBrowser.coolDownAsync();
     };
@@ -55,7 +52,6 @@ export default function SignIn() {
   const onGooglePress = async () => {
     setIsLoading(true);
     setError("");
-
     try {
       const { createdSessionId, setActive, authSessionResult } =
         await startSSOFlow({
@@ -63,9 +59,7 @@ export default function SignIn() {
           redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
         });
 
-      if (authSessionResult?.type === "cancel") {
-        return;
-      }
+      if (authSessionResult?.type === "cancel") return;
 
       if (!createdSessionId) {
         setError("Google sign-in could not be completed.");
@@ -82,28 +76,26 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-      <View className="flex-1 px-8 py-6">
-        <View className="flex-1 justify-center">
+    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <View className="flex-1 px-6 pb-20">
+        {/* ── Image + Text overlay ── */}
+        <View className="flex-1 items-center justify-center">
+          {/* Phone mockup image */}
           <Image
-            source={getStartedLogo}
-            className="mb-16 h-36 self-center"
+            source={authPhone}
+            className="h-[100%] w-[130%] -mb-60"
             resizeMode="contain"
           />
 
-          <Text className="mt-16 text-[40px] font-bold leading-[50px] tracking-[-0.56px] text-[#1D1A27]">
-            Welcome to Look AI 👋🏻
-          </Text>
-
-          <Text className="mt-4 text-[38px] leading-[38px] text-[#4D4858]">
-            Your personal AI stylist that helps you choose perfect outfits.
-          </Text>
-
-          <Text className="mt-2 text-[30px] leading-[38px] text-[#4D4858]">
-            Dress smart. Feel confident.
-          </Text>
+          {/* Text overlay: image ke upar */}
+          <View className="flex absolute bottom-[70px] left-0 right-0 items-center px-15">
+            <Text className="text-center text-[35px] font-semibold leading-[35px] text-[#1D1A27]">
+              Scan Your Clothes,{"\n"}Get Styled Instantly
+            </Text>
+          </View>
         </View>
 
+        {/* ── Buttons & Terms ── */}
         <View>
           {error ? (
             <Text className="mb-3 text-center text-sm text-red-500">
@@ -111,36 +103,50 @@ export default function SignIn() {
             </Text>
           ) : null}
 
+          {/* Google button */}
           <TouchableOpacity
             onPress={onGooglePress}
             disabled={isLoading}
-            className="w-full items-center rounded-2xl border border-[#D8D6DD] bg-white py-4"
+            className="flex-row mt-[-50] items-center justify-center rounded-2xl border border-[#D8D6DD] bg-white py-4"
           >
             {isLoading ? (
               <ActivityIndicator color="#2563EB" />
             ) : (
-              <Text className="text-lg font-medium text-[#1D1A27]">
-                Continue with Google
-              </Text>
+              <>
+                <Image
+                  source={require("../../assets/images/google-icon-logo-svgrepo-com.png")}
+                  className="mr-2 h-5 w-5"
+                  resizeMode="contain"
+                />
+                <Text className="text-base font-medium text-[#1D1A27]">
+                  Continue with Google
+                </Text>
+              </>
             )}
           </TouchableOpacity>
 
+          {/* Email button */}
           <TouchableOpacity
             onPress={() => router.push("/(auth)/email" as Href)}
             disabled={isLoading}
-            className="mt-3 w-full items-center rounded-2xl bg-[#1A1827] py-4"
+            className="mt-3 items-center rounded-2xl bg-[#1A1827] py-4"
           >
-            <Text className="text-lg font-medium text-white">
+            <Text className="text-base font-medium text-white">
               Continue with Email
             </Text>
           </TouchableOpacity>
 
-          <Text className="mt-4 px-1 text-center font-semibold text-sm leading-5 text-[#191919]">
+          {/* Terms */}
+          <Text className="mt-5 px-4 text-center text-sm leading-5 text-[#1b1b1b]">
             By continuing, you accept our{" "}
-            <Text className="underline font-black ">Terms of Service</Text> and
-            acknowledge our{" "}
-            <Text className="underline font-black ">Privacy Policy</Text>. You
-            can tap them to view details.
+            <Text className="font-semibold text-[#1D1A27] underline">
+              Terms of Service
+            </Text>{" "}
+            and acknowledge our{" "}
+            <Text className="font-semibold text-[#1D1A27] underline">
+              Privacy Policy
+            </Text>
+            . You can tap them to view details.
           </Text>
         </View>
       </View>

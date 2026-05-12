@@ -1,9 +1,11 @@
 import { useAuth } from "@clerk/clerk-expo";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createSupabaseClient } from "@/lib/supabase";
 
 export const useSupabase = () => {
   const { isLoaded, isSignedIn, getToken, userId } = useAuth();
+  const getTokenRef = useRef(getToken);
+  getTokenRef.current = getToken;
   const [supabase, setSupabase] = useState(() => createSupabaseClient(null));
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -19,7 +21,7 @@ export const useSupabase = () => {
 
       try {
         const token = isSignedIn
-          ? await getToken({ template: "supabase" })
+          ? await getTokenRef.current({ template: "supabase" })
           : null;
 
         if (!isMounted) {
@@ -32,7 +34,10 @@ export const useSupabase = () => {
           return;
         }
 
-        console.warn("Failed to initialize Supabase client with Clerk token", error);
+        console.warn(
+          "Failed to initialize Supabase client with Clerk token",
+          error,
+        );
         setSupabase(createSupabaseClient(null));
       } finally {
         if (isMounted) {
@@ -46,7 +51,7 @@ export const useSupabase = () => {
     return () => {
       isMounted = false;
     };
-  }, [getToken, isLoaded, isSignedIn, userId]);
+  }, [isLoaded, isSignedIn, userId]);
 
   return { supabase, isInitializing };
 };

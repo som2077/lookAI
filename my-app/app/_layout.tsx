@@ -2,6 +2,7 @@ import "../global.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { Stack, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import {
   OnboardingProvider,
@@ -20,23 +21,24 @@ function RootNavigator() {
   const { isSignedIn, isLoaded, userId } = useAuth();
   const router = useRouter();
   const segments = useSegments();
+  const segmentKey = segments.join("/");
   const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(
     null,
   );
   const completionVersion = useOnboardingState((s) => s._completionVersion);
 
   useEffect(() => {
+    if (!userId) {
+      setOnboardingComplete(null);
+      return;
+    }
+
     if (completionVersion > 0) {
       setOnboardingComplete(true);
       return;
     }
 
     const loadOnboardingStatus = async () => {
-      if (!userId) {
-        setOnboardingComplete(null);
-        return;
-      }
-
       const value = await SecureStore.getItemAsync(
         `onboarding_complete_${userId}`,
       );
@@ -47,13 +49,12 @@ function RootNavigator() {
   }, [isSignedIn, userId, completionVersion]);
 
   useEffect(() => {
-    if (!isLoaded || onboardingComplete === null) {
-      return;
-    }
+    if (!isLoaded) return;
 
     const inAuth = segments[0] === "(auth)";
     const inRoot = segments[0] === "(root)";
-    const inOnboarding = inRoot && segments.includes("onboarding");
+    const inOnboarding =
+      inRoot && (segments as string[]).includes("onboarding");
 
     if (!isSignedIn) {
       if (!inAuth) {
@@ -61,6 +62,9 @@ function RootNavigator() {
       }
       return;
     }
+
+    // Signed in — wait for onboarding status to load
+    if (onboardingComplete === null) return;
 
     if (!onboardingComplete) {
       if (!inOnboarding) {
@@ -72,7 +76,8 @@ function RootNavigator() {
     if (inOnboarding || inAuth || !inRoot) {
       router.replace("/(root)/(tabs)");
     }
-  }, [isSignedIn, isLoaded, onboardingComplete, router, segments]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, isLoaded, onboardingComplete, segmentKey]);
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }
@@ -81,6 +86,7 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <SafeAreaProvider>
+        <StatusBar style="dark" />
         <OnboardingProvider>
           <RootNavigator />
         </OnboardingProvider>

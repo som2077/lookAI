@@ -56,7 +56,6 @@ CREATE TABLE user_profiles (
   height INTEGER,
   gender TEXT,
   body_type TEXT,
-  skin_tone TEXT,
   style_preferences TEXT[],
   created_at TIMESTAMP DEFAULT NOW()
 );
@@ -99,14 +98,13 @@ App Launch
   │                                              ├── Google SSO
   │                                              └── Email OTP
   │
-  ├── Signed In + Onboarding Incomplete ──→ Onboarding (7 steps)
+  ├── Signed In + Onboarding Incomplete ──→ Onboarding (6 steps)
   │                                           1. Welcome
   │                                           2. Age
   │                                           3. Height
   │                                           4. Gender
   │                                           5. Body Type
-  │                                           6. Skin Tone
-  │                                           7. Style Preferences
+  │                                           6. Style Preferences
   │                                           └── Saves to Supabase → Home
   │
   └── Signed In + Onboarding Complete ──→ Home (Tabs)
@@ -126,7 +124,7 @@ App Launch
 
 ### Onboarding
 
-A 7-step wizard that collects user profile data:
+A 6-step wizard that collects user profile data:
 
 | Step | Screen            | Data Collected                                |
 | ---- | ----------------- | --------------------------------------------- |
@@ -135,8 +133,7 @@ A 7-step wizard that collects user profile data:
 | 3    | Height Picker     | `height` in cm (vertical scroll wheel)        |
 | 4    | Gender            | `gender` (Male / Female / Other)              |
 | 5    | Body Type         | `bodyType` (gender-aware card selection)      |
-| 6    | Skin Tone         | `skinTone` (6 color swatches)                 |
-| 7    | Style Preferences | `stylePreferences` (exactly 3 from 8 options) |
+| 6    | Style Preferences | `stylePreferences` (exactly 3 from 8 options) |
 
 On completion:
 
