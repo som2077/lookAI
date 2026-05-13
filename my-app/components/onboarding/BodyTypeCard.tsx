@@ -61,7 +61,7 @@ export function BodyTypeCard({
           });
         }}
         className={`rounded-2xl border border-[#d3d3d3] bg-[#F2F4F7] ${
-          selected ? "bg-[#ECEDF9]" : "border-[#BCBCBC]"
+          selected ? "bg-[#e0e1e9]" : "border-[#BCBCBC]"
         }`}
       >
         {/* Header row */}

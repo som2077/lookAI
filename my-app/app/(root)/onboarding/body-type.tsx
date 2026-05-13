@@ -127,7 +127,7 @@ export default function BodyTypesScreen() {
           activeOpacity={0.9}
           disabled={!selectedBodyType}
           onPress={handleContinue}
-          className={`items-center rounded-2xl py-5 ${selectedBodyType ? "bg-[#000000]" : "bg-[#1B1623]/40"}`}
+          className={`items-center rounded-2xl py-5 ${selectedBodyType ? "bg-[#000000]" : "bg-[#1B1623]"}`}
         >
           <Text className="text-base font-semibold text-white">Continue</Text>
         </TouchableOpacity>
