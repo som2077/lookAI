@@ -81,7 +81,7 @@ export function CustomTabBar({
     >
       <View className="flex-row items-center justify-between">
         <View
-          className="mr-5 ml-7 h-[62px]  border border-[#D8D8D8] flex-1 flex-row opacity-80 items-center justify-between rounded-full bg-[#ffffff] px-4"
+          className="mr-5 ml-7 h-[62px]  border border-[#D8D8D8] flex-1 flex-row opacity-80 items-center justify-between rounded-full bg-[#EFF1F7] px-4"
           style={{
             shadowColor: "#000000",
             shadowOpacity: 0.24,
