@@ -1,28 +1,37 @@
-# Code Changes Log — LookAI
+# Payment Integration Blueprint (Razorpay + Stripe)
 
 **Last Updated:** 2026-05-19
 
----
+- Added a client-side payments service at `lib/payments.ts` with:
+  - gateway resolution (`resolveProvider`) for India vs international
+  - typed API contracts for create/status/razorpay verify
+  - fetch wrappers for:
+    - `POST /api/payments/create`
+    - `POST /api/payments/verify-razorpay`
+    - `GET /api/payments/:localOrderId/status`
 
-## Session 1: Bug Fixes (Scan Report Issues)
+- Updated `app/(root)/(tabs)/outfit.tsx` into a payment integration sandbox:
+  - user inputs for country, currency, and amount
+  - provider preview (razorpay/stripe)
+  - payment create + status query flow wired to backend API
 
-### Change 1 — `app/(auth)/sign-in.tsx`
+## Required backend endpoints
 
-- **Removed** debug `bg-red-300` class from "Welcome to Look AI" heading
-- **Fixed** `tracking-[-5.60px]` → `tracking-[-0.56px]` (typo — extreme letter-spacing)
-- **Removed** leading space before "Continue with Google" text
+Implement these endpoints on your backend:
 
-### Change 2 — `app/(root)/onboarding/_layout.tsx`
+1. `POST /api/payments/create`
+2. `POST /api/payments/verify-razorpay`
+3. `GET /api/payments/:localOrderId/status`
+4. `POST /api/webhooks/stripe`
+5. `POST /api/webhooks/razorpay`
 
-- **Removed** duplicate `OnboardingProvider` wrapper (already exists in root `app/_layout.tsx`)
-- **Removed** unused `OnboardingProvider` import
+## Required env for app
 
-### Change 3 — `app/(root)/onboarding/body-type.tsx`
+Add to `.env`:
 
-- **Added** early return guard for empty `gender` string: `if (!gender) return maleBodyTypes`
-- Prevents silent fallthrough when gender is `""` (default)
+- `EXPO_PUBLIC_PAYMENTS_API_BASE_URL=https://your-backend-domain.com`
 
-### Change 4 — `app/(root)/onboarding/setup-account.tsx`
+## Notes
 
 - **Added** `isMounted` guard to prevent state updates on unmounted component
 - Later updated — see Change 10
