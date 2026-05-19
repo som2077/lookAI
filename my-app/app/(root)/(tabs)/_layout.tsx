@@ -14,6 +14,10 @@ export default function TabLayout() {
       <Tabs.Screen name="outfit" options={{ title: "Planner" }} />
       <Tabs.Screen name="saved" options={{ title: "Saved" }} />
       <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+      <Tabs.Screen
+        name="subscription"
+        options={{ href: null, title: "Subscription" }}
+      />
     </Tabs>
   );
 }

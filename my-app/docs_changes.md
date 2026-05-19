@@ -1,6 +1,6 @@
 # Code Changes Log — LookAI
 
-**Last Updated:** 2025-05-10
+**Last Updated:** 2026-05-19
 
 ---
 
@@ -286,3 +286,91 @@ New: Welcome → Gender → Age → Height → Body Type → Style Preference
 | `components/onboarding/ProgressIndicator.tsx` | Updated from 7 steps to 6 steps                                |
 | `components/onboarding/BodyTypeCard.tsx`      | Rewritten as accordion with title, description, chevron icons  |
 | `app/(root)/onboarding/body-type.tsx`         | Added descriptions, expanded state for accordion UI            |
+
+---
+
+## Session: Full-Length Pics — Gallery Upload to Supabase (2026-05-13)
+
+### Change — `app/(root)/onboarding/full-length-pics.tsx`
+
+**What changed:**
+
+- Installed `expo-image-picker` package
+- Added gallery permission request via `requestMediaLibraryPermissionsAsync`
+- Implemented `handlePickImages`: opens gallery with `allowsMultipleSelection: true`, `selectionLimit: 2`
+- Added `uploadToSupabase`: fetches each selected image as a blob and uploads to Supabase Storage bucket `full-length-pics` under path `{userId}/{timestamp}_{random}.{ext}` using Clerk JWT token
+- Selected images shown as live preview (two side-by-side thumbnails) replacing the placeholder image
+- Upload button shows "Select Images" before selection and "Upload Image" after; shows `ActivityIndicator` while uploading
+- Error handling via `Alert` on permission denial or upload failure
+- Navigates to `/(root)/onboarding/nickname` on successful upload
+
+---
+
+## Session N: Payment Integration (Razorpay + Stripe)
+
+### New Files Created
+
+| File                                                | Purpose                                                                                                    |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `lib/payment/types.ts`                              | Shared TypeScript types: `Plan`, `PaymentProvider`, `PaymentIntent`, `Subscription`, `PaymentResult`, etc. |
+| `lib/payment/razorpay.ts`                           | Razorpay provider: creates order via Edge Function, opens checkout via `expo-web-browser`                  |
+| `lib/payment/stripe.ts`                             | Stripe provider: creates session via Edge Function, opens Stripe Hosted Checkout via `expo-web-browser`    |
+| `lib/payment/index.ts`                              | Unified gateway: `getProvider(country)` routes India→Razorpay, else→Stripe; `initiatePaymentWithToken()`   |
+| `constants/plans.ts`                                | Plan definitions: Free / Pro (₹299/$4) / Premium (₹699/$9) with Razorpay & Stripe plan IDs                 |
+| `store/payment-store.ts`                            | Zustand store: `fetchSubscription`, `startPayment`, `isPaymentInProgress`, `subscription` state            |
+| `components/payment/PlanCard.tsx`                   | Individual plan card with features list, price (INR/USD), CTA button                                       |
+| `components/payment/PlanList.tsx`                   | Renders all plans, shows active plan, includes `PaymentMethodBadge`                                        |
+| `components/payment/PaymentMethodBadge.tsx`         | Badge showing "UPI/Cards (India)" or "International Card"                                                  |
+| `app/(root)/(tabs)/subscription.tsx`                | Main subscription tab screen                                                                               |
+| `app/(root)/payment/_layout.tsx`                    | Stack layout for payment screens                                                                           |
+| `app/(root)/payment/checkout.tsx`                   | Checkout screen — confirms plan, triggers payment, routes to success/cancel                                |
+| `app/(root)/payment/success.tsx`                    | Success confirmation screen                                                                                |
+| `app/(root)/payment/cancel.tsx`                     | Payment failed/cancelled screen                                                                            |
+| `supabase/functions/create-razorpay-order/index.ts` | Edge Function: creates Razorpay order (server-side, secrets safe)                                          |
+| `supabase/functions/create-stripe-session/index.ts` | Edge Function: creates Stripe Checkout session (server-side, secrets safe)                                 |
+| `supabase/functions/payment-webhook/index.ts`       | Edge Function: handles Razorpay + Stripe webhooks, verifies signatures, updates `subscriptions` table      |
+
+### Schema Changes (`supabase/schema.sql`)
+
+- Added `subscriptions` table: `user_id`, `plan_id`, `provider`, `status`, `provider_subscription_id`, `current_period_end`
+- Added `payment_events` table: audit log for all webhook events
+- Both tables have RLS policies (user can only read/write own data)
+
+### Environment Variables Required (`.env`)
+
+```
+EXPO_PUBLIC_RAZORPAY_KEY_ID=
+EXPO_PUBLIC_RAZORPAY_PRO_PLAN_ID=
+EXPO_PUBLIC_RAZORPAY_PREMIUM_PLAN_ID=
+EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+EXPO_PUBLIC_STRIPE_PRO_PRICE_ID=
+EXPO_PUBLIC_STRIPE_PREMIUM_PRICE_ID=
+# Server-side only (Supabase Edge Function secrets):
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRO_PRICE_ID=
+STRIPE_PREMIUM_PRICE_ID=
+```
+
+### Architecture Notes
+
+- **No native SDKs** — uses `expo-web-browser` (already installed), works in Expo Go
+- **Provider routing** — `getProvider(country)` checks locale; India → Razorpay, else → Stripe
+- **Secret keys** — never client-side; only inside Supabase Edge Functions
+- **Adding a new provider** — create `lib/payment/newprovider.ts` + update `lib/payment/index.ts` router
+
+---
+
+## Session N+1: Subscription Routing Setup
+
+### Change 1 — `app/(root)/(tabs)/profile.tsx`
+
+- Added `useRouter` from `expo-router`
+- Added `Crown` icon from `lucide-react-native`
+- Added **"Manage Subscription"** button (purple, Crown icon) above Logout → navigates to `/(root)/(tabs)/subscription`
+
+### Change 2 — `app/(root)/(tabs)/_layout.tsx`
+
+- Registered `subscription` screen with `href: null` — hidden from tab bar but fully routable via `router.push`

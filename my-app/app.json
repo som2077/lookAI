@@ -1,6 +1,5 @@
 {
   "expo": {
-    
     "name": "my-app",
     "slug": "my-app",
     "version": "1.0.0",
@@ -13,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "permissions": ["READ_MEDIA_IMAGES"],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
