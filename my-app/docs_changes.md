@@ -383,3 +383,46 @@ STRIPE_PREMIUM_PRICE_ID=
 ### Change 2 — `app/(root)/(tabs)/_layout.tsx`
 
 - Registered `subscription` screen with `href: null` — hidden from tab bar but fully routable via `router.push`
+
+---
+
+## Session: Home Page Header — Logo, Streak & Calendar (2026-05-21)
+
+### Change — `components/ui/HomeHeader.tsx` (NEW FILE)
+
+- **Created** reusable `HomeHeader` component
+- Left side: `getStartedLogo.png` image (`w-28 h-8`, `resizeMode="contain"`)
+- Right side:
+  - Streak pill: 🔥 emoji + count from `useState<number>(1)` — ready to wire to API
+  - Calendar button: `CalendarDays` icon from `lucide-react-native`, navigates to `/(root)/calendar` via `router.push`
+  - Both elements have pill/circle border with `bg-white/70` frosted styling
+
+### Change — `app/(root)/(tabs)/index.tsx`
+
+- **Added** `HomeHeader` import
+- **Rendered** `<HomeHeader />` at top of `SafeAreaView`, above the body content card
+- **Added** `mt-4` margin to the body card to space it from the header
+
+---
+
+## Session: Swipe Left/Right Tab Navigation (2026-05-21)
+
+### Change — `components/navigation/SwipeTabWrapper.tsx` (NEW FILE)
+
+- **Created** reusable `SwipeTabWrapper` component
+- Accepts `tabIndex: number` + `children: ReactNode`
+- Uses `Gesture.Fling` from `react-native-gesture-handler` (already installed)
+- Swipe **left** → navigates to next tab (`tabIndex + 1`)
+- Swipe **right** → navigates to previous tab (`tabIndex - 1`)
+- Boundary safe: index 0 ignores right swipe, index 4 ignores left swipe
+- Tab order: `0=Home`, `1=Wardrobe`, `2=Outfit`, `3=Saved`, `4=Profile`
+
+### Change — All 5 tab screens
+
+| File                             | Change                                        |
+| -------------------------------- | --------------------------------------------- |
+| `app/(root)/(tabs)/index.tsx`    | Wrapped with `<SwipeTabWrapper tabIndex={0}>` |
+| `app/(root)/(tabs)/wardrobe.tsx` | Wrapped with `<SwipeTabWrapper tabIndex={1}>` |
+| `app/(root)/(tabs)/outfit.tsx`   | Wrapped with `<SwipeTabWrapper tabIndex={2}>` |
+| `app/(root)/(tabs)/saved.tsx`    | Wrapped with `<SwipeTabWrapper tabIndex={3}>` |
+| `app/(root)/(tabs)/profile.tsx`  | Wrapped with `<SwipeTabWrapper tabIndex={4}>` |

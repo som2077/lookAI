@@ -92,8 +92,8 @@ export function BodyTypeCard({
           <Animated.View entering={FadeIn.duration(200)}>
             <Image
               source={item.image}
-              resizeMode="cover"
-              className="h-[260px] w-full rounded-b-2xl"
+              resizeMode="contain"
+              className="h-[300px] w-full rounded-b-2xl"
             />
           </Animated.View>
         )}

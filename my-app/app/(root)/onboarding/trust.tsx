@@ -39,10 +39,10 @@ export default function TrustScreen() {
       </Text>
 
       {/* Privacy badge */}
-      <View className=" mt-10 bg-red-400 items-center">
+      <View className="mt-10 items-center">
         <Image
           source={require("@/assets/images/trust2.png")}
-          className=" w-[400px] h-40"
+          className="w-[400px] h-40"
           resizeMode="cover"
         />
       </View>

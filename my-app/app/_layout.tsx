@@ -4,6 +4,7 @@ import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   OnboardingProvider,
   useOnboardingState,
@@ -84,13 +85,15 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <SafeAreaProvider>
-        <StatusBar style="dark" />
-        <OnboardingProvider>
-          <RootNavigator />
-        </OnboardingProvider>
-      </SafeAreaProvider>
-    </ClerkProvider>
+    <GestureHandlerRootView className="flex-1">
+      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        <SafeAreaProvider>
+          <StatusBar style="dark" />
+          <OnboardingProvider>
+            <RootNavigator />
+          </OnboardingProvider>
+        </SafeAreaProvider>
+      </ClerkProvider>
+    </GestureHandlerRootView>
   );
 }

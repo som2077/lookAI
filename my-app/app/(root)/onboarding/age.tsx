@@ -10,7 +10,7 @@ export default function AgeScreen() {
   const { age, setAge } = useOnboardingState();
 
   return (
-    <View className="flex-1 pb-10 pt-2">
+    <View className="flex-1 pb-6 pt-2">
       {/* Header */}
       <View className="px-6">
         <OnboardingHeader step={2} />
@@ -30,7 +30,7 @@ export default function AgeScreen() {
       </View>
 
       {/* Continue button pinned to bottom */}
-      <View className="px-6">
+      <View className="px-5">
         <ContinueButton
           onPress={() => router.push("/(root)/onboarding/height")}
         />

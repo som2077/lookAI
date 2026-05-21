@@ -9,7 +9,7 @@ export default function HeightScreen() {
   const { height, setHeight } = useOnboardingState();
   return (
     // <SafeAreaView className="flex-1">
-    <View className="flex-1 px-6 pb-6 pt-2">
+    <View className="flex-1 px-5 pb-6 pt-2">
       <OnboardingHeader step={3} />
       <Text className="text-4xl font-semibold px-2 tracking-tight text-[#1D1A27]">
         What is your height?
