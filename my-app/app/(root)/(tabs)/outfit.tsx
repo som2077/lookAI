@@ -14,7 +14,6 @@ import {
   getPaymentStatus,
   resolveProvider,
 } from "@/lib/payments";
-import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 
 export default function OutfitScreen() {
   const { userId } = useAuth();
@@ -81,69 +80,67 @@ export default function OutfitScreen() {
   };
 
   return (
-    <SwipeTabWrapper tabIndex={2}>
-      <SafeAreaView className="flex-1 bg-[#ECEDF9] px-5 pt-4">
-        <View className="rounded-3xl p-5 shadow-sm">
-          <Text className="text-2xl font-semibold text-[#171421]">
-            AI Outfit Planner
-          </Text>
-          <Text className="mt-2 text-sm text-[#5F5A72]">
-            Payment gateway integration sandbox
-          </Text>
-        </View>
+    <SafeAreaView className="flex-1 bg-[#ECEDF9] px-5 pt-4">
+      <View className="rounded-3xl p-5 shadow-sm">
+        <Text className="text-2xl font-semibold text-[#171421]">
+          AI Outfit Planner
+        </Text>
+        <Text className="mt-2 text-sm text-[#5F5A72]">
+          Payment gateway integration sandbox
+        </Text>
+      </View>
 
-        <View className="mt-4 rounded-2xl bg-white p-4">
-          <Text className="mb-1 text-xs font-medium text-[#5F5A72]">
-            Country (ISO-2)
-          </Text>
-          <TextInput
-            value={country}
-            onChangeText={setCountry}
-            autoCapitalize="characters"
-            className="rounded-xl border border-[#E5E7EB] px-3 py-2"
-          />
+      <View className="mt-4 rounded-2xl bg-white p-4">
+        <Text className="mb-1 text-xs font-medium text-[#5F5A72]">
+          Country (ISO-2)
+        </Text>
+        <TextInput
+          value={country}
+          onChangeText={setCountry}
+          autoCapitalize="characters"
+          className="rounded-xl border border-[#E5E7EB] px-3 py-2"
+        />
 
-          <Text className="mb-1 mt-3 text-xs font-medium text-[#5F5A72]">
-            Currency (ISO-3)
-          </Text>
-          <TextInput
-            value={currency}
-            onChangeText={setCurrency}
-            autoCapitalize="characters"
-            className="rounded-xl border border-[#E5E7EB] px-3 py-2"
-          />
+        <Text className="mb-1 mt-3 text-xs font-medium text-[#5F5A72]">
+          Currency (ISO-3)
+        </Text>
+        <TextInput
+          value={currency}
+          onChangeText={setCurrency}
+          autoCapitalize="characters"
+          className="rounded-xl border border-[#E5E7EB] px-3 py-2"
+        />
 
-          <Text className="mb-1 mt-3 text-xs font-medium text-[#5F5A72]">
-            Amount (smallest unit)
-          </Text>
-          <TextInput
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="number-pad"
-            className="rounded-xl border border-[#E5E7EB] px-3 py-2"
-          />
+        <Text className="mb-1 mt-3 text-xs font-medium text-[#5F5A72]">
+          Amount (smallest unit)
+        </Text>
+        <TextInput
+          value={amount}
+          onChangeText={setAmount}
+          keyboardType="number-pad"
+          className="rounded-xl border border-[#E5E7EB] px-3 py-2"
+        />
 
-          <Text className="mt-3 text-sm text-[#171421]">
-            Chosen provider: {selectedProvider}
-          </Text>
+        <Text className="mt-3 text-sm text-[#171421]">
+          Chosen provider: {selectedProvider}
+        </Text>
 
-          <Pressable
-            disabled={isProcessing}
-            onPress={startPayment}
-            className="mt-4 items-center rounded-xl bg-[#2563EB] px-4 py-3"
-          >
-            {isProcessing ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text className="text-base font-semibold text-white">
-                Start payment
-              </Text>
-            )}
-          </Pressable>
+        <Pressable
+          disabled={isProcessing}
+          onPress={startPayment}
+          className="mt-4 items-center rounded-xl bg-[#2563EB] px-4 py-3"
+        >
+          {isProcessing ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-base font-semibold text-white">
+              Start payment
+            </Text>
+          )}
+        </Pressable>
 
-          <Text className="mt-4 text-xs text-[#5F5A72]">{statusText}</Text>
-        </View>
-      </SafeAreaView>
-    </SwipeTabWrapper>
+        <Text className="mt-4 text-xs text-[#5F5A72]">{statusText}</Text>
+      </View>
+    </SafeAreaView>
   );
 }

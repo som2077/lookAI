@@ -14,17 +14,17 @@ export function HomeHeader() {
     <View className="flex-row items-center justify-between ">
       <Image
         source={require("../../assets/images/getStartedLogo.png")}
-        className="h-16 w-56 mx-[-30]"
+        className="h-16 w-56 ml-[-40]"
         resizeMode="contain"
       />
 
-      <View className="flex-row items-center gap-4 mr-3">
-        <View className="flex-row items-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-5 py-2">
+      <View className="flex-row items-center gap-2">
+        <View className="flex-row items-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-4 py-2">
           <Text className="text-base">
-            <IconFlameFilled size={22} />
+            <IconFlameFilled size={18} />
           </Text>
           <Text className="ml-1 text-sm font-semibold text-[#171421]">
-            {streak} <Text className="text-sm">days</Text>
+            {streak} <Text className="text-sm">day</Text>
           </Text>
         </View>
 
@@ -33,7 +33,7 @@ export function HomeHeader() {
           className="items-center justify-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-2 py-2"
           activeOpacity={0.7}
         >
-          <IconCalendarWeekFilled size={23} color="#171421" />
+          <IconCalendarWeekFilled size={18} color="#171421" />
         </TouchableOpacity>
       </View>
     </View>

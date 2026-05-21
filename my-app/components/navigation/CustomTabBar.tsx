@@ -1,36 +1,42 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Image, Pressable, View, Animated } from "react-native";
-import { ReactNode, useMemo, useRef } from "react";
+import { Image, Pressable, View, Animated, Text } from "react-native";
+import React, { ReactNode, useMemo, useRef } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  IconSmartHome,
+  IconHanger,
+  IconBookmark,
+  IconPlus,
+  type IconProps,
+} from "@tabler/icons-react-native";
 
-type TabIcon = keyof typeof Ionicons.glyphMap;
-type TabConfig = Record<string, TabIcon>;
+type TabIconComponent = React.ComponentType<IconProps>;
+type TabConfig = Record<string, TabIconComponent>;
 
 const TAB_CONFIG: TabConfig = {
-  index: "home",
-  wardrobe: "briefcase-outline",
-  outfit: "grid-outline",
-  saved: "bookmark-outline",
-  profile: "person",
+  index: IconSmartHome,
+  wardrobe: IconHanger,
+  saved: IconBookmark,
 };
 
 function AnimatedTabButton({
   focused,
   onPress,
   children,
+  label,
   testID,
 }: {
   focused: boolean;
   onPress: () => void;
   children: ReactNode;
+  label?: string;
   testID?: string;
 }) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const animateIn = () => {
     Animated.spring(scale, {
-      toValue: focused ? 1.03 : 0.95,
+      toValue: 0.93,
       useNativeDriver: true,
       speed: 24,
       bounciness: 7,
@@ -47,17 +53,58 @@ function AnimatedTabButton({
   };
 
   return (
-    <Animated.View style={{ transform: [{ scale }] }}>
-      <Pressable
-        testID={testID}
-        onPress={onPress}
-        onPressIn={animateIn}
-        onPressOut={animateOut}
-        android_ripple={{ color: "#E9E9E9", borderless: true }}
-        className="h-11 w-11 items-center justify-center"
-      >
-        {children}
-      </Pressable>
+    // flex:1 rakhein taaki tabs equally spaced rahein,
+    // lekin alignItems:"center" se inner content shrink ho
+    <Animated.View
+      style={{ transform: [{ scale }], flex: 1, alignItems: "center" }}
+    >
+      <View style={{ borderRadius: 999, overflow: "hidden", width: "100%" }}>
+        <Pressable
+          testID={testID}
+          onPress={onPress}
+          onPressIn={animateIn}
+          onPressOut={animateOut}
+          android_ripple={{ color: "#E9E9E9", borderless: false }}
+          style={{ alignItems: "center", width: "100%" }}
+        >
+          <View
+            style={[
+              {
+                width: "100%",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 999,
+                paddingHorizontal: 8,
+                paddingVertical: 6,
+                backgroundColor: focused ? "#F2F2F2" : "transparent",
+              },
+              focused
+                ? {
+                    shadowColor: "#000",
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    shadowOffset: { width: 0, height: 2 },
+                    elevation: 4,
+                  }
+                : undefined,
+            ]}
+          >
+            {children}
+            {label ? (
+              <Text
+                style={{
+                  marginTop: 2,
+                  fontSize: 8,
+                  fontWeight: focused ? "600" : "400",
+                  color: focused ? "#161421" : "#9898A6",
+                }}
+              >
+                {label}
+              </Text>
+            ) : null}
+          </View>
+        </Pressable>
+      </View>
     </Animated.View>
   );
 }
@@ -76,18 +123,32 @@ export function CustomTabBar({
   return (
     <View
       pointerEvents="box-none"
-      className="absolute inset-x-0 px-3"
-      style={{ bottom }}
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom,
+        paddingHorizontal: 16,
+      }}
     >
-      <View className="flex-row items-center justify-between">
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {/* Main Tab Bar Pill */}
         <View
-          className="mr-5 ml-7 h-[62px]  border border-[#D8D8D8] flex-1 flex-row opacity-80 items-center justify-between rounded-full bg-[#EFF1F7] px-4"
           style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderRadius: 999,
+            backgroundColor: "#Ffffff",
+            paddingHorizontal: 8,
+            paddingVertical: 8,
+            height: 60,
             shadowColor: "#000000",
-            shadowOpacity: 0.24,
-            shadowRadius: 16,
-            shadowOffset: { width: 0, height: 8 },
-            elevation: 23,
+            shadowOpacity: 0.12,
+            shadowRadius: 20,
+            shadowOffset: { width: 0, height: 6 },
+            elevation: 16,
           }}
         >
           {state.routes.map((route, index) => {
@@ -104,18 +165,37 @@ export function CustomTabBar({
               }
             };
 
+            const label = options?.title ?? route.name;
+
+            // Profile tab — avatar icon
             if (route.name === "profile") {
               return (
                 <AnimatedTabButton
                   key={route.key}
                   focused={focused}
                   onPress={onPress}
+                  label={label}
                   testID={options?.tabBarButtonTestID}
                 >
-                  <View className="h-9 w-9 items-center justify-center rounded-full bg-[#141221]">
+                  <View
+                    style={[
+                      {
+                        height: 28,
+                        width: 28,
+                        borderRadius: 14,
+                        overflow: "hidden",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      },
+                      {
+                        borderWidth: 14,
+                        borderColor: focused ? "#5ECFC2" : "#C8C8D0",
+                      },
+                    ]}
+                  >
                     <Image
                       source={require("../../assets/images/kribb.png")}
-                      className="h-8 w-8 rounded-full"
+                      style={{ height: 28, width: 28, borderRadius: 14 }}
                       resizeMode="cover"
                     />
                   </View>
@@ -123,33 +203,43 @@ export function CustomTabBar({
               );
             }
 
-            const icon = TAB_CONFIG[route.name] ?? "ellipse-outline";
-            const iconColor = focused ? "#161421" : "#5E5D67";
+            const IconComponent = TAB_CONFIG[route.name];
+            const iconColor = focused ? "#161421" : "#9898A6";
+            if (!IconComponent) return null;
+
             return (
               <AnimatedTabButton
                 key={route.key}
                 focused={focused}
                 onPress={onPress}
+                label={label}
                 testID={options?.tabBarButtonTestID}
               >
-                <Ionicons name={icon} size={22} color={iconColor} />
+                <IconComponent size={25} color={iconColor} strokeWidth={1.5} />
               </AnimatedTabButton>
             );
           })}
         </View>
 
+        {/* Plus / Add Button */}
         <Pressable
           onPress={() => navigation.navigate("outfit")}
-          className=" ml-1 mr-6 h-[80px] w-[80px] items-center justify-center  rounded-full bg-[#1A1827]"
           style={{
-            shadowColor: "#000",
-            shadowOpacity: 0.24,
-            shadowRadius: 16,
-            shadowOffset: { width: 0, height: 10 },
-            elevation: 10,
+            marginLeft: 12,
+            height: 60,
+            width: 60,
+            borderRadius: 30,
+            backgroundColor: "#1A1827",
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#1A1827",
+            shadowOpacity: 0.35,
+            shadowRadius: 14,
+            shadowOffset: { width: 0, height: 6 },
+            elevation: 12,
           }}
         >
-          <Ionicons name="add" size={40} color="#FFFFFF" />
+          <IconPlus size={30} color="#FFFFFF" strokeWidth={2.5} />
         </Pressable>
       </View>
     </View>

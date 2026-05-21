@@ -16,7 +16,6 @@ import { useRouter } from "expo-router";
 const TAB_ROUTES = [
   "/(root)/(tabs)/",
   "/(root)/(tabs)/wardrobe",
-  "/(root)/(tabs)/outfit",
   "/(root)/(tabs)/saved",
   "/(root)/(tabs)/profile",
 ] as const;

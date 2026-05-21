@@ -43,9 +43,9 @@ export default function SignIn() {
 
   useEffect(() => {
     if (Platform.OS !== "android") return;
-    void WebBrowser.warmUpAsync();
+    WebBrowser.warmUpAsync().catch(() => {});
     return () => {
-      void WebBrowser.coolDownAsync();
+      WebBrowser.coolDownAsync().catch(() => {});
     };
   }, []);
 

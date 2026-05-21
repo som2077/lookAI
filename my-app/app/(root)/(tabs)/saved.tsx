@@ -5,7 +5,7 @@ import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper"
 
 export default function SavedScreen() {
   return (
-    <SwipeTabWrapper tabIndex={3}>
+    <SwipeTabWrapper tabIndex={2}>
       <SafeAreaView className="flex-1 bg-transparent px-5 pt-4">
         <View className="rounded-3xl bg-white/55 p-5 shadow-sm">
           <Text className="text-2xl font-semibold text-[#171421]">Saved</Text>
