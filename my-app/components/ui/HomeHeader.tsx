@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
-import { CalendarDays } from "lucide-react-native";
+import {
+  IconCalendarWeekFilled,
+  IconFlameFilled,
+} from "@tabler/icons-react-native";
 
 export function HomeHeader() {
   const router = useRouter();
@@ -15,20 +18,22 @@ export function HomeHeader() {
         resizeMode="contain"
       />
 
-      <View className="flex-row items-center gap-2">
-        <View className="flex-row items-center rounded-full border border-[#E2E2EA] bg-white/70 px-3 py-1.5">
-          <Text className="text-base">🔥</Text>
+      <View className="flex-row items-center gap-4 mr-3">
+        <View className="flex-row items-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-5 py-2">
+          <Text className="text-base">
+            <IconFlameFilled size={22} />
+          </Text>
           <Text className="ml-1 text-sm font-semibold text-[#171421]">
-            {streak}
+            {streak} <Text className="text-sm">days</Text>
           </Text>
         </View>
 
         <TouchableOpacity
           onPress={() => router.push("/(root)/calendar" as never)}
-          className="items-center justify-center rounded-full border border-[#E2E2EA] bg-white/70 p-2"
+          className="items-center justify-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-2 py-2"
           activeOpacity={0.7}
         >
-          <CalendarDays size={18} color="#171421" strokeWidth={1.8} />
+          <IconCalendarWeekFilled size={23} color="#171421" />
         </TouchableOpacity>
       </View>
     </View>

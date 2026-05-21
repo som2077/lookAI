@@ -1,6 +1,16 @@
 import React, { ReactNode } from "react";
-import { View } from "react-native";
-import { Gesture, GestureDetector, Directions } from "react-native-gesture-handler";
+import {
+  Gesture,
+  GestureDetector,
+  Directions,
+} from "react-native-gesture-handler";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+  Easing,
+} from "react-native-reanimated";
 import { useRouter } from "expo-router";
 
 const TAB_ROUTES = [
@@ -11,6 +21,9 @@ const TAB_ROUTES = [
   "/(root)/(tabs)/profile",
 ] as const;
 
+const SLIDE_DISTANCE = 80;
+const ANIM_DURATION = 100;
+
 interface SwipeTabWrapperProps {
   tabIndex: number;
   children: ReactNode;
@@ -18,30 +31,54 @@ interface SwipeTabWrapperProps {
 
 export function SwipeTabWrapper({ tabIndex, children }: SwipeTabWrapperProps) {
   const router = useRouter();
+  const translateX = useSharedValue(0);
+  const opacity = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    opacity: opacity.value,
+    flex: 1,
+  }));
+
+  const navigate = (route: string) => {
+    router.navigate(route as never);
+    translateX.value = 0;
+    opacity.value = 1;
+  };
 
   const swipeLeft = Gesture.Fling()
     .direction(Directions.LEFT)
-    .runOnJS(true)
     .onEnd(() => {
       if (tabIndex < TAB_ROUTES.length - 1) {
-        router.navigate(TAB_ROUTES[tabIndex + 1] as never);
+        translateX.value = withTiming(-SLIDE_DISTANCE, {
+          duration: ANIM_DURATION,
+          easing: Easing.out(Easing.quad),
+        });
+        opacity.value = withTiming(0, { duration: ANIM_DURATION }, () => {
+          runOnJS(navigate)(TAB_ROUTES[tabIndex + 1]);
+        });
       }
     });
 
   const swipeRight = Gesture.Fling()
     .direction(Directions.RIGHT)
-    .runOnJS(true)
     .onEnd(() => {
       if (tabIndex > 0) {
-        router.navigate(TAB_ROUTES[tabIndex - 1] as never);
+        translateX.value = withTiming(SLIDE_DISTANCE, {
+          duration: ANIM_DURATION,
+          easing: Easing.out(Easing.quad),
+        });
+        opacity.value = withTiming(0, { duration: ANIM_DURATION }, () => {
+          runOnJS(navigate)(TAB_ROUTES[tabIndex - 1]);
+        });
       }
     });
 
-  const composed = Gesture.Simultaneous(swipeLeft, swipeRight);
+  const composed = Gesture.Exclusive(swipeLeft, swipeRight);
 
   return (
     <GestureDetector gesture={composed}>
-      <View className="flex-1">{children}</View>
+      <Animated.View style={animatedStyle}>{children}</Animated.View>
     </GestureDetector>
   );
 }
