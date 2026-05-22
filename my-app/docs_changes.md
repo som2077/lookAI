@@ -540,3 +540,53 @@ backend/
 | `app/(root)/(tabs)/outfit.tsx`   | Wrapped with `<SwipeTabWrapper tabIndex={2}>` |
 | `app/(root)/(tabs)/saved.tsx`    | Wrapped with `<SwipeTabWrapper tabIndex={3}>` |
 | `app/(root)/(tabs)/profile.tsx`  | Wrapped with `<SwipeTabWrapper tabIndex={4}>` |
+
+---
+
+## Session: AddActionMenu — Plus Button Action Menu (2026-05-22)
+
+### Change — `components/navigation/AddActionMenu.tsx` (NEW FILE)
+
+- **Created** new `AddActionMenu` component for the plus button action menu
+- **Features:**
+  - Modal overlay with fade animation
+  - 4 action cards in 2x2 grid:
+    1. **Log outfit** — Capture today's look (navigates to outfit tab)
+    2. **Add cloths** — New items to wardrobe (navigates to wardrobe tab)
+    3. **AI outfit** — Generate my mood (navigates to outfit tab)
+    4. **Style score** — Face + outfit match (navigates to outfit tab)
+  - Close button (X) at bottom
+  - Smooth spring animations for entry/exit
+  - Each card has colored icon with shadow effect
+
+### Change — `components/navigation/CustomTabBar.tsx`
+
+- **Added** `useState` import for menu visibility state
+- **Added** `AddActionMenu` import
+- **Added** `menuVisible` state to control modal visibility
+- **Added** `handleNavigate` helper function
+- **Updated** Plus button `onPress` — now opens `AddActionMenu` modal instead of directly navigating to outfit tab
+- **Added** `<AddActionMenu />` component with `visible`, `onClose`, and `onNavigate` props
+- **Updated** Close button styling to match Add button size (60x60) and position (right aligned)
+- **Removed** background overlay tap-to-close — modal now only closes via X button
+- **Removed all shadows** for clean flat design:
+  - Tab bar pill shadow (`shadowColor`, `shadowOpacity`, `shadowRadius`, `shadowOffset`, `elevation`)
+  - Focused tab button shadow
+  - Plus button shadow (`elevation`)
+
+### Change — `components/navigation/AddActionMenu.tsx` (Full Screen Layout)
+
+- **Installed** `expo-blur` package for native blur effect
+- **Added** `BlurView` import from `expo-blur`
+- **Converted** bottom sheet to full screen layout:
+  - Removed `justify-end` — content now centered vertically
+  - Removed `rounded-t-[32px]` — no rounded corners (full screen)
+  - Removed `translateY` animation — only scale + fade now
+  - Added `justify-center` — cards centered on screen
+  - Added `pt-12` — top padding for status bar
+- **Background blur**: `BlurView` with `intensity={12}` and `tint="light"`
+- **Cards**: White background (`bg-[#ffffff]`), no shadow (flat design)
+- **Title**: White text (`text-[#ffffff]`) with `font-bold`
+- **Card text**: Black text (`text-[#000000]`) for both title and subtitle
+- **Icon containers**: `#b29090` background color
+- **Removed all shadows** from cards, icon containers, and close button (clean flat design)

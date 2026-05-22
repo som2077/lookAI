@@ -1,6 +1,6 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Image, Pressable, View, Animated, Text } from "react-native";
-import React, { ReactNode, useMemo, useRef } from "react";
+import React, { ReactNode, useMemo, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   IconSmartHome,
@@ -9,6 +9,7 @@ import {
   IconPlus,
   type IconProps,
 } from "@tabler/icons-react-native";
+import { AddActionMenu } from "./AddActionMenu";
 
 type TabIconComponent = React.ComponentType<IconProps>;
 type TabConfig = Record<string, TabIconComponent>;
@@ -78,15 +79,6 @@ function AnimatedTabButton({
                 paddingVertical: 6,
                 backgroundColor: focused ? "#F2F2F2" : "transparent",
               },
-              focused
-                ? {
-                    shadowColor: "#000",
-                    shadowOpacity: 0.1,
-                    shadowRadius: 8,
-                    shadowOffset: { width: 0, height: 2 },
-                    elevation: 4,
-                  }
-                : undefined,
             ]}
           >
             {children}
@@ -119,6 +111,11 @@ export function CustomTabBar({
     () => Math.max(16, insets.bottom + 8),
     [insets.bottom],
   );
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const handleNavigate = (route: string) => {
+    navigation.navigate(route);
+  };
 
   return (
     <View
@@ -140,15 +137,10 @@ export function CustomTabBar({
             alignItems: "center",
             justifyContent: "space-between",
             borderRadius: 999,
-            backgroundColor: "#Ffffff",
+            backgroundColor: "rgba(255, 255, 255, 0.85)",
             paddingHorizontal: 7,
             paddingVertical: 8,
             height: 60,
-            shadowColor: "#000000",
-            shadowOpacity: 0.12,
-            shadowRadius: 20,
-            shadowOffset: { width: 0, height: 6 },
-            elevation: 16,
           }}
         >
           {state.routes.map((route, index) => {
@@ -223,7 +215,7 @@ export function CustomTabBar({
 
         {/* Plus / Add Button */}
         <Pressable
-          onPress={() => navigation.navigate("outfit")}
+          onPress={() => setMenuVisible(true)}
           style={{
             marginLeft: 12,
             height: 60,
@@ -232,16 +224,17 @@ export function CustomTabBar({
             backgroundColor: "#1A1827",
             alignItems: "center",
             justifyContent: "center",
-            shadowColor: "#1A1827",
-            shadowOpacity: 0.35,
-            shadowRadius: 14,
-            shadowOffset: { width: 0, height: 6 },
-            elevation: 12,
           }}
         >
           <IconPlus size={30} color="#FFFFFF" strokeWidth={2.5} />
         </Pressable>
       </View>
+
+      <AddActionMenu
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </View>
   );
 }
