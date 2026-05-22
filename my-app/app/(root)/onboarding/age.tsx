@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 import { AgePicker } from "@/components/onboarding/AgePicker";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
-import { useOnboardingState } from "@/store/onboarding-store";
+import { useOnboardingState } from "@/backend/store/onboarding-store";
 
 export default function AgeScreen() {
   const { age, setAge } = useOnboardingState();

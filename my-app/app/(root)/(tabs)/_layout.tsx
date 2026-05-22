@@ -18,6 +18,7 @@ export default function TabLayout() {
         name="subscription"
         options={{ href: null, title: "Subscription" }}
       />
+      <Tabs.Screen name="posts" options={{ href: null, title: "Posts" }} />
     </Tabs>
   );
 }

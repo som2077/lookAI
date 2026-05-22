@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PostgrestError } from "@supabase/supabase-js";
-import { useSupabase } from "@/hooks/useSupabase";
+import { useSupabase } from "./useSupabase";
 
 type QueryBuilder = ReturnType<
   ReturnType<

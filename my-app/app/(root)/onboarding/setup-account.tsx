@@ -2,8 +2,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { useOnboardingState } from "@/store/onboarding-store";
-import { useSupabase } from "@/hooks/useSupabase";
+import { useOnboardingState } from "@/backend/store/onboarding-store";
+import { useSupabase } from "@/backend/hooks/useSupabase";
 
 export default function SetupAccountScreen() {
   const { user } = useUser();

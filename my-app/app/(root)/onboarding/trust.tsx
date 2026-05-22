@@ -3,8 +3,8 @@ import { useAuth } from "@clerk/clerk-expo";
 import { Image, Text, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
-import { useOnboardingState } from "@/store/onboarding-store";
-import { useSupabase } from "@/hooks/useSupabase";
+import { useOnboardingState } from "@/backend/store/onboarding-store";
+import { useSupabase } from "@/backend/hooks/useSupabase";
 
 export default function TrustScreen() {
   const { userId } = useAuth();

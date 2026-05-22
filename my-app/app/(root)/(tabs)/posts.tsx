@@ -3,14 +3,14 @@ import {
   ActivityIndicator,
   Button,
   FlatList,
-  SafeAreaView,
   Text,
   TextInput,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
-import { useSupabase } from "@/hooks/useSupabase";
-import { useSupabaseQuery } from "@/hooks/useSupabaseQuery";
+import { useSupabase } from "@/backend/hooks/useSupabase";
+import { useSupabaseQuery } from "@/backend/hooks/useSupabaseQuery";
 
 type Post = {
   id: string;
@@ -22,7 +22,12 @@ type Post = {
 export default function PostsScreen() {
   const { user } = useUser();
   const { supabase, isInitializing } = useSupabase();
-  const { data: posts, loading, error, refetch } = useSupabaseQuery<Post>("posts", {
+  const {
+    data: posts,
+    loading,
+    error,
+    refetch,
+  } = useSupabaseQuery<Post>("posts", {
     apply: (query) => query.order("created_at", { ascending: false }),
     enabled: !!user,
   });
@@ -73,7 +78,11 @@ export default function PostsScreen() {
         placeholder="Write something..."
         className="mb-3 rounded-md border border-gray-300 px-3 py-2"
       />
-      <Button title={isSaving ? "Saving..." : "Create post"} onPress={onCreatePost} disabled={isSaving} />
+      <Button
+        title={isSaving ? "Saving..." : "Create post"}
+        onPress={onCreatePost}
+        disabled={isSaving}
+      />
 
       {(error || saveError) && (
         <Text className="mt-3 text-red-500">{saveError ?? error?.message}</Text>
@@ -87,7 +96,9 @@ export default function PostsScreen() {
           <View className="rounded-md border border-gray-200 p-3">
             <Text className="text-xs text-gray-500">{item.user_id}</Text>
             <Text className="mt-1 text-base">{item.content ?? "(empty)"}</Text>
-            <Text className="mt-1 text-xs text-gray-400">{new Date(item.created_at).toLocaleString()}</Text>
+            <Text className="mt-1 text-xs text-gray-400">
+              {new Date(item.created_at).toLocaleString()}
+            </Text>
           </View>
         )}
       />

@@ -13,7 +13,7 @@ import {
   createPaymentIntent,
   getPaymentStatus,
   resolveProvider,
-} from "@/lib/payments";
+} from "@/backend/api/payment";
 
 export default function OutfitScreen() {
   const { userId } = useAuth();

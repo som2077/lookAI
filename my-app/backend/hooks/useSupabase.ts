@@ -1,6 +1,6 @@
 import { useAuth } from "@clerk/clerk-expo";
 import { useEffect, useRef, useState } from "react";
-import { createSupabaseClient } from "@/lib/supabase";
+import { createSupabaseClient } from "@/backend/api/supabase";
 
 export const useSupabase = () => {
   const { isLoaded, isSignedIn, getToken, userId } = useAuth();

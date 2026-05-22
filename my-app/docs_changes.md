@@ -405,6 +405,120 @@ STRIPE_PREMIUM_PRICE_ID=
 
 ---
 
+## Session: Folder Structure Cleanup (2026-05-22)
+
+### Change 1 — `app/(root)/(tabs)/posts.tsx` (NEW FILE)
+
+- **Moved** `screens/PostsScreen.tsx` → `app/(root)/(tabs)/posts.tsx`
+- **Fixed** import: changed `SafeAreaView` from `react-native` to `react-native-safe-area-context`
+- **Rationale:** All screens must be in `app/` folder per expo-router conventions
+
+### Change 2 — `app/(root)/(tabs)/_layout.tsx`
+
+- **Added** `<Tabs.Screen name="posts" options={{ href: null, title: "Posts" }} />`
+- Posts screen is routable but hidden from tab bar (like subscription)
+
+### Change 3 — Deleted `screens/PostsScreen.tsx`
+
+- **Deleted** entire `screens/` folder (expo-router violation)
+
+### Change 4 — Deleted `lib/payments.ts`
+
+- **Deleted** duplicate file — all imports already use `@/lib/payment` folder
+- `lib/payment/` folder (with `index.ts`, `types.ts`, `razorpay.ts`, `stripe.ts`) is the canonical location
+
+---
+
+## Session: Production Backend Folder Structure (2026-05-22)
+
+### Problem
+
+Backend-related code was scattered across multiple folders (`lib/`, `hooks/`, `store/`, `constants/`), making it hard to maintain and understand the architecture.
+
+### Solution
+
+Created a centralized `backend/` folder containing all backend-related code:
+
+```
+backend/
+├── api/                    # API clients & services
+│   ├── supabase.ts         # Supabase client configuration
+│   └── payment/            # Payment service (Razorpay + Stripe)
+│       ├── index.ts
+│       ├── types.ts
+│       ├── razorpay.ts
+│       └── stripe.ts
+├── hooks/                  # Backend data fetching hooks
+│   ├── useSupabase.ts
+│   └── useSupabaseQuery.ts
+├── store/                  # Backend-connected Zustand stores
+│   ├── payment-store.ts
+│   └── onboarding-store.ts
+└── config/                 # Backend configuration
+    └── plans.ts            # Payment plan definitions
+```
+
+### Files Created
+
+| File                                | Description                         |
+| ----------------------------------- | ----------------------------------- |
+| `backend/api/supabase.ts`           | Supabase client with Clerk JWT auth |
+| `backend/api/payment/index.ts`      | Payment gateway router              |
+| `backend/api/payment/types.ts`      | Shared TypeScript types             |
+| `backend/api/payment/razorpay.ts`   | Razorpay integration                |
+| `backend/api/payment/stripe.ts`     | Stripe integration                  |
+| `backend/hooks/useSupabase.ts`      | React hook for Supabase client      |
+| `backend/hooks/useSupabaseQuery.ts` | React hook for Supabase queries     |
+| `backend/store/payment-store.ts`    | Zustand store for payments          |
+| `backend/store/onboarding-store.ts` | Zustand store for onboarding        |
+| `backend/config/plans.ts`           | Plan definitions & pricing          |
+
+### Import Mapping Changes
+
+| Old Import                 | New Import                         |
+| -------------------------- | ---------------------------------- |
+| `@/lib/supabase`           | `@/backend/api/supabase`           |
+| `@/lib/payment`            | `@/backend/api/payment`            |
+| `@/lib/payment/types`      | `@/backend/api/payment/types`      |
+| `@/hooks/useSupabase`      | `@/backend/hooks/useSupabase`      |
+| `@/hooks/useSupabaseQuery` | `@/backend/hooks/useSupabaseQuery` |
+| `@/store/payment-store`    | `@/backend/store/payment-store`    |
+| `@/store/onboarding-store` | `@/backend/store/onboarding-store` |
+| `@/constants/plans`        | `@/backend/config/plans`           |
+
+### Files Updated (Import Changes)
+
+- `app/_layout.tsx`
+- `app/(root)/payment/checkout.tsx`
+- `app/(root)/(tabs)/subscription.tsx`
+- `app/(root)/(tabs)/posts.tsx`
+- `app/(root)/(tabs)/outfit.tsx`
+- `app/(root)/onboarding/setup-account.tsx`
+- `app/(root)/onboarding/trust.tsx`
+- `app/(root)/onboarding/age.tsx`
+- `app/(root)/onboarding/body-type.tsx`
+- `app/(root)/onboarding/full-length-pics.tsx`
+- `app/(root)/onboarding/gender.tsx`
+- `app/(root)/onboarding/height.tsx`
+- `app/(root)/onboarding/nickname.tsx`
+- `app/(root)/onboarding/style-preference.tsx`
+- `components/payment/PlanList.tsx`
+- `components/payment/PlanCard.tsx`
+- `components/payment/PaymentMethodBadge.tsx`
+
+### Deleted Folders
+
+- `lib/` - Empty after migration
+- `hooks/` - Empty after migration
+- `store/` - Empty after migration
+- `constants/` - Empty after migration
+
+### Additional Fix
+
+- **Fixed** TypeScript lint error in `backend/api/supabase.ts`: Added explicit `Record<string, string>` type to `authHeaders`
+
+---
+
 ## Session: Swipe Left/Right Tab Navigation (2026-05-21)
 
 ### Change — `components/navigation/SwipeTabWrapper.tsx` (NEW FILE)

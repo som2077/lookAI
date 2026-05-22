@@ -1,8 +1,8 @@
 import { ScrollView, View, Text } from "react-native";
 import { PlanCard } from "./PlanCard";
 import { PaymentMethodBadge } from "./PaymentMethodBadge";
-import type { Plan, Subscription } from "@/lib/payment/types";
-import { getProvider } from "@/lib/payment";
+import type { Plan, Subscription } from "@/backend/api/payment/types";
+import { getProvider } from "@/backend/api/payment";
 
 interface PlanListProps {
   plans: Plan[];

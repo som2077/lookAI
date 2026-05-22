@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { Subscription, SubscriptionStatus, PlanId, PaymentIntent, PaymentResult } from "@/lib/payment/types";
-import { initiatePaymentWithToken, getProvider } from "@/lib/payment";
-import { createSupabaseClient } from "@/lib/supabase";
+import type { Subscription, SubscriptionStatus, PlanId, PaymentIntent, PaymentResult } from "@/backend/api/payment/types";
+import { initiatePaymentWithToken, getProvider } from "@/backend/api/payment";
+import { createSupabaseClient } from "@/backend/api/supabase";
 
 interface PaymentState {
   subscription: Subscription | null;

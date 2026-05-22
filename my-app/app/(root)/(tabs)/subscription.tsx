@@ -4,9 +4,12 @@ import { useRouter } from "expo-router";
 import { useUser, useAuth } from "@clerk/clerk-expo";
 import { useEffect } from "react";
 import { PlanList } from "@/components/payment/PlanList";
-import { usePaymentStore, isSubscriptionActive } from "@/store/payment-store";
-import { PLANS } from "@/constants/plans";
-import type { Plan } from "@/lib/payment/types";
+import {
+  usePaymentStore,
+  isSubscriptionActive,
+} from "@/backend/store/payment-store";
+import { PLANS } from "@/backend/config/plans";
+import type { Plan } from "@/backend/api/payment/types";
 
 export default function SubscriptionScreen() {
   const router = useRouter();

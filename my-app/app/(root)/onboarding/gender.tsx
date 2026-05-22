@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
-import { useOnboardingState } from "@/store/onboarding-store";
+import { useOnboardingState } from "@/backend/store/onboarding-store";
 
 export default function GenderScreen() {
   const { gender, setGender } = useOnboardingState();

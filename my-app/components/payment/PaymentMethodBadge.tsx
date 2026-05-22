@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import type { PaymentProvider } from "@/lib/payment/types";
+import type { PaymentProvider } from "@/backend/api/payment/types";
 
 interface PaymentMethodBadgeProps {
   provider: PaymentProvider;

@@ -141,7 +141,7 @@ export function CustomTabBar({
             justifyContent: "space-between",
             borderRadius: 999,
             backgroundColor: "#Ffffff",
-            paddingHorizontal: 8,
+            paddingHorizontal: 7,
             paddingVertical: 8,
             height: 60,
             shadowColor: "#000000",

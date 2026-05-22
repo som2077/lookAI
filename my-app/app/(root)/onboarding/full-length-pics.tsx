@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
-import { createSupabaseClient } from "@/lib/supabase";
+import { createSupabaseClient } from "@/backend/api/supabase";
 
 const BUCKET = "full-length-pics";
 

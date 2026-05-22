@@ -8,7 +8,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   OnboardingProvider,
   useOnboardingState,
-} from "@/store/onboarding-store";
+} from "@/backend/store/onboarding-store";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 

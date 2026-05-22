@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
-import { useOnboardingState } from "@/store/onboarding-store";
+import { useOnboardingState } from "@/backend/store/onboarding-store";
 
 const maleBodyTypes: BodyTypeOption[] = [
   {

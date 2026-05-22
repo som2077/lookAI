@@ -9,14 +9,16 @@ if (!supabaseUrl) {
 }
 
 if (!supabaseAnonKey) {
-  throw new Error("Missing EXPO_PUBLIC_SUPABASE_ANON_KEY environment variable.");
+  throw new Error(
+    "Missing EXPO_PUBLIC_SUPABASE_ANON_KEY environment variable.",
+  );
 }
 
-export const createSupabaseClient = (clerkToken?: string | null): SupabaseClient => {
-  const authHeaders = clerkToken
-    ? {
-        Authorization: `Bearer ${clerkToken}`,
-      }
+export const createSupabaseClient = (
+  clerkToken?: string | null,
+): SupabaseClient => {
+  const authHeaders: Record<string, string> = clerkToken
+    ? { Authorization: `Bearer ${clerkToken}` }
     : {};
 
   return createClient(supabaseUrl, supabaseAnonKey, {

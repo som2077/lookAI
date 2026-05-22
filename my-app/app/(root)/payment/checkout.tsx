@@ -4,11 +4,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useUser, useAuth } from "@clerk/clerk-expo";
 import { useEffect } from "react";
 import { ArrowLeft, CreditCard, Smartphone } from "lucide-react-native";
-import { usePaymentStore } from "@/store/payment-store";
-import { getProvider } from "@/lib/payment";
-import { PLAN_MAP } from "@/constants/plans";
+import { usePaymentStore } from "@/backend/store/payment-store";
+import { getProvider } from "@/backend/api/payment";
+import { PLAN_MAP } from "@/backend/config/plans";
 import { PaymentMethodBadge } from "@/components/payment/PaymentMethodBadge";
-import type { PlanId } from "@/lib/payment/types";
+import type { PlanId } from "@/backend/api/payment/types";
 
 export default function CheckoutScreen() {
   const router = useRouter();

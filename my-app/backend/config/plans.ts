@@ -1,4 +1,4 @@
-import type { Plan } from "@/lib/payment/types";
+import type { Plan } from "@/backend/api/payment/types";
 
 export const PLANS: Plan[] = [
   {
