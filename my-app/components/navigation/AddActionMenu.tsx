@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Modal, Animated } from "react-native";
+import { View, Text, Pressable, Modal, Animated, Image } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
@@ -126,32 +126,58 @@ export function AddActionMenu({
           }}
         >
           <Text className="text-[#ffffff] text-3xl font-bold text-center mb-8">
-            what would you like to do?
+            What would you like to do?
           </Text>
 
-          <View className="flex-row flex-wrap justify-between mb-6">
+          <View className="flex-row flex-wrap justify-between mb-4">
             {ACTION_CARDS.map((card, index) => {
               const IconComponent = card.icon;
               return (
                 <Pressable
                   key={card.id}
                   onPress={() => handleCardPress(card.route)}
-                  className="w-[48%] aspect-square rounded-2xl bg-[#ffffff] mb-4 overflow-hidden"
+                  className="w-[48%] h-[240px] rounded-[35px] bg-[#ffffff] mb-4 overflow-hidden"
                 >
-                  <View className="flex-1 p-4 justify-between">
-                    <View className="w-14 h-14 rounded-xl bg-[#b29090] items-center justify-center">
-                      <IconComponent
-                        size={24}
-                        color={card.color}
-                        strokeWidth={1.8}
-                      />
+                  <View className="flex-1 p-6 items-center">
+                    <View className="w-full h-40 rounded-full items-center justify-center overflow-hidden">
+                      {card.id === "log-outfit" ? (
+                        <Image
+                          source={require("../../assets/action-menu/one.png")}
+                          className="w-full h-full"
+                          resizeMode="contain"
+                        />
+                      ) : card.id === "add-cloths" ? (
+                        <Image
+                          source={require("../../assets/action-menu/two.png")}
+                          className="w-full h-full"
+                          resizeMode="contain"
+                        />
+                      ) : card.id === "ai-outfit" ? (
+                        <Image
+                          source={require("../../assets/action-menu/three.png")}
+                          className="w-full h-full"
+                          resizeMode="cover"
+                        />
+                      ) : card.id === "style-score" ? (
+                        <Image
+                          source={require("../../assets/action-menu/four.png")}
+                          className="w-full h-full"
+                          resizeMode="center"
+                        />
+                      ) : (
+                        <IconComponent
+                          size={24}
+                          color={card.color}
+                          strokeWidth={1.8}
+                        />
+                      )}
                     </View>
 
                     <View>
-                      <Text className="text-[#000000] text-base font-semibold mb-0.5">
+                      <Text className="text-[#000000] text-xl font-semibold text-center mb-1 mt-2">
                         {card.title}
                       </Text>
-                      <Text className="text-[#000000] text-xs">
+                      <Text className="text-[#000000] text-sm text-center">
                         {card.subtitle}
                       </Text>
                     </View>

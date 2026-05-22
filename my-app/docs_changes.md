@@ -590,3 +590,15 @@ backend/
 - **Card text**: Black text (`text-[#000000]`) for both title and subtitle
 - **Icon containers**: `#b29090` background color
 - **Removed all shadows** from cards, icon containers, and close button (clean flat design)
+- **Added** `Image` import from `react-native`
+- **Log outfit card**: Replaced `IconCamera` with `one.png` image
+- **Add cloths card**: Replaced `IconHanger` with `two.png` image
+- **AI outfit card**: Replaced `IconSparkles` with `three.png` image
+- **Style score card**: Replaced `IconTrendingUp` with `four.png` image
+- **All 4 cards now use images** from `assets/action-menu/`
+- **Image rendering**: Conditional logic for cards:
+  - `card.id === "log-outfit"` → shows `one.png`
+  - `card.id === "add-cloths"` → shows `two.png`
+  - `card.id === "ai-outfit"` → shows `three.png`
+  - `card.id === "style-score"` → shows `four.png`
+- **Image styling**: `resizeMode="contain"` with `w-full h-full` to fit the container
