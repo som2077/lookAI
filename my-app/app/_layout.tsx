@@ -5,11 +5,13 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useSupabase } from "@/backend/hooks/useSupabase";
 import {
   OnboardingProvider,
   useOnboardingState,
 } from "@/backend/store/onboarding-store";
 import { BillingService } from "@/billing/BillingService";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import * as SecureStore from "expo-secure-store";
 import { memo, useCallback, useEffect, useState } from "react";
 
@@ -28,13 +30,74 @@ const RootNavigator = memo(function RootNavigator() {
     null,
   );
   const completionVersion = useOnboardingState((s) => s._completionVersion);
+  const ensureOnboardingSession = useOnboardingState(
+    (s) => s.ensureUserSession,
+  );
+  const resetOnboardingState = useOnboardingState((s) => s.resetState);
+  const { supabase, isInitializing: isSupabaseInitializing } = useSupabase();
 
-  const loadOnboardingStatus = useCallback(async (uid: string) => {
-    const value = await SecureStore.getItemAsync(`onboarding_complete_${uid}`);
-    setOnboardingComplete(value === "true");
-  }, []);
+  const loadOnboardingStatus = useCallback(
+    async (uid: string, client: SupabaseClient) => {
+      const storedValue = await SecureStore.getItemAsync(
+        `onboarding_complete_${uid}`,
+      );
+
+      if (storedValue === "true") {
+        setOnboardingComplete(true);
+        return;
+      }
+
+      try {
+        const { data, error } = await client
+          .from("user_profiles")
+          .select("user_id")
+          .eq("user_id", uid)
+          .maybeSingle();
+
+        if (error) {
+          console.warn("Failed to load remote onboarding status", error);
+          setOnboardingComplete(false);
+          return;
+        }
+
+        const isComplete = Boolean(data);
+
+        if (isComplete) {
+          await SecureStore.setItemAsync(`onboarding_complete_${uid}`, "true");
+        }
+
+        setOnboardingComplete(isComplete);
+      } catch (err) {
+        console.warn("Unexpected onboarding status error", err);
+        setOnboardingComplete(false);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn || !userId) {
+      resetOnboardingState();
+      return;
+    }
+
+    ensureOnboardingSession(userId);
+  }, [
+    ensureOnboardingSession,
+    resetOnboardingState,
+    isLoaded,
+    isSignedIn,
+    userId,
+  ]);
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setOnboardingComplete(null);
+      return;
+    }
+
     if (!userId) {
       setOnboardingComplete(null);
       return;
@@ -45,8 +108,19 @@ const RootNavigator = memo(function RootNavigator() {
       return;
     }
 
-    void loadOnboardingStatus(userId);
-  }, [isSignedIn, userId, completionVersion, loadOnboardingStatus]);
+    if (isSupabaseInitializing) {
+      return;
+    }
+
+    void loadOnboardingStatus(userId, supabase);
+  }, [
+    isSignedIn,
+    userId,
+    completionVersion,
+    loadOnboardingStatus,
+    supabase,
+    isSupabaseInitializing,
+  ]);
 
   useEffect(() => {
     if (!isLoaded) return;

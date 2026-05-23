@@ -25,10 +25,11 @@ const GENDER_OPTIONS = [
 
 export default function GenderScreen() {
   const { gender, setGender } = useOnboardingState();
-  const handleContinue = useCallback(
-    () => router.push("/(root)/onboarding/age"),
-    [],
-  );
+  const handleContinue = useCallback(() => {
+    if (!gender) return;
+
+    router.push("/(root)/onboarding/age");
+  }, [gender]);
 
   return (
     <View className="flex-1 px-5 pb-6 pt-2">

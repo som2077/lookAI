@@ -68,8 +68,10 @@ export default function StylePreferenceScreen() {
   const { stylePreferences, toggleStyle } = useOnboardingState();
 
   const handleContinue = useCallback(() => {
+    if (stylePreferences.length !== 5) return;
+
     router.push("/(root)/onboarding/full-length-pics");
-  }, [router]);
+  }, [router, stylePreferences]);
 
   return (
     // <SafeAreaView className="flex-1">
@@ -96,7 +98,7 @@ export default function StylePreferenceScreen() {
       </Text>
       <ContinueButton
         onPress={handleContinue}
-        disabled={stylePreferences.length > 5}
+        disabled={stylePreferences.length !== 5}
       />
     </View>
     // </SafeAreaView>

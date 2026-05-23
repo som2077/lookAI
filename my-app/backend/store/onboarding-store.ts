@@ -5,27 +5,42 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type Gender = "Male" | "Female" | "";
 
-type OnboardingState = {
+type OnboardingFormData = {
   age: number;
   height: number;
   gender: Gender;
   bodyType: string;
   nickname: string;
   stylePreferences: string[];
+};
+
+type OnboardingState = OnboardingFormData & {
   isSaving: boolean;
   error: string | null;
   _completionVersion: number;
+  activeUserId: string | null;
   setAge: (value: number) => void;
   setHeight: (value: number) => void;
   setGender: (value: Gender) => void;
   setBodyType: (value: string) => void;
   setNickname: (value: string) => void;
   toggleStyle: (value: string) => void;
+  ensureUserSession: (userId: string) => void;
+  resetState: () => void;
   completeOnboarding: (
     userId: string,
     supabase: SupabaseClient,
   ) => Promise<boolean>;
 };
+
+const createInitialFormState = (): OnboardingFormData => ({
+  age: 28,
+  height: 165,
+  gender: "" as Gender,
+  bodyType: "",
+  nickname: "",
+  stylePreferences: [],
+});
 
 const secureStorage = {
   getItem: (name: string) => SecureStore.getItemAsync(name),
@@ -37,15 +52,11 @@ const secureStorage = {
 export const useOnboardingState = create<OnboardingState>()(
   persist(
     (set, get) => ({
-      age: 28,
-      height: 165,
-      gender: "",
-      bodyType: "",
-      nickname: "",
-      stylePreferences: [],
+      ...createInitialFormState(),
       isSaving: false,
       error: null,
       _completionVersion: 0,
+      activeUserId: null,
       setAge: (age) => set({ age }),
       setHeight: (height) => set({ height }),
       setGender: (gender) => set({ gender }),
@@ -62,6 +73,26 @@ export const useOnboardingState = create<OnboardingState>()(
           }
           if (state.stylePreferences.length >= 5) return state;
           return { stylePreferences: [...state.stylePreferences, style] };
+        }),
+      ensureUserSession: (userId: string) =>
+        set((state) => {
+          if (state.activeUserId === userId) return {};
+
+          return {
+            ...createInitialFormState(),
+            activeUserId: userId,
+            isSaving: false,
+            error: null,
+            _completionVersion: 0,
+          };
+        }),
+      resetState: () =>
+        set({
+          ...createInitialFormState(),
+          activeUserId: null,
+          isSaving: false,
+          error: null,
+          _completionVersion: 0,
         }),
       completeOnboarding: async (userId: string, supabase: SupabaseClient) => {
         set({ isSaving: true, error: null });

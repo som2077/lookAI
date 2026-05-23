@@ -110,13 +110,8 @@ export default function BodyTypesScreen() {
             selected={selectedBodyType === item.id}
             expanded={expandedId === item.id}
             onPress={() => {
-              if (expandedId === item.id) {
-                // Already expanded, select it
-                setSelectedBodyType(item.id);
-              } else {
-                // Expand it
-                setExpandedId(item.id);
-              }
+              setSelectedBodyType(item.id);
+              setExpandedId(item.id);
             }}
           />
         )}
