@@ -1,13 +1,18 @@
 import { Tabs } from "expo-router";
 import { CustomTabBar } from "../../../components/navigation/CustomTabBar";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+
+const renderTabBar = (props: BottomTabBarProps) => <CustomTabBar {...props} />;
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        freezeOnBlur: true,
+        lazy: true,
       }}
-      tabBar={(props) => <CustomTabBar {...props} />}
+      tabBar={renderTabBar}
     >
       <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen name="wardrobe" options={{ title: "Wardrobe" }} />
@@ -19,6 +24,10 @@ export default function TabLayout() {
         options={{ href: null, title: "Subscription" }}
       />
       <Tabs.Screen name="posts" options={{ href: null, title: "Posts" }} />
+      <Tabs.Screen
+        name="manage-subscription"
+        options={{ href: null, title: "Manage Subscription" }}
+      />
     </Tabs>
   );
 }

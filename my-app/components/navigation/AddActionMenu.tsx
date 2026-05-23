@@ -1,7 +1,14 @@
-import { View, Text, Pressable, Modal, Animated, Image } from "react-native";
-import React, { useEffect, useRef } from "react";
+import { View, Text, Pressable, Modal, Image } from "react-native";
+import React, { useCallback, useEffect } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  Easing,
+} from "react-native-reanimated";
 import {
   IconCamera,
   IconHanger,
@@ -67,70 +74,66 @@ export function AddActionMenu({
   onNavigate,
 }: AddActionMenuProps) {
   const insets = useSafeAreaInsets();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const fadeAnim = useSharedValue(0);
+  const scaleAnim = useSharedValue(0.95);
+  const translateY = useSharedValue(30);
 
   useEffect(() => {
     if (visible) {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          useNativeDriver: true,
-          speed: 15,
-          bounciness: 8,
-        }),
-      ]).start();
+      fadeAnim.value = withTiming(1, {
+        duration: 250,
+        easing: Easing.out(Easing.quad),
+      });
+      scaleAnim.value = withSpring(1, { damping: 16, stiffness: 160 });
+      translateY.value = withSpring(0, { damping: 16, stiffness: 160 });
     } else {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 0.9,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      fadeAnim.value = withTiming(0, {
+        duration: 200,
+        easing: Easing.in(Easing.quad),
+      });
+      scaleAnim.value = withSpring(0.95, { damping: 16, stiffness: 160 });
+      translateY.value = withSpring(30, { damping: 16, stiffness: 160 });
     }
-  }, [visible, fadeAnim, scaleAnim]);
+  }, [visible, fadeAnim, scaleAnim, translateY]);
 
-  const handleCardPress = (route: string) => {
-    onClose();
-    setTimeout(() => {
-      onNavigate(route);
-    }, 200);
-  };
+  const backdropStyle = useAnimatedStyle(() => ({ opacity: fadeAnim.value }));
+  const contentStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAnim.value }, { translateY: translateY.value }],
+  }));
+
+  const handleCardPress = useCallback(
+    (route: string) => {
+      onClose();
+      setTimeout(() => {
+        onNavigate(route);
+      }, 200);
+    },
+    [onClose, onNavigate],
+  );
 
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <Animated.View className="flex-1" style={{ opacity: fadeAnim }}>
+      <Animated.View className="flex-1" style={backdropStyle}>
         <BlurView intensity={135} tint="dark" className="absolute inset-0" />
         <Animated.View
           className="flex-1 px-[16px] mb-[-8px] justify-end"
-          style={{
-            transform: [{ scale: scaleAnim }],
-            paddingBottom: Math.max(24, insets.bottom + 16),
-          }}
+          style={[
+            contentStyle,
+            { paddingBottom: Math.max(24, insets.bottom + 16) },
+          ]}
         >
           <Text className="text-[#ffffff] text-3xl font-bold text-center mb-8">
             What would you like to do?
           </Text>
 
           <View className="flex-row flex-wrap justify-between mb-4">
-            {ACTION_CARDS.map((card, index) => {
+            {ACTION_CARDS.map((card) => {
               const IconComponent = card.icon;
               return (
                 <Pressable

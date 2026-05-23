@@ -1,6 +1,13 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Image, Pressable, View, Animated, Text } from "react-native";
-import React, { ReactNode, useMemo, useRef, useState } from "react";
+import { Image as ExpoImage } from "expo-image";
+import { Pressable, View, Animated, Text } from "react-native";
+import React, {
+  ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   IconSmartHome,
@@ -20,7 +27,7 @@ const TAB_CONFIG: TabConfig = {
   saved: IconBookmark,
 };
 
-function AnimatedTabButton({
+const AnimatedTabButton = React.memo(function AnimatedTabButton({
   focused,
   onPress,
   children,
@@ -35,27 +42,25 @@ function AnimatedTabButton({
 }) {
   const scale = useRef(new Animated.Value(1)).current;
 
-  const animateIn = () => {
+  const animateIn = useCallback(() => {
     Animated.spring(scale, {
       toValue: 0.93,
       useNativeDriver: true,
       speed: 24,
       bounciness: 7,
     }).start();
-  };
+  }, [scale]);
 
-  const animateOut = () => {
+  const animateOut = useCallback(() => {
     Animated.spring(scale, {
       toValue: 1,
       useNativeDriver: true,
       speed: 24,
       bounciness: 5,
     }).start();
-  };
+  }, [scale]);
 
   return (
-    // flex:1 rakhein taaki tabs equally spaced rahein,
-    // lekin alignItems:"center" se inner content shrink ho
     <Animated.View
       style={{ transform: [{ scale }], flex: 1, alignItems: "center" }}
     >
@@ -99,7 +104,7 @@ function AnimatedTabButton({
       </View>
     </Animated.View>
   );
-}
+});
 
 export function CustomTabBar({
   state,
@@ -113,9 +118,12 @@ export function CustomTabBar({
   );
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const handleNavigate = (route: string) => {
-    navigation.navigate(route);
-  };
+  const handleNavigate = useCallback(
+    (route: string) => {
+      navigation.navigate(route);
+    },
+    [navigation],
+  );
 
   return (
     <View
@@ -137,7 +145,9 @@ export function CustomTabBar({
             alignItems: "center",
             justifyContent: "space-between",
             borderRadius: 999,
-            backgroundColor: "rgba(255, 255, 255, 0.85)",
+            borderWidth: 0.5,
+            borderColor: "rgba(200, 200, 208, 0.6)",
+            backgroundColor: "rgba(255, 255, 255)",
             paddingHorizontal: 7,
             paddingVertical: 8,
             height: 60,
@@ -185,10 +195,11 @@ export function CustomTabBar({
                       },
                     ]}
                   >
-                    <Image
+                    <ExpoImage
                       source={require("../../assets/images/kribb.png")}
                       style={{ height: 28, width: 28, borderRadius: 14 }}
-                      resizeMode="cover"
+                      contentFit="cover"
+                      cachePolicy="memory-disk"
                     />
                   </View>
                 </AnimatedTabButton>

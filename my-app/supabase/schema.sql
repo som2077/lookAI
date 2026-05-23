@@ -30,50 +30,96 @@ CREATE POLICY "update_own" ON user_profiles FOR UPDATE
 USING (auth.jwt() ->> 'sub' = user_id);
 
 -- =============================================
--- PAYMENT TABLES
+-- GOOGLE PLAY BILLING TABLES
 -- =============================================
 
--- Subscriptions table
-DROP TABLE IF EXISTS subscriptions;
-CREATE TABLE subscriptions (
+-- entitlements: single source of truth for premium access
+-- Written ONLY by the verify-purchase Edge Function (service role).
+-- Client can only SELECT their own row.
+DROP TABLE IF EXISTS entitlements;
+CREATE TABLE entitlements (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  plan_id TEXT NOT NULL CHECK (plan_id IN ('free', 'pro', 'premium')),
-  provider TEXT NOT NULL CHECK (provider IN ('razorpay', 'stripe')),
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('active', 'inactive', 'expired', 'cancelled', 'pending')),
-  provider_subscription_id TEXT,
-  current_period_end TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  user_id TEXT UNIQUE NOT NULL,
+  tier TEXT NOT NULL DEFAULT 'free'
+    CHECK (tier IN ('free', 'pro', 'premium')),
+  plan_id TEXT,
+  status TEXT NOT NULL DEFAULT 'inactive'
+    CHECK (status IN (
+      'active', 'inactive', 'expired', 'cancelled',
+      'pending', 'grace_period', 'on_hold', 'paused'
+    )),
+  purchase_token TEXT,
+  order_id TEXT,
+  expires_at TIMESTAMPTZ,
+  grace_period_ends_at TIMESTAMPTZ,
+  is_auto_renewing BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE entitlements ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "sub_insert_own" ON subscriptions FOR INSERT
-WITH CHECK (auth.jwt() ->> 'sub' = user_id);
-
-CREATE POLICY "sub_select_own" ON subscriptions FOR SELECT
+-- Users can only read their own entitlement
+CREATE POLICY "entitlement_select_own" ON entitlements FOR SELECT
 USING (auth.jwt() ->> 'sub' = user_id);
 
-CREATE POLICY "sub_update_own" ON subscriptions FOR UPDATE
-USING (auth.jwt() ->> 'sub' = user_id);
-
--- Payment events table (webhook audit log)
-DROP TABLE IF EXISTS payment_events;
-CREATE TABLE payment_events (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id TEXT,
-  provider TEXT NOT NULL CHECK (provider IN ('razorpay', 'stripe')),
-  event_type TEXT NOT NULL,
-  provider_event_id TEXT,
-  payload JSONB,
-  processed_at TIMESTAMP DEFAULT NOW()
-);
-
-ALTER TABLE payment_events ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "events_insert_service" ON payment_events FOR INSERT
+-- Only service role (Edge Function) can insert/update
+CREATE POLICY "entitlement_service_insert" ON entitlements FOR INSERT
 WITH CHECK (true);
 
-CREATE POLICY "events_select_own" ON payment_events FOR SELECT
+CREATE POLICY "entitlement_service_update" ON entitlements FOR UPDATE
+USING (true);
+
+-- purchase_tokens: audit log of every verified token (prevents replay attacks)
+DROP TABLE IF EXISTS purchase_tokens;
+CREATE TABLE purchase_tokens (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  product_id TEXT NOT NULL,
+  purchase_token TEXT UNIQUE NOT NULL,
+  order_id TEXT,
+  verified_at TIMESTAMPTZ DEFAULT NOW(),
+  gpb_response JSONB
+);
+
+ALTER TABLE purchase_tokens ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "tokens_service_insert" ON purchase_tokens FOR INSERT
+WITH CHECK (true);
+
+CREATE POLICY "tokens_select_own" ON purchase_tokens FOR SELECT
 USING (auth.jwt() ->> 'sub' = user_id);
+
+-- billing_events: RTDN (Real-time Developer Notifications) webhook audit log
+DROP TABLE IF EXISTS billing_events;
+CREATE TABLE billing_events (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id TEXT,
+  notification_type TEXT NOT NULL,
+  purchase_token TEXT,
+  product_id TEXT,
+  payload JSONB,
+  processed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE billing_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "billing_events_service_insert" ON billing_events FOR INSERT
+WITH CHECK (true);
+
+CREATE POLICY "billing_events_select_own" ON billing_events FOR SELECT
+USING (auth.jwt() ->> 'sub' = user_id);
+
+-- Auto-update updated_at on entitlements
+CREATE OR REPLACE FUNCTION update_entitlement_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS entitlements_updated_at ON entitlements;
+CREATE TRIGGER entitlements_updated_at
+  BEFORE UPDATE ON entitlements
+  FOR EACH ROW EXECUTE FUNCTION update_entitlement_updated_at();

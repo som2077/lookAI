@@ -1,21 +1,27 @@
-import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Image as ExpoImage } from "expo-image";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import {
   IconCalendarWeekFilled,
   IconFlameFilled,
 } from "@tabler/icons-react-native";
 
-export function HomeHeader() {
+export const HomeHeader = React.memo(function HomeHeader() {
   const router = useRouter();
   const [streak] = useState<number>(1);
+  const onCalendarPress = useCallback(
+    () => router.push("/(root)/calendar" as never),
+    [router],
+  );
 
   return (
     <View className="flex-row items-center justify-between ">
-      <Image
+      <ExpoImage
         source={require("../../assets/images/getStartedLogo.png")}
-        className="h-16 w-56 ml-[-40]"
-        resizeMode="contain"
+        style={{ height: 64, width: 224, marginLeft: -40 }}
+        contentFit="contain"
+        cachePolicy="memory-disk"
       />
 
       <View className="flex-row items-center gap-2">
@@ -29,7 +35,7 @@ export function HomeHeader() {
         </View>
 
         <TouchableOpacity
-          onPress={() => router.push("/(root)/calendar" as never)}
+          onPress={onCalendarPress}
           className="items-center justify-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-2 py-2"
           activeOpacity={0.7}
         >
@@ -38,4 +44,4 @@ export function HomeHeader() {
       </View>
     </View>
   );
-}
+});

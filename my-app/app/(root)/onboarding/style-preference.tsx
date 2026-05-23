@@ -1,8 +1,37 @@
+import React, { useCallback } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
+
+interface StyleChipProps {
+  label: string;
+  selected: boolean;
+  onToggle: (style: string) => void;
+}
+
+const StyleChip = React.memo(function StyleChip({
+  label,
+  selected,
+  onToggle,
+}: StyleChipProps) {
+  const handlePress = useCallback(() => onToggle(label), [onToggle, label]);
+  return (
+    <Pressable
+      onPress={handlePress}
+      className={`rounded-full border px-4 py-3 ${
+        selected ? "border-black bg-black" : "border-transparent bg-[#ECEDF9]"
+      }`}
+    >
+      <Text
+        className={`text-base ${selected ? "font-medium text-white" : "text-[#1D1A27]"}`}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+});
 
 const styles = [
   "Casual",
@@ -38,9 +67,9 @@ export default function StylePreferenceScreen() {
   const router = useRouter();
   const { stylePreferences, toggleStyle } = useOnboardingState();
 
-  const handleContinue = () => {
+  const handleContinue = useCallback(() => {
     router.push("/(root)/onboarding/full-length-pics");
-  };
+  }, [router]);
 
   return (
     // <SafeAreaView className="flex-1">
@@ -53,28 +82,14 @@ export default function StylePreferenceScreen() {
         Select fashion styles you like most.
       </Text>
       <View className="flex-row flex-wrap gap-3 mt-8 items-center justify-center">
-        {styles.map((style) => {
-          const selected = stylePreferences.includes(style);
-          return (
-            <Pressable
-              key={style}
-              onPress={() => toggleStyle(style)}
-              className={`rounded-full border px-4 py-3 ${
-                selected
-                  ? "border-black bg-black"
-                  : "border-transparent bg-[#ECEDF9]"
-              }`}
-            >
-              <Text
-                className={`text-base ${
-                  selected ? "font-medium text-white" : "text-[#1D1A27]"
-                }`}
-              >
-                {style}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {styles.map((style) => (
+          <StyleChip
+            key={style}
+            label={style}
+            selected={stylePreferences.includes(style)}
+            onToggle={toggleStyle}
+          />
+        ))}
       </View>
       <Text className="mt-10  text-sm font-medium text-center text-[#000000]">
         Choose up to 5 styles that feel most like you.

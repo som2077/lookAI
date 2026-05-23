@@ -17,9 +17,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 const authPhone = require("../../assets/images/auth-phone.png");
 
-const GOOGLE_LOGO =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png";
-
 const getErrorMessage = (error: unknown) => {
   if (
     typeof error === "object" &&

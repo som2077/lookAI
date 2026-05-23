@@ -9,8 +9,9 @@ import {
   OnboardingProvider,
   useOnboardingState,
 } from "@/backend/store/onboarding-store";
+import { BillingService } from "@/billing/BillingService";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -18,7 +19,7 @@ if (!publishableKey) {
   throw new Error("Add your Clerk Publishable Key to the .env file");
 }
 
-function RootNavigator() {
+const RootNavigator = memo(function RootNavigator() {
   const { isSignedIn, isLoaded, userId } = useAuth();
   const router = useRouter();
   const segments = useSegments();
@@ -27,6 +28,11 @@ function RootNavigator() {
     null,
   );
   const completionVersion = useOnboardingState((s) => s._completionVersion);
+
+  const loadOnboardingStatus = useCallback(async (uid: string) => {
+    const value = await SecureStore.getItemAsync(`onboarding_complete_${uid}`);
+    setOnboardingComplete(value === "true");
+  }, []);
 
   useEffect(() => {
     if (!userId) {
@@ -39,15 +45,8 @@ function RootNavigator() {
       return;
     }
 
-    const loadOnboardingStatus = async () => {
-      const value = await SecureStore.getItemAsync(
-        `onboarding_complete_${userId}`,
-      );
-      setOnboardingComplete(value === "true");
-    };
-
-    void loadOnboardingStatus();
-  }, [isSignedIn, userId, completionVersion]);
+    void loadOnboardingStatus(userId);
+  }, [isSignedIn, userId, completionVersion, loadOnboardingStatus]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -81,9 +80,15 @@ function RootNavigator() {
   }, [isSignedIn, isLoaded, onboardingComplete, segmentKey]);
 
   return <Stack screenOptions={{ headerShown: false }} />;
-}
+});
 
 export default function RootLayout() {
+  useEffect(() => {
+    return () => {
+      void BillingService.disconnect();
+    };
+  }, []);
+
   return (
     <GestureHandlerRootView className="flex-1">
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { memo, useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -19,6 +19,23 @@ type Post = {
   created_at: string;
 };
 
+const CONTENT_CONTAINER_STYLE = { paddingTop: 16, gap: 12 };
+
+const PostItem = memo(function PostItem({ item }: { item: Post }) {
+  return (
+    <View className="rounded-md border border-gray-200 p-3">
+      <Text className="text-xs text-gray-500">{item.user_id}</Text>
+      <Text className="mt-1 text-base">{item.content ?? "(empty)"}</Text>
+      <Text className="mt-1 text-xs text-gray-400">
+        {new Date(item.created_at).toLocaleString()}
+      </Text>
+    </View>
+  );
+});
+
+const keyExtractor = (item: Post) => item.id;
+const renderItem = ({ item }: { item: Post }) => <PostItem item={item} />;
+
 export default function PostsScreen() {
   const { user } = useUser();
   const { supabase, isInitializing } = useSupabase();
@@ -36,7 +53,7 @@ export default function PostsScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const onCreatePost = async () => {
+  const onCreatePost = useCallback(async () => {
     if (!user) {
       setSaveError("You must be signed in.");
       return;
@@ -59,7 +76,7 @@ export default function PostsScreen() {
     setContent("");
     setIsSaving(false);
     await refetch();
-  };
+  }, [user, supabase, content, refetch]);
 
   if (isInitializing || loading) {
     return (
@@ -90,17 +107,13 @@ export default function PostsScreen() {
 
       <FlatList
         data={posts}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingTop: 16, gap: 12 }}
-        renderItem={({ item }) => (
-          <View className="rounded-md border border-gray-200 p-3">
-            <Text className="text-xs text-gray-500">{item.user_id}</Text>
-            <Text className="mt-1 text-base">{item.content ?? "(empty)"}</Text>
-            <Text className="mt-1 text-xs text-gray-400">
-              {new Date(item.created_at).toLocaleString()}
-            </Text>
-          </View>
-        )}
+        keyExtractor={keyExtractor}
+        contentContainerStyle={CONTENT_CONTAINER_STYLE}
+        renderItem={renderItem}
+        removeClippedSubviews
+        maxToRenderPerBatch={10}
+        windowSize={5}
+        initialNumToRender={10}
       />
     </SafeAreaView>
   );

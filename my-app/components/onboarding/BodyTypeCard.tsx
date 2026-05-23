@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronRight, Check } from "lucide-react-native";
-import { useEffect } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import { Image as ExpoImage } from "expo-image";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -24,7 +25,7 @@ type BodyTypeCardProps = {
   index: number;
 };
 
-export function BodyTypeCard({
+export const BodyTypeCard = React.memo(function BodyTypeCard({
   item,
   selected,
   expanded,
@@ -44,6 +45,17 @@ export function BodyTypeCard({
     transform: [{ scale: scale.value }],
   }));
 
+  const onPressIn = useCallback(() => {
+    scale.value = withSpring(0.985, { damping: 14, stiffness: 220 });
+  }, [scale]);
+
+  const onPressOut = useCallback(() => {
+    scale.value = withSpring(selected ? 1.01 : 1, {
+      damping: 14,
+      stiffness: 180,
+    });
+  }, [scale, selected]);
+
   return (
     <Animated.View
       entering={FadeInDown.duration(300).delay(index * 60)}
@@ -51,15 +63,8 @@ export function BodyTypeCard({
     >
       <Pressable
         onPress={onPress}
-        onPressIn={() => {
-          scale.value = withSpring(0.985, { damping: 14, stiffness: 220 });
-        }}
-        onPressOut={() => {
-          scale.value = withSpring(selected ? 1.01 : 1, {
-            damping: 14,
-            stiffness: 180,
-          });
-        }}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
         className={`rounded-2xl border border-[#d3d3d3] bg-[#F2F4F7] ${
           selected ? "bg-[#e0e1e9]" : "border-[#BCBCBC]"
         }`}
@@ -90,14 +95,20 @@ export function BodyTypeCard({
         {/* Expanded image */}
         {expanded && (
           <Animated.View entering={FadeIn.duration(200)}>
-            <Image
+            <ExpoImage
               source={item.image}
-              resizeMode="contain"
-              className="h-[300px] w-full rounded-b-2xl"
+              contentFit="contain"
+              cachePolicy="memory-disk"
+              style={{
+                height: 300,
+                width: "100%",
+                borderBottomLeftRadius: 16,
+                borderBottomRightRadius: 16,
+              }}
             />
           </Animated.View>
         )}
       </Pressable>
     </Animated.View>
   );
-}
+});

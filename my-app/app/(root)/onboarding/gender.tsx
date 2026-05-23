@@ -1,11 +1,34 @@
+import { useCallback } from "react";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
+import type { Gender } from "@/backend/store/onboarding-store";
+
+const GENDER_OPTIONS = [
+  {
+    label: "Male",
+    icon: "♂",
+    bg: "#1E1A27",
+    iconColor: "#FFFFFF",
+    ringColor: "#1E1A27",
+  },
+  {
+    label: "Female",
+    icon: "♀",
+    bg: "#DCE754",
+    iconColor: "#1E1A27",
+    ringColor: "#DCE754",
+  },
+] as const;
 
 export default function GenderScreen() {
   const { gender, setGender } = useOnboardingState();
+  const handleContinue = useCallback(
+    () => router.push("/(root)/onboarding/age"),
+    [],
+  );
 
   return (
     <View className="flex-1 px-5 pb-6 pt-2">
@@ -18,27 +41,12 @@ export default function GenderScreen() {
       </Text>
 
       <View className="mt-36  items-center gap-8">
-        {[
-          {
-            label: "Male",
-            icon: "♂",
-            bg: "#1E1A27",
-            iconColor: "#FFFFFF",
-            ringColor: "#1E1A27",
-          },
-          {
-            label: "Female",
-            icon: "♀",
-            bg: "#DCE754",
-            iconColor: "#1E1A27",
-            ringColor: "#DCE754",
-          },
-        ].map((o) => {
+        {GENDER_OPTIONS.map((o) => {
           const isSelected = gender === o.label;
           return (
             <Pressable
               key={o.label}
-              onPress={() => setGender(o.label as any)}
+              onPress={() => setGender(o.label as Gender)}
               android_ripple={null}
               style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
               className="items-center"
@@ -82,10 +90,7 @@ export default function GenderScreen() {
         })}
       </View>
 
-      <ContinueButton
-        onPress={() => router.push("/(root)/onboarding/age")}
-        disabled={!gender}
-      />
+      <ContinueButton onPress={handleContinue} disabled={!gender} />
     </View>
   );
 }

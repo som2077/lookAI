@@ -386,6 +386,20 @@ STRIPE_PREMIUM_PRICE_ID=
 
 ---
 
+## Session N+2: Home Screen Weekly Calendar
+
+### Change 1 — `components/ui/WeeklyCalendarStrip.tsx`
+
+- Added new weekly calendar component with selectable dates, Monday-start logic, and optional `initialDate` / `onDateChange` props.
+- Styles use Tailwind classes with rounded pill background matching the provided design reference.
+
+### Change 2 — `app/(root)/(tabs)/index.tsx`
+
+- Imported and rendered `WeeklyCalendarStrip` directly beneath `HomeHeader` to surface the week view on the Home tab.
+- Adjusted spacing on the “Home” card to accommodate the new calendar.
+
+---
+
 ## Session: Home Page Header — Logo, Streak & Calendar (2026-05-21)
 
 ### Change — `components/ui/HomeHeader.tsx` (NEW FILE)
@@ -602,3 +616,8 @@ backend/
   - `card.id === "ai-outfit"` → shows `three.png`
   - `card.id === "style-score"` → shows `four.png`
 - **Image styling**: `resizeMode="contain"` with `w-full h-full` to fit the container
+- **Smoother animations**: Improved open/close animations
+  - Added `translateY` animation (30px → 0 on open, 0 → 30px on close)
+  - Updated spring config: `friction: 8`, `tension: 40` for smoother feel
+  - Increased fade duration: 250ms open, 200ms close
+  - Scale animation: 0.95 → 1 with spring physics

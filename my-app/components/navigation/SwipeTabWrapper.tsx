@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback, useMemo } from "react";
 import {
   Gesture,
   GestureDetector,
@@ -39,41 +39,46 @@ export function SwipeTabWrapper({ tabIndex, children }: SwipeTabWrapperProps) {
     flex: 1,
   }));
 
-  const navigate = (route: string) => {
-    router.navigate(route as never);
-    translateX.value = 0;
-    opacity.value = 1;
-  };
+  const navigate = useCallback(
+    (route: string) => {
+      router.navigate(route as never);
+      translateX.value = 0;
+      opacity.value = 1;
+    },
+    [router, translateX, opacity],
+  );
 
-  const swipeLeft = Gesture.Fling()
-    .direction(Directions.LEFT)
-    .onEnd(() => {
-      if (tabIndex < TAB_ROUTES.length - 1) {
-        translateX.value = withTiming(-SLIDE_DISTANCE, {
-          duration: ANIM_DURATION,
-          easing: Easing.out(Easing.quad),
-        });
-        opacity.value = withTiming(0, { duration: ANIM_DURATION }, () => {
-          runOnJS(navigate)(TAB_ROUTES[tabIndex + 1]);
-        });
-      }
-    });
+  const composed = useMemo(() => {
+    const swipeLeft = Gesture.Fling()
+      .direction(Directions.LEFT)
+      .onEnd(() => {
+        if (tabIndex < TAB_ROUTES.length - 1) {
+          translateX.value = withTiming(-SLIDE_DISTANCE, {
+            duration: ANIM_DURATION,
+            easing: Easing.out(Easing.quad),
+          });
+          opacity.value = withTiming(0, { duration: ANIM_DURATION }, () => {
+            runOnJS(navigate)(TAB_ROUTES[tabIndex + 1]);
+          });
+        }
+      });
 
-  const swipeRight = Gesture.Fling()
-    .direction(Directions.RIGHT)
-    .onEnd(() => {
-      if (tabIndex > 0) {
-        translateX.value = withTiming(SLIDE_DISTANCE, {
-          duration: ANIM_DURATION,
-          easing: Easing.out(Easing.quad),
-        });
-        opacity.value = withTiming(0, { duration: ANIM_DURATION }, () => {
-          runOnJS(navigate)(TAB_ROUTES[tabIndex - 1]);
-        });
-      }
-    });
+    const swipeRight = Gesture.Fling()
+      .direction(Directions.RIGHT)
+      .onEnd(() => {
+        if (tabIndex > 0) {
+          translateX.value = withTiming(SLIDE_DISTANCE, {
+            duration: ANIM_DURATION,
+            easing: Easing.out(Easing.quad),
+          });
+          opacity.value = withTiming(0, { duration: ANIM_DURATION }, () => {
+            runOnJS(navigate)(TAB_ROUTES[tabIndex - 1]);
+          });
+        }
+      });
 
-  const composed = Gesture.Exclusive(swipeLeft, swipeRight);
+    return Gesture.Exclusive(swipeLeft, swipeRight);
+  }, [tabIndex, navigate, translateX, opacity]);
 
   return (
     <GestureDetector gesture={composed}>

@@ -4,6 +4,7 @@ const path = require('path');
 
 const config = getDefaultConfig(__dirname);
 
+// ── Resolver: alias heavy icon library to pre-built CJS bundle ────────────────
 config.resolver.extraNodeModules = {
   ...config.resolver.extraNodeModules,
   "@tabler/icons-react-native": path.resolve(
@@ -12,4 +13,10 @@ config.resolver.extraNodeModules = {
   ),
 };
 
-module.exports = withNativeWind(config, { input: './global.css' });
+// ── Transformer: inline requires so modules load lazily ───────────────────────
+config.transformer = {
+  ...config.transformer,
+  inlineRequires: true,
+};
+
+module.exports = withNativeWind(config, { input: "./global.css" });
