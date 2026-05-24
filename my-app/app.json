@@ -33,6 +33,12 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Look AI to access your camera to log outfits."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/kribb.png",

@@ -1,17 +1,17 @@
 import { View, Text, Pressable, Modal, Image } from "react-native";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSpring,
   Easing,
+  runOnJS,
 } from "react-native-reanimated";
 import {
   IconCamera,
-  IconHanger,
+  IconMesh,
   IconSparkles,
   IconTrendingUp,
   IconX,
@@ -33,15 +33,15 @@ const ACTION_CARDS: ActionCard[] = [
     title: "Log outfit",
     subtitle: "Capture today's look",
     icon: IconCamera,
-    route: "/(root)/(tabs)/outfit",
+    route: "/(root)/log-outfit/camera",
     color: "#5ECFC2",
   },
   {
     id: "add-cloths",
     title: "Add cloths",
     subtitle: "New items to wardrobe",
-    icon: IconHanger,
-    route: "/(root)/(tabs)/wardrobe",
+    icon: IconMesh,
+    route: "/(root)/add-clothes",
     color: "#FF6B6B",
   },
   {
@@ -77,24 +77,32 @@ export function AddActionMenu({
   const fadeAnim = useSharedValue(0);
   const scaleAnim = useSharedValue(0.95);
   const translateY = useSharedValue(30);
+  const [rendered, setRendered] = useState(visible);
 
   useEffect(() => {
     if (visible) {
-      fadeAnim.value = withTiming(1, {
-        duration: 250,
+      setRendered(true);
+      const inConfig = {
+        duration: 220,
         easing: Easing.out(Easing.quad),
-      });
-      scaleAnim.value = withSpring(1, { damping: 16, stiffness: 160 });
-      translateY.value = withSpring(0, { damping: 16, stiffness: 160 });
-    } else {
-      fadeAnim.value = withTiming(0, {
+      };
+      fadeAnim.value = withTiming(1, inConfig);
+      scaleAnim.value = withTiming(1, inConfig);
+      translateY.value = withTiming(0, inConfig);
+    } else if (rendered) {
+      const outConfig = {
         duration: 200,
         easing: Easing.in(Easing.quad),
+      };
+      scaleAnim.value = withTiming(0.98, outConfig);
+      translateY.value = withTiming(20, outConfig);
+      fadeAnim.value = withTiming(0, outConfig, (finished) => {
+        if (finished) {
+          runOnJS(setRendered)(false);
+        }
       });
-      scaleAnim.value = withSpring(0.95, { damping: 16, stiffness: 160 });
-      translateY.value = withSpring(30, { damping: 16, stiffness: 160 });
     }
-  }, [visible, fadeAnim, scaleAnim, translateY]);
+  }, [visible, rendered, fadeAnim, scaleAnim, translateY]);
 
   const backdropStyle = useAnimatedStyle(() => ({ opacity: fadeAnim.value }));
   const contentStyle = useAnimatedStyle(() => ({
@@ -113,7 +121,7 @@ export function AddActionMenu({
 
   return (
     <Modal
-      visible={visible}
+      visible={rendered}
       transparent
       animationType="none"
       onRequestClose={onClose}

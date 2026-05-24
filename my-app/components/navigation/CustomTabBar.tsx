@@ -1,6 +1,7 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Image as ExpoImage } from "expo-image";
 import { Pressable, View, Animated, Text } from "react-native";
+import { useRouter, type Href } from "expo-router";
 import React, {
   ReactNode,
   useCallback,
@@ -11,11 +12,11 @@ import React, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   IconSmartHome,
-  IconHanger,
   IconBookmark,
   IconPlus,
   type IconProps,
 } from "@tabler/icons-react-native";
+import { IconMesh } from "@tabler/icons-react-native";
 import { AddActionMenu } from "./AddActionMenu";
 
 type TabIconComponent = React.ComponentType<IconProps>;
@@ -23,7 +24,7 @@ type TabConfig = Record<string, TabIconComponent>;
 
 const TAB_CONFIG: TabConfig = {
   index: IconSmartHome,
-  wardrobe: IconHanger,
+  wardrobe: IconMesh,
   saved: IconBookmark,
 };
 
@@ -112,6 +113,7 @@ export function CustomTabBar({
   navigation,
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const bottom = useMemo(
     () => Math.max(16, insets.bottom + 8),
     [insets.bottom],
@@ -120,9 +122,9 @@ export function CustomTabBar({
 
   const handleNavigate = useCallback(
     (route: string) => {
-      navigation.navigate(route);
+      router.push(route as Href);
     },
-    [navigation],
+    [router],
   );
 
   return (

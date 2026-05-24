@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Look AI — Log Outfit Flow Wireframe</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" />
+<style>
+  :root {
+    --bg: #0c0c0c;
+    --card: #141414;
+    --border: #1e1e1e;
+    --gold: #c9a84c;
+    --purple: #534AB7;
+    --purple-light: #EEEDFE;
+    --green: #1D9E75;
+    --red: #ef5350;
+    --blue: #2196f3;
+    --amber: #d4a233;
+    --grey: #555555;
+    --grey-2: #2a2a2a;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #050505;
+    color: var(--white);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100%;
+  }
+  body {
+    padding: 60px 20px 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .page-title {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .page-title h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .page-title h1 .gold { color: var(--gold); }
+  .page-title p {
+    color: #888;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  /* Step label */
+  .step-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0 18px;
+  }
+  .step-label .num {
+    background: var(--gold);
+    color: #1a1400;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+  .step-label .text {
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Phone mockup */
+  .phone {
+    width: 300px;
+    background: var(--bg);
+    border: 8px solid #1a1a1a;
+    border-radius: 42px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px #222;
+    height: 620px;
+    display: flex;
+    flex-direction: column;
+  }
+  .notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 22px;
+    background: #000;
+    border-radius: 0 0 16px 16px;
+    z-index: 50;
+  }
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px 4px;
+    font-size: 10px;
+    color: #fff;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  .status-bar .right { display: flex; gap: 4px; align-items: center; }
+
+  /* Arrow connector */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 0 0;
+    gap: 6px;
+  }
+  .arrow .line {
+    width: 2px;
+    height: 30px;
+    background: linear-gradient(to bottom, transparent, var(--gold));
+  }
+  .arrow .icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #1a1400;
+    display: grid; place-items: center;
+    font-size: 18px;
+    box-shadow: 0 0 30px rgba(201,168,76,0.4);
+  }
+  .arrow .desc {
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    max-width: 240px;
+    margin-top: 4px;
+  }
+
+  /* Common screen elements */
+  .screen {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .top-bar .title { font-size: 14px; font-weight: 700; color: #fff; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 10px;
+    background: var(--card);
+    display: grid; place-items: center;
+    color: #fff;
+    font-size: 14px;
+    border: 1px solid var(--border);
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 12px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 9px;
+    color: var(--grey);
+  }
+  .nav-item.active { color: var(--gold); }
+  .nav-item.active i { color: var(--gold); }
+  .nav-item i { font-size: 18px; }
+  .nav-fab {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #1a1400;
+    display: grid; place-items: center;
+    font-size: 22px;
+    margin-top: -16px;
+    box-shadow: 0 6px 20px rgba(201,168,76,0.5);
+  }
+
+  /* Header (home) */
+  .home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px 10px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: #1a1400;
+    font-size: 16px;
+  }
+  .logo-text { font-weight: 800; font-size: 14px; }
+  .streak-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ========== SCREEN 1: BOTTOM SHEET ========== */
+  .screen-bg-home {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .sheet-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+  }
+  .bottom-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: var(--card);
+    border-radius: 22px 22px 0 0;
+    padding: 12px 16px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .drag-handle {
+    width: 40px; height: 4px;
+    background: #444;
+    border-radius: 999px;
+    margin: 0 auto 14px;
+  }
+  .sheet-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+  .sheet-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .sheet-card {
+    border-radius: 16px;
+    padding: 12px;
+    aspect-ratio: 1.05;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .sheet-card .ic {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    display: grid; place-items: center;
+    font-size: 16px;
+  }
+  .sheet-card .tt { font-size: 12px; font-weight: 700; color: #fff; }
+  .sheet-card .st { font-size: 9px; color: #aaa; margin-top: 2px; }
+  .sheet-card.s-log {
+    background: #1d1d1d;
+    border: 2px solid var(--purple);
+    box-shadow: 0 0 0 4px rgba(83,74,183,0.15);
+  }
+  .sheet-card.s-add {
+    background: var(--purple-light);
+    opacity: 0.55;
+  }
+  .sheet-card.s-add .tt { color: #1a1a2e; }
+  .sheet-card.s-add .st { color: #444; }
+  .sheet-card.s-add .ic { background: rgba(0,0,0,0.1); color: #1a1a2e; }
+  .sheet-card.s-ai {
+    background: #3a2e0e;
+    opacity: 0.55;
+  }
+  .sheet-card.s-ai .ic { background: rgba(201,168,76,0.2); color: var(--gold); }
+  .sheet-card.s-score {
+    background: #3a1e1a;
+    opacity: 0.55;
+    position: relative;
+  }
+  .sheet-card.s-score .ic { background: rgba(239,83,80,0.2); color: #ff7a76; }
+  .new-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--gold);
+    color: #1a1400;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 999px;
+  }
+  .close-x {
+    position: absolute;
+    right: 14px; top: 14px;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #222;
+    color: #fff;
+    display: grid; place-items: center;
+    font-size: 12px;
+  }
+  .tap-indicator {
+    position: absolute;
+    right: -6px; bottom: -6px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.9);
+    color: #1a1400;
+    display: grid; place-items: center;
+    font-size: 18px;
+    box-shadow: 0 0 0 6px rgba(201,168,76,0.25), 0 0 0 12px rgba(201,168,76,0.1);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  /* Home content (background of screen 1 and screen 7) */
+  .date-strip {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 16px 12px;
+  }
+  .day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #888;
+  }
+  .day .num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--card);
+    color: #fff;
+    font-weight: 700;
+    font-size: 11px;
+  }
+  .day.today .num {
+    background: var(--gold);
+    color: #1a1400;
+  }
+  .day.today { color: var(--gold); }
+
+  .home-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    margin: 0 16px 10px;
+  }
+
+  /* ========== SCREEN 2: CAMERA ========== */
+  .camera-screen {
+    flex: 1;
+    background: #050505;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .cam-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.5);
+  }
+  .cam-hint {
+    text-align: center;
+    color: #aaa;
+    font-size: 10px;
+    padding: 8px 20px;
+  }
+  .cam-body {
+    flex: 1;
+    background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    position: relative;
+  }
+  .cam-frame {
+    width: 180px;
+    height: 240px;
+    border: 2px dashed #555;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #777;
+  }
+  .cam-frame i { font-size: 48px; }
+  .cam-frame .ft { font-size: 10px; }
+  .angle-pills {
+    display: flex;
+    gap: 8px;
+  }
+  .angle-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--card);
+    color: #888;
+    border: 1px solid var(--border);
+  }
+  .angle-pill.active {
+    background: #2a2418;
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .cam-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px 18px;
+    background: rgba(0,0,0,0.7);
+  }
+  .shutter {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    display: grid; place-items: center;
+  }
+  .shutter::after {
+    content: '';
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  /* ========== SCREEN 3: AI ANALYZING ========== */
+  .analyze-body {
+    padding: 14px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .photo-preview {
+    width: 100%;
+    height: 160px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #1a1a1a, #0c0c0c);
+    border: 1px solid var(--border);
+    position: relative;
+    display: grid; place-items: center;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .photo-preview i { font-size: 70px; color: #2e2e2e; }
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--purple), transparent);
+    box-shadow: 0 0 16px var(--purple);
+    top: 50%;
+    animation: scan 2s ease-in-out infinite;
+  }
+  @keyframes scan {
+    0%,100% { top: 10%; }
+    50% { top: 90%; }
+  }
+  .scan-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--purple);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .section-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .tag-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .chip.done { background: rgba(29,158,117,0.15); color: var(--green); border: 1px solid rgba(29,158,117,0.3); }
+  .chip.prog { background: rgba(83,74,183,0.15); color: #8b82ff; border: 1px solid rgba(83,74,183,0.4); }
+  .chip.wait { background: #1a1a1a; color: #666; border: 1px solid var(--border); }
+  .progress {
+    height: 6px;
+    background: #1a1a1a;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress .bar {
+    width: 72%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), #8b82ff);
+  }
+  .progress-label {
+    font-size: 10px;
+    color: #aaa;
+    margin-bottom: 12px;
+  }
+  .check-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+  }
+  .check-card .ttl {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 11px;
+    color: #ddd;
+  }
+  .check-row .ic-c {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 11px;
+  }
+  .ic-c.ok { background: rgba(29,158,117,0.2); color: var(--green); }
+  .ic-c.spin { background: rgba(83,74,183,0.2); color: #8b82ff; animation: spin 1.4s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .top-bar-spinner i {
+    animation: spin 1.4s linear infinite;
+    color: var(--purple);
+  }
+
+  /* ========== SCREEN 4: CONFIRM ITEMS ========== */
+  .confirm-body {
+    padding: 14px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .thumb {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    color: #444;
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .sec-sub {
+    font-size: 9px;
+    color: #888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .item-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .item-row.amber {
+    background: #2a2010;
+    border-color: var(--amber);
+  }
+  .item-row .it-ic {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: #1f1f1f;
+    display: grid; place-items: center;
+    color: #aaa;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .item-row.amber .it-ic {
+    background: rgba(212,162,51,0.2);
+    color: var(--amber);
+  }
+  .item-row .it-info { flex: 1; }
+  .it-info .nm { font-size: 12px; font-weight: 700; color: #fff; }
+  .item-row.amber .it-info .nm { color: var(--amber); }
+  .it-info .sb { font-size: 10px; color: #777; margin-top: 2px; }
+  .item-row.amber .it-info .sb { color: #d4a233; opacity: 0.8; }
+  .pill-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 999px;
+  }
+  .pill-badge.green { background: rgba(29,158,117,0.2); color: var(--green); border: 1px solid rgba(29,158,117,0.4); }
+  .pill-badge.amber { background: rgba(212,162,51,0.2); color: var(--amber); border: 1px solid rgba(212,162,51,0.4); }
+  .add-more {
+    border: 1.5px dashed #333;
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+    color: #888;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  /* ========== SCREEN 5: OUTFIT DETAILS ========== */
+  .details-body {
+    padding: 14px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .field-group { margin-bottom: 16px; }
+  .field-lbl {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .occ-chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .occ-chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: #aaa;
+    white-space: nowrap;
+  }
+  .occ-chip.sel {
+    background: #1d1d1d;
+    color: #fff;
+    border-color: #444;
+  }
+  .stars {
+    display: flex;
+    gap: 4px;
+    font-size: 22px;
+  }
+  .stars .filled { color: var(--gold); }
+  .stars .empty { color: #333; }
+  .note-field {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #555;
+  }
+  .toggle-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toggle-card .info { flex: 1; }
+  .toggle-card .nm { font-size: 12px; font-weight: 700; }
+  .toggle-card .sb { font-size: 10px; color: #777; margin-top: 2px; }
+  .toggle {
+    width: 36px; height: 20px;
+    background: var(--gold);
+    border-radius: 999px;
+    position: relative;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px; right: 3px;
+  }
+  .full-btn {
+    width: 100%;
+    background: #1d1d1d;
+    color: #fff;
+    border: 1px solid #2a2a2a;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+
+  /* ========== SCREEN 6: SUCCESS ========== */
+  .success-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 18px 18px;
+    text-align: center;
+  }
+  .success-circle {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: var(--green);
+    display: grid; place-items: center;
+    color: #fff;
+    font-size: 36px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 0 8px rgba(29,158,117,0.15), 0 0 0 18px rgba(29,158,117,0.07);
+  }
+  .success-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .success-sub {
+    color: #888;
+    font-size: 11px;
+    margin-bottom: 18px;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 6px;
+  }
+  .stat-card .n {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .stat-card .l {
+    font-size: 9px;
+    color: #888;
+    margin-top: 2px;
+  }
+  .gold-info {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 14px;
+    padding: 12px;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+    text-align: left;
+  }
+  .gold-info .gi-ic {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba(201,168,76,0.2);
+    color: var(--gold);
+    display: grid; place-items: center;
+    font-size: 18px;
+  }
+  .gold-info .gi-t { font-size: 12px; font-weight: 700; color: #fff; }
+  .gold-info .gi-s { font-size: 10px; color: var(--gold); margin-top: 2px; }
+  .btn-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btn-outline {
+    width: 100%;
+    background: transparent;
+    color: #fff;
+    border: 1px solid #333;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ========== SCREEN 7: HOME UPDATED ========== */
+  .green-pill {
+    margin: 0 16px 10px;
+    background: rgba(29,158,117,0.12);
+    border: 1px solid rgba(29,158,117,0.4);
+    border-radius: 999px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--green);
+    font-weight: 600;
+  }
+  .wardrobe-card .wh {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .wh .wt {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #888;
+  }
+  .wh .weekly {
+    font-size: 9px;
+    background: #1a1a1a;
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: #aaa;
+  }
+  .ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .ring-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .ring-stat .num { font-size: 22px; font-weight: 800; }
+  .ring-stat .lbl { font-size: 9px; color: #777; letter-spacing: 0.5px; }
+  .ring-stat.gold .num { color: var(--gold); }
+  .ring-stat.blue .num { color: var(--blue); }
+  .ring-stat.red .num { color: var(--red); }
+  .ring-stat.grey .num { color: #ddd; }
+  .ring-svg {
+    width: 120px; height: 120px;
+    flex-shrink: 0;
+  }
+  .ring-center-text {
+    fill: #fff;
+    font-size: 7px;
+    font-weight: 700;
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    font-size: 9px;
+    color: #888;
+    margin-top: 6px;
+  }
+  .legend .lg { display: flex; align-items: center; gap: 4px; }
+  .legend .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .ai-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .ai-ic {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba(201,168,76,0.15);
+    color: var(--gold);
+    display: grid; place-items: center;
+    font-size: 16px;
+  }
+  .ai-info { flex: 1; }
+  .ai-info .ll { font-size: 10px; color: #888; }
+  .ai-info .vv { font-size: 12px; font-weight: 700; }
+  .try-btn {
+    background: var(--gold);
+    color: #1a1400;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 16px 8px;
+  }
+  .sec-head .h { font-size: 12px; font-weight: 700; }
+  .sec-head .a { font-size: 10px; color: var(--gold); font-weight: 600; }
+  .recent-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0 16px 8px;
+  }
+  .recent-card {
+    flex-shrink: 0;
+    width: 80px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .recent-card.today { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.2); }
+  .recent-card .img {
+    height: 70px;
+    background: #1a1a1a;
+    display: grid; place-items: center;
+    color: #333;
+    font-size: 28px;
+    position: relative;
+  }
+  .recent-card .nm {
+    font-size: 9px;
+    padding: 5px 6px 2px;
+    font-weight: 600;
+  }
+  .rc-badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    font-size: 8px;
+    padding: 2px 5px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .rc-badge.today { background: var(--green); color: #fff; }
+  .rc-badge.grey { background: #1a1a1a; color: #aaa; border: 1px solid var(--border); }
+  .rc-badge.red { background: rgba(239,83,80,0.2); color: var(--red); border: 1px solid rgba(239,83,80,0.4); }
+
+  /* Scroll thin */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #222; border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1><span class="gold">Look AI</span> — Log Outfit Flow</h1>
+  <p>Complete 7-screen workflow wireframe</p>
+</div>
+
+<!-- ============================================================= -->
+<!-- STEP 1 — BOTTOM SHEET                                          -->
+<!-- ============================================================= -->
+<div class="step-label">
+  <span class="num">STEP 1</span>
+  <span class="text">User taps the gold (+) FAB → action sheet opens</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="right"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+  </div>
+  <div class="screen">
+    <!-- Faded home in background -->
+    <div class="screen-bg-home">
+      <div class="home-header">
+        <div class="logo">
+          <div class="logo-mark"><i class="ti ti-eye"></i></div>
+          <div class="logo-text">Look AI</div>
+        </div>
+        <div class="streak-pill">🔥 12</div>
+      </div>
+      <div class="date-strip">
+        <div class="day"><span>T</span><span class="num">28</span></div>
+        <div class="day"><span>F</span><span class="num">29</span></div>
+        <div class="day"><span>S</span><span class="num">30</span></div>
+        <div class="day"><span>S</span><span class="num">31</span></div>
+        <div class="day today"><span>M</span><span class="num">1</span></div>
+        <div class="day"><span>T</span><span class="num">2</span></div>
+        <div class="day"><span>W</span><span class="num">3</span></div>
+      </div>
+      <div class="home-card" style="height:90px;opacity:0.4;"></div>
+      <div class="home-card" style="height:110px;opacity:0.4;"></div>
+
+      <!-- Overlay + sheet -->
+      <div class="sheet-overlay"></div>
+      <div class="bottom-sheet">
+        <div class="drag-handle"></div>
+        <div class="sheet-title">What would you like to do?</div>
+        <div class="sheet-grid">
+          <div class="sheet-card s-log">
+            <div class="ic"><i class="ti ti-camera"></i></div>
+            <div>
+              <div class="tt">Log outfit</div>
+              <div class="st">Capture today's look</div>
+            </div>
+            <div class="tap-indicator"><i class="ti ti-hand-finger"></i></div>
+          </div>
+          <div class="sheet-card s-add">
+            <div class="ic"><i class="ti ti-hanger"></i></div>
+            <div>
+              <div class="tt">Add clothes</div>
+              <div class="st">New item to wardrobe</div>
+            </div>
+          </div>
+          <div class="sheet-card s-ai">
+            <div class="ic"><i class="ti ti-sparkles"></i></div>
+            <div>
+              <div class="tt">AI outfit</div>
+              <div class="st">Generate by mood</div>
+            </div>
+          </div>
+          <div class="sheet-card s-score">
+            <div class="new-badge">NEW</div>
+            <div class="ic"><i class="ti ti-star"></i></div>
+            <div>
+              <div class="tt">Style score</div>
+              <div class="st">Face + outfit match</div>
+            </div>
+          </div>
+        </div>
+        <div class="close-x" style="position:absolute;right:18px;bottom:18px;"><i class="ti ti-x"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><i class="ti ti-home"></i><span>Home</span></div>
+    <div class="nav-item"><i class="ti ti-hanger"></i><span>Wardrobe</span></div>
+    <div class="nav-fab"><i class="ti ti-plus"></i></div>
+    <div class="nav-item"><i class="ti ti-calendar"></i><span>Calendar</span></div>
+    <div class="nav-item"><i class="ti ti-user"></i><span>Profile</span></div>
+  </div>
+</div>
+
+<div class="arrow">
+  <div class="line"></div>
+  <div class="icon"><i class="ti ti-arrow-down"></i></div>
+  <div class="desc">Tap "Log outfit" → camera opens</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- STEP 2 — CAMERA                                                -->
+<!-- ============================================================= -->
+<div class="step-label">
+  <span class="num">STEP 2</span>
+  <span class="text">Capture full-body outfit photo</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="right"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+  </div>
+  <div class="screen">
+    <div class="camera-screen">
+      <div class="cam-top">
+        <div class="icon-btn"><i class="ti ti-arrow-left"></i></div>
+        <div class="title">Log outfit</div>
+        <div class="icon-btn"><i class="ti ti-info-circle"></i></div>
+      </div>
+      <div class="cam-hint">Show your full outfit — head to toe in good lighting</div>
+      <div class="cam-body">
+        <div class="cam-frame">
+          <i class="ti ti-user"></i>
+          <div class="ft">Stand full body in frame</div>
+        </div>
+        <div class="angle-pills">
+          <div class="angle-pill active">Front</div>
+          <div class="angle-pill">Side</div>
+          <div class="angle-pill">Full body</div>
+        </div>
+      </div>
+      <div class="cam-controls">
+        <div class="icon-btn" style="width:40px;height:40px;border-radius:12px;"><i class="ti ti-photo"></i></div>
+        <div class="shutter"></div>
+        <div class="icon-btn" style="width:40px;height:40px;border-radius:12px;"><i class="ti ti-rotate"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">
+  <div class="line"></div>
+  <div class="icon"><i class="ti ti-arrow-down"></i></div>
+  <div class="desc">Shutter pressed → AI analyzes photo</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- STEP 3 — AI ANALYZING                                          -->
+<!-- ============================================================= -->
+<div class="step-label">
+  <span class="num">STEP 3</span>
+  <span class="text">AI scans outfit and matches with wardrobe</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="right"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+  </div>
+  <div class="screen">
+    <div class="top-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="top-bar-spinner"><i class="ti ti-loader-2"></i></span>
+        <span class="title">Analyzing your outfit...</span>
+      </div>
+      <div style="width:24px;"></div>
+    </div>
+    <div class="analyze-body">
+      <div class="photo-preview">
+        <i class="ti ti-user"></i>
+        <div class="scan-line"></div>
+        <div class="scan-badge">⚡ AI scanning</div>
+      </div>
+      <div class="section-lbl">What AI is detecting:</div>
+      <div class="tag-chips">
+        <span class="chip done"><i class="ti ti-check"></i> Clothing items</span>
+        <span class="chip done"><i class="ti ti-check"></i> Colors</span>
+        <span class="chip prog"><i class="ti ti-loader-2"></i> Wardrobe match...</span>
+        <span class="chip prog"><i class="ti ti-loader-2"></i> Categories...</span>
+        <span class="chip wait">New items...</span>
+      </div>
+      <div class="progress"><div class="bar"></div></div>
+      <div class="progress-label">72% — matching with your wardrobe</div>
+
+      <div class="check-card">
+        <div class="ttl">Checking wardrobe for:</div>
+        <div class="check-row">
+          <div class="ic-c ok"><i class="ti ti-check"></i></div>
+          <span>Blue kurta — found in wardrobe</span>
+        </div>
+        <div class="check-row">
+          <div class="ic-c ok"><i class="ti ti-check"></i></div>
+          <span>Beige palazzo — found</span>
+        </div>
+        <div class="check-row">
+          <div class="ic-c spin"><i class="ti ti-loader-2"></i></div>
+          <span>Tan sandals — checking...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">
+  <div class="line"></div>
+  <div class="icon"><i class="ti ti-arrow-down"></i></div>
+  <div class="desc">Analysis complete → confirm detected items</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- STEP 4 — CONFIRM ITEMS                                         -->
+<!-- ============================================================= -->
+<div class="step-label">
+  <span class="num">STEP 4</span>
+  <span class="text">Confirm detected wardrobe items</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="right"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+  </div>
+  <div class="screen">
+    <div class="top-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:var(--green);font-size:16px;"><i class="ti ti-circle-check"></i></span>
+        <span class="title">Confirm your outfit</span>
+      </div>
+      <div style="width:24px;"></div>
+    </div>
+    <div class="confirm-body">
+      <div class="thumb"><i class="ti ti-user"></i></div>
+      <div class="sec-sub">AI detected 3 items</div>
+
+      <div class="item-row">
+        <div class="it-ic"><i class="ti ti-shirt"></i></div>
+        <div class="it-info">
+          <div class="nm">Blue kurta</div>
+          <div class="sb">Tops · Ethnic</div>
+        </div>
+        <div class="pill-badge green">In wardrobe</div>
+      </div>
+      <div class="item-row">
+        <div class="it-ic"><i class="ti ti-hanger-2"></i></div>
+        <div class="it-info">
+          <div class="nm">Beige palazzo</div>
+          <div class="sb">Bottoms · Casual</div>
+        </div>
+        <div class="pill-badge green">In wardrobe</div>
+      </div>
+      <div class="item-row amber">
+        <div class="it-ic"><i class="ti ti-shoe"></i></div>
+        <div class="it-info">
+          <div class="nm">Tan sandals</div>
+          <div class="sb">Footwear — not in wardrobe</div>
+        </div>
+        <div class="pill-badge amber">Add?</div>
+      </div>
+
+      <div class="add-more"><i class="ti ti-plus"></i> Add more items manually</div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">
+  <div class="line"></div>
+  <div class="icon"><i class="ti ti-arrow-down"></i></div>
+  <div class="desc">Items confirmed → fill outfit details</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- STEP 5 — OUTFIT DETAILS                                        -->
+<!-- ============================================================= -->
+<div class="step-label">
+  <span class="num">STEP 5</span>
+  <span class="text">Tag occasion, feeling and note</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="right"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+  </div>
+  <div class="screen">
+    <div class="top-bar">
+      <div class="icon-btn"><i class="ti ti-arrow-left"></i></div>
+      <div class="title">Outfit details</div>
+      <div style="color:var(--gold);font-weight:700;font-size:12px;">Save</div>
+    </div>
+    <div class="details-body">
+      <div class="field-group">
+        <div class="field-lbl">Occasion</div>
+        <div class="occ-chips">
+          <div class="occ-chip sel">Casual</div>
+          <div class="occ-chip">Office</div>
+          <div class="occ-chip">Party</div>
+          <div class="occ-chip">Wedding</div>
+          <div class="occ-chip">Date</div>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-lbl">How do you feel in this outfit?</div>
+        <div class="stars">
+          <span class="filled"><i class="ti ti-star-filled"></i></span>
+          <span class="filled"><i class="ti ti-star-filled"></i></span>
+          <span class="filled"><i class="ti ti-star-filled"></i></span>
+          <span class="filled"><i class="ti ti-star-filled"></i></span>
+          <span class="empty"><i class="ti ti-star"></i></span>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-lbl">Add a note (optional)</div>
+        <div class="note-field">e.g. Office lunch meeting...</div>
+      </div>
+      <div class="field-group">
+        <div class="toggle-card">
+          <div class="info">
+            <div class="nm">Add tan sandals to wardrobe</div>
+            <div class="sb">New item detected — save it</div>
+          </div>
+          <div class="toggle"></div>
+        </div>
+      </div>
+      <button class="full-btn">Log this outfit</button>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">
+  <div class="line"></div>
+  <div class="icon"><i class="ti ti-arrow-down"></i></div>
+  <div class="desc">Log button pressed → outfit saved</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- STEP 6 — SUCCESS                                               -->
+<!-- ============================================================= -->
+<div class="step-label">
+  <span class="num">STEP 6</span>
+  <span class="text">Outfit logged successfully — show stats</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="right"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+  </div>
+  <div class="screen">
+    <div class="success-body">
+      <div class="success-circle"><i class="ti ti-check"></i></div>
+      <div class="success-title">Outfit logged!</div>
+      <div class="success-sub">Today's look has been saved to your diary</div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="n">9</div><div class="l">Blue kurta wears</div></div>
+        <div class="stat-card"><div class="n">5</div><div class="l">This week</div></div>
+        <div class="stat-card"><div class="n">12</div><div class="l">Day streak</div></div>
+      </div>
+
+      <div class="gold-info">
+        <div class="gi-ic"><i class="ti ti-trending-up"></i></div>
+        <div>
+          <div class="gi-t">Blue kurta is your top item!</div>
+          <div class="gi-s">Worn 9 times — most in your wardrobe</div>
+        </div>
+      </div>
+
+      <div class="btn-stack">
+        <button class="full-btn">Go to home</button>
+        <button class="btn-outline">View outfit diary</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">
+  <div class="line"></div>
+  <div class="icon"><i class="ti ti-arrow-down"></i></div>
+  <div class="desc">Return to home → updated wardrobe stats</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- STEP 7 — HOME UPDATED                                          -->
+<!-- ============================================================= -->
+<div class="step-label">
+  <span class="num">STEP 7</span>
+  <span class="text">Home reflects new wear count and streak</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="right"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+  </div>
+  <div class="screen">
+    <div style="flex:1;overflow-y:auto;">
+      <div class="home-header">
+        <div class="logo">
+          <div class="logo-mark"><i class="ti ti-eye"></i></div>
+          <div class="logo-text">Look AI</div>
+        </div>
+        <div class="streak-pill">🔥 12</div>
+      </div>
+      <div class="date-strip">
+        <div class="day"><span>T</span><span class="num">28</span></div>
+        <div class="day"><span>F</span><span class="num">29</span></div>
+        <div class="day"><span>S</span><span class="num">30</span></div>
+        <div class="day"><span>S</span><span class="num">31</span></div>
+        <div class="day today"><span>M</span><span class="num">1</span></div>
+        <div class="day"><span>T</span><span class="num">2</span></div>
+        <div class="day"><span>W</span><span class="num">3</span></div>
+      </div>
+
+      <div class="green-pill">
+        <i class="ti ti-circle-check-filled"></i>
+        Outfit logged today — wear count updated
+      </div>
+
+      <div class="home-card wardrobe-card">
+        <div class="wh">
+          <div class="wt">WARDROBE OVERVIEW</div>
+          <div class="weekly">Weekly</div>
+        </div>
+        <div class="ring-wrap">
+          <div class="ring-stats">
+            <div class="ring-stat gold"><div class="num">75%</div><div class="lbl">WORN</div></div>
+            <div class="ring-stat grey"><div class="num">36</div><div class="lbl">ITEMS</div></div>
+          </div>
+          <svg class="ring-svg" viewBox="0 0 100 100">
+            <!-- Outer ring (gold) -->
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#1a1a1a" stroke-width="6"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#c9a84c" stroke-width="6"
+                    stroke-dasharray="197.9 263.9" stroke-linecap="round"
+                    transform="rotate(-90 50 50)"/>
+            <!-- Middle ring (red) -->
+            <circle cx="50" cy="50" r="32" fill="none" stroke="#1a1a1a" stroke-width="5"/>
+            <circle cx="50" cy="50" r="32" fill="none" stroke="#ef5350" stroke-width="5"
+                    stroke-dasharray="60 201" stroke-linecap="round"
+                    transform="rotate(-90 50 50)"/>
+            <!-- Inner ring (blue) -->
+            <circle cx="50" cy="50" r="23" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+            <circle cx="50" cy="50" r="23" fill="none" stroke="#2196f3" stroke-width="4"
+                    stroke-dasharray="130 145" stroke-linecap="round"
+                    transform="rotate(-90 50 50)"/>
+            <text x="50" y="42" text-anchor="middle" class="ring-center-text" fill="#888">LOOK AI</text>
+            <text x="50" y="54" text-anchor="middle" fill="#c9a84c" font-size="11" font-weight="800">75%</text>
+            <text x="50" y="62" text-anchor="middle" class="ring-center-text" fill="#888">WORN</text>
+            <text x="50" y="72" text-anchor="middle" class="ring-center-text" fill="#555" font-size="6">May 1</text>
+          </svg>
+          <div class="ring-stats" style="align-items:flex-end;text-align:right;">
+            <div class="ring-stat blue"><div class="num">215</div><div class="lbl">WEARS +1</div></div>
+            <div class="ring-stat red"><div class="num">12</div><div class="lbl">NEVER</div></div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="lg"><span class="dot" style="background:var(--gold);"></span>Worn</div>
+          <div class="lg"><span class="dot" style="background:var(--red);"></span>Never worn</div>
+          <div class="lg"><span class="dot" style="background:var(--blue);"></span>Total wears</div>
+        </div>
+      </div>
+
+      <div class="home-card ai-card">
+        <div class="ai-ic"><i class="ti ti-sparkles"></i></div>
+        <div class="ai-info">
+          <div class="ll">Today's AI outfit</div>
+          <div class="vv">White top + beige palazzo</div>
+        </div>
+        <button class="try-btn">Try on</button>
+      </div>
+
+      <div class="sec-head">
+        <div class="h">Recently worn</div>
+        <div class="a">See all</div>
+      </div>
+      <div class="recent-scroll">
+        <div class="recent-card today">
+          <div class="img">
+            <i class="ti ti-shirt"></i>
+            <div class="rc-badge today">Today</div>
+          </div>
+          <div class="nm">Blue kurta</div>
+        </div>
+        <div class="recent-card">
+          <div class="img">
+            <i class="ti ti-hanger-2"></i>
+            <div class="rc-badge grey">×5</div>
+          </div>
+          <div class="nm">Beige palazzo</div>
+        </div>
+        <div class="recent-card">
+          <div class="img">
+            <i class="ti ti-shirt"></i>
+            <div class="rc-badge grey">×4</div>
+          </div>
+          <div class="nm">Beige top</div>
+        </div>
+        <div class="recent-card">
+          <div class="img">
+            <i class="ti ti-jacket"></i>
+            <div class="rc-badge red">45d idle</div>
+          </div>
+          <div class="nm">Denim jacket</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active"><i class="ti ti-home"></i><span>Home</span></div>
+      <div class="nav-item"><i class="ti ti-hanger"></i><span>Wardrobe</span></div>
+      <div class="nav-fab"><i class="ti ti-plus"></i></div>
+      <div class="nav-item"><i class="ti ti-calendar"></i><span>Calendar</span></div>
+      <div class="nav-item"><i class="ti ti-user"></i><span>Profile</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:40px;color:#444;font-size:11px;text-align:center;">
+  End of flow — Look AI Log Outfit wireframe
+</div>
+
+</body>
+</html>
