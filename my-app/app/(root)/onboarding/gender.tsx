@@ -41,7 +41,7 @@ export default function GenderScreen() {
         This will be used to calibrate your custom plan
       </Text>
 
-      <View className="mt-36  items-center gap-8">
+      <View className="mt-14 items-center gap-8">
         {GENDER_OPTIONS.map((o) => {
           const isSelected = gender === o.label;
           return (
