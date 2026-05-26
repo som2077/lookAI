@@ -24,7 +24,7 @@ export const OutfitAnalyzingCard = React.memo(function OutfitAnalyzingCard() {
 
   return (
     <View
-      className="mx-7 mt-3 bg-white rounded-[20px] overflow-hidden"
+      className="mx-6 mt-3 bg-white border border-[#E9EBF8] rounded-[20px] overflow-hidden"
       style={{
         shadowColor: "#000",
         shadowOpacity: 0.09,

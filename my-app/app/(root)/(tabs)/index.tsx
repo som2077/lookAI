@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Dimensions, FlatList, View } from "react-native";
+import { Dimensions, FlatList, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
@@ -10,9 +10,13 @@ import { WardrobeRingSummaryCard } from "../../../components/ui/WardrobeRingSumm
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
 import { OutfitAnalyzingCard } from "../../../components/ui/OutfitAnalyzingCard";
+import {
+  RecentlyUploadedHeading,
+  OutfitPreviewCard,
+} from "../../../components/ui/RecentlyUploadedCard";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const H_PADDING = 28; // matches px-7 (7 * 4 = 28)
+const H_PADDING = 20; // matches px-5 (5 * 4 = 20)
 
 const RING_SEGMENT_BASE: readonly Omit<RingProgressSegment, "progress">[] = [
   { id: "outer", color: "#F5B93A", radius: 58, strokeWidth: 8 },
@@ -79,51 +83,61 @@ export default function HomeScreen() {
     <SwipeTabWrapper tabIndex={0}>
       <AppGradientBackground>
         <SafeAreaView className="flex-1">
-          {/* Header & calendar keep their own padding */}
-          <View className="px-7">
-            <HomeHeader />
-            <WeeklyCalendarStrip />
-          </View>
-
-          {/* FlatList is full-width — no parent padding — so pagingEnabled snaps perfectly */}
-          <FlatList
-            ref={flatListRef}
-            data={[...CARDS] as CardKey[]}
-            keyExtractor={(item) => item}
-            renderItem={renderCard}
-            horizontal
-            pagingEnabled // snaps every SCREEN_WIDTH
-            showsHorizontalScrollIndicator={false}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewabilityConfig}
-            style={{ flexGrow: 0 }}
-          />
-
-          {/* Pagination dots */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: 10,
-              gap: 7,
-            }}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 24 }}
           >
-            {CARDS.map((_, i) => (
-              <View
-                key={i}
-                style={{
-                  width: i === activeIndex ? 8 : 7,
-                  height: i === activeIndex ? 8 : 7,
-                  borderRadius: 5,
-                  backgroundColor: i === activeIndex ? "#1C1C1E" : "#C7C7C7",
-                }}
-              />
-            ))}
-          </View>
+            {/* Header & calendar keep their own padding */}
+            <View className="mx-7">
+              <HomeHeader />
+              <WeeklyCalendarStrip />
+            </View>
 
-          {/* Outfit analyzing card — visible while background analysis runs */}
-          <OutfitAnalyzingCard />
+            {/* FlatList is full-width — no parent padding — so pagingEnabled snaps perfectly */}
+            <FlatList
+              ref={flatListRef}
+              data={[...CARDS] as CardKey[]}
+              keyExtractor={(item) => item}
+              renderItem={renderCard}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              style={{ flexGrow: 0 }}
+              scrollEnabled
+            />
+
+            {/* Pagination dots */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 10,
+                gap: 7,
+              }}
+            >
+              {CARDS.map((_, i) => (
+                <View
+                  key={i}
+                  style={{
+                    width: i === activeIndex ? 8 : 7,
+                    height: i === activeIndex ? 8 : 7,
+                    borderRadius: 5,
+                    backgroundColor: i === activeIndex ? "#1C1C1E" : "#C7C7C7",
+                  }}
+                />
+              ))}
+            </View>
+
+            {/* Outfit analyzing card — visible while background analysis runs */}
+            <OutfitAnalyzingCard />
+
+            {/* Recently uploaded — heading + card shown after analysis completes */}
+            <RecentlyUploadedHeading />
+            <OutfitPreviewCard />
+          </ScrollView>
         </SafeAreaView>
       </AppGradientBackground>
     </SwipeTabWrapper>
