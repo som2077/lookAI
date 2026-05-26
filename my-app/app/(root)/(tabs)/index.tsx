@@ -9,6 +9,7 @@ import type { RingProgressSegment } from "../../../components/ui/WardrobeRingSum
 import { WardrobeRingSummaryCard } from "../../../components/ui/WardrobeRingSummaryCard";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
+import { OutfitAnalyzingCard } from "../../../components/ui/OutfitAnalyzingCard";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const H_PADDING = 28; // matches px-7 (7 * 4 = 28)
@@ -120,6 +121,9 @@ export default function HomeScreen() {
               />
             ))}
           </View>
+
+          {/* Outfit analyzing card — visible while background analysis runs */}
+          <OutfitAnalyzingCard />
         </SafeAreaView>
       </AppGradientBackground>
     </SwipeTabWrapper>

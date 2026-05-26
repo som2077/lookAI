@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions, type CameraType } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
+import { useOutfitAnalysisStore } from "@/backend/store/outfit-analysis-store";
 import {
   IconArrowLeft,
   IconInfoCircle,
@@ -29,12 +30,10 @@ export default function CameraScreen() {
 
   const goToAnalyzing = useCallback(
     (uri: string) => {
-      router.push({
-        pathname: "/(root)/log-outfit/analyzing",
-        params: { photoUri: uri, angle },
-      } as never);
+      useOutfitAnalysisStore.getState().startAnalysis(uri);
+      router.replace("/(root)/(tabs)" as never);
     },
-    [router, angle],
+    [router],
   );
 
   const handleShutter = useCallback(async () => {
