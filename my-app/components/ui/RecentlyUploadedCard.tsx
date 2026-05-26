@@ -10,7 +10,7 @@ const MOCK_NAME = "Breezy office look";
 const MOCK_SUBTITLE = "Kurta · Palazzo · Flats";
 const MOCK_TAGS = ["Office", "Casual"];
 
-const CARD_H_MARGIN = 24; // mx-6 = 6 * 4
+const CARD_H_MARGIN = 20; // mx-6 = 6 * 4
 const CARD_WIDTH = Dimensions.get("window").width - CARD_H_MARGIN * 2;
 
 // ─── Component 1: section heading ────────────────────────────────────────────
@@ -21,7 +21,7 @@ export const RecentlyUploadedHeading = React.memo(
     if (lastOutfits.length === 0) return null;
     return (
       <Text className="text-[#1D1A27] text-lg font-bold mx-8 mt-4">
-        Recently uploaded
+        Recently Styled
       </Text>
     );
   },
@@ -39,7 +39,7 @@ function CardItem({ item, index, onWearIt }: CardItemProps) {
   return (
     <View style={{ width: CARD_WIDTH }}>
       <View
-        className="flex-row rounded-3xl border border-[#E9EBF8] overflow-hidden h-40"
+        className="flex-row rounded-3xl border border-[#E9EBF8] bg-white overflow-hidden h-40"
         style={{
           shadowColor: "#000000",
           shadowOpacity: 0.08,

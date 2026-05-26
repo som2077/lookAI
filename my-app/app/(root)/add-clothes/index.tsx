@@ -8,12 +8,11 @@ import {
   IconArrowLeft,
   IconCamera,
   IconChevronRight,
-  IconPencil,
   IconPhoto,
 } from "@tabler/icons-react-native";
 
 interface MethodOption {
-  id: "camera" | "gallery" | "manual";
+  id: "camera" | "gallery";
   Icon: React.ComponentType<{ size?: number; color?: string }>;
   title: string;
   desc: string;
@@ -31,12 +30,6 @@ const OPTIONS: MethodOption[] = [
     Icon: IconPhoto,
     title: "Choose from gallery",
     desc: "Pick an existing photo of the item",
-  },
-  {
-    id: "manual",
-    Icon: IconPencil,
-    title: "Add manually",
-    desc: "Enter clothing details by hand",
   },
 ];
 
@@ -66,13 +59,8 @@ export default function AddClothesIndex() {
     (id: MethodOption["id"]) => {
       if (id === "camera") {
         router.push("/(root)/add-clothes/camera" as never);
-      } else if (id === "gallery") {
-        handleGallery();
       } else {
-        router.push({
-          pathname: "/(root)/add-clothes/form",
-          params: { mode: "manual" },
-        } as never);
+        handleGallery();
       }
     },
     [router, handleGallery],

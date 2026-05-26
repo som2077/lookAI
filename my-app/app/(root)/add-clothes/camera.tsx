@@ -4,9 +4,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions, type CameraType } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
 import {
   IconArrowLeft,
   IconMesh,
+  IconPhoto,
   IconRotate,
 } from "@tabler/icons-react-native";
 
@@ -50,6 +52,17 @@ export default function AddClothesCameraScreen() {
   const handleBack = useCallback(() => {
     if (router.canGoBack()) router.back();
   }, [router]);
+
+  const handleGallery = useCallback(async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.85,
+      allowsEditing: false,
+    });
+    if (!result.canceled && result.assets[0]?.uri) {
+      goToScanning(result.assets[0].uri);
+    }
+  }, [goToScanning]);
 
   if (!permission) {
     return (
@@ -135,7 +148,12 @@ export default function AddClothesCameraScreen() {
 
         {/* Bottom controls */}
         <View className="flex-row items-center justify-between px-8 pb-6 pt-4 bg-black/55">
-          <View className="w-12" />
+          <Pressable
+            onPress={handleGallery}
+            className="h-12 w-12 items-center justify-center rounded-xl bg-black/55 border border-white/15"
+          >
+            <IconPhoto size={20} color="#ffffff" />
+          </Pressable>
           <Pressable
             onPress={handleShutter}
             disabled={capturing}
