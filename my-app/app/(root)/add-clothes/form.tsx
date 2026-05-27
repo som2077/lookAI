@@ -4,9 +4,11 @@ import { Image as ExpoImage } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import {
   IconArrowLeft,
   IconMesh,
+  IconPhoto,
   IconSparkles,
 } from "@tabler/icons-react-native";
 
@@ -53,12 +55,27 @@ export default function AddClothesFormScreen() {
   const params = useLocalSearchParams() as FormParams;
 
   const isScanned = params.mode === "scanned";
+  const isManual = params.mode === "manual";
 
   const [name, setName] = useState<string>(params.name ?? "");
   const [category, setCategory] = useState<CategoryId>(
     (params.category as CategoryId) ?? "top",
   );
   const [color, setColor] = useState<string>(params.color ?? "");
+  const [localPhotoUri, setLocalPhotoUri] = useState<string>(
+    params.photoUri ?? "",
+  );
+
+  const handlePickPhoto = useCallback(async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.85,
+      allowsEditing: true,
+    });
+    if (!result.canceled && result.assets[0]?.uri) {
+      setLocalPhotoUri(result.assets[0].uri);
+    }
+  }, []);
   const [occasion, setOccasion] = useState<Occasion>("Casual");
   const [season, setSeason] = useState<Season>("All");
   const [notes, setNotes] = useState<string>("");
@@ -71,14 +88,12 @@ export default function AddClothesFormScreen() {
     router.replace({
       pathname: "/(root)/add-clothes/success",
       params: {
-        photoUri: params.photoUri ?? "",
+        photoUri: localPhotoUri,
         name: name || "Untitled item",
         category,
       },
     } as never);
-  }, [router, name, category, params.photoUri]);
-
-  const photoUri = params.photoUri;
+  }, [router, name, category, localPhotoUri]);
 
   return (
     <View className="flex-1 bg-[#0c0c0c]">
@@ -106,13 +121,15 @@ export default function AddClothesFormScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Photo / placeholder */}
-          <View
+          <Pressable
+            onPress={isManual ? handlePickPhoto : undefined}
+            disabled={!isManual}
             className="rounded-2xl border border-[#1e1e1e] overflow-hidden items-center justify-center mb-4"
             style={{ height: 200, backgroundColor: "#141414" }}
           >
-            {photoUri ? (
+            {localPhotoUri ? (
               <ExpoImage
-                source={{ uri: photoUri }}
+                source={{ uri: localPhotoUri }}
                 style={{ width: "100%", height: "100%" }}
                 contentFit="cover"
                 cachePolicy="memory"
@@ -120,7 +137,13 @@ export default function AddClothesFormScreen() {
             ) : (
               <View className="items-center">
                 <IconMesh size={48} color="#333" strokeWidth={1.5} />
-                <Text className="text-[#555] text-[11px] mt-2">No photo</Text>
+                {isManual ? (
+                  <Text className="text-[#555] text-[11px] mt-2">
+                    Tap to add photo (optional)
+                  </Text>
+                ) : (
+                  <Text className="text-[#555] text-[11px] mt-2">No photo</Text>
+                )}
               </View>
             )}
             {isScanned ? (
@@ -131,7 +154,26 @@ export default function AddClothesFormScreen() {
                 </Text>
               </View>
             ) : null}
-          </View>
+            {isManual && !localPhotoUri ? (
+              <View className="absolute bottom-3 flex-row items-center gap-1 bg-[#1e1e1e]/90 rounded-full px-3 py-1.5">
+                <IconPhoto size={12} color="#888" />
+                <Text className="text-[#888] text-[10px]">
+                  Tap to pick from gallery
+                </Text>
+              </View>
+            ) : null}
+            {isManual && localPhotoUri ? (
+              <Pressable
+                onPress={handlePickPhoto}
+                className="absolute top-2 right-2 bg-[#141414]/90 border border-[#1e1e1e] rounded-full px-2.5 py-1 flex-row items-center gap-1"
+              >
+                <IconPhoto size={10} color="#c9a84c" />
+                <Text className="text-[#c9a84c] text-[9px] font-bold">
+                  Change
+                </Text>
+              </Pressable>
+            ) : null}
+          </Pressable>
 
           {isScanned ? (
             <Text className="text-[#888] text-[11px] mb-4 leading-4">

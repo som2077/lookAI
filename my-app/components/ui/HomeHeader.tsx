@@ -25,14 +25,18 @@ export const HomeHeader = React.memo(function HomeHeader() {
       />
 
       <View className="flex-row items-center gap-2">
-        <View className="flex-row items-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-4 py-2">
+        <TouchableOpacity
+          onPress={() => router.push("/(root)/streak" as never)}
+          activeOpacity={0.7}
+          className="flex-row items-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-4 py-2"
+        >
           <Text className="text-base">
             <IconFlameFilled size={18} />
           </Text>
           <Text className="ml-1 text-sm font-semibold text-[#171421]">
             {streak} <Text className="text-sm">day</Text>
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={onCalendarPress}

@@ -18,6 +18,11 @@ export default function RootLayout() {
         name="add-clothes"
         options={{ animation: "slide_from_bottom" }}
       />
+      <Stack.Screen name="streak" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen
+        name="calendar"
+        options={{ animation: "slide_from_right" }}
+      />
     </Stack>
   );
 }

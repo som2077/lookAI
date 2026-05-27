@@ -6,7 +6,7 @@ import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper"
 export default function WardrobeScreen() {
   return (
     <SwipeTabWrapper tabIndex={1}>
-      <SafeAreaView className="flex-1 bg-transparent px-5 pt-4">
+      <SafeAreaView className="flex-1 bg-white px-5 pt-4">
         <View className="rounded-3xl bg-white/55 p-5 shadow-sm">
           <Text className="text-2xl font-semibold text-[#171421]">
             Wardrobe

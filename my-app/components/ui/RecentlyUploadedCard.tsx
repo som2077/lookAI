@@ -17,8 +17,6 @@ const CARD_WIDTH = Dimensions.get("window").width - CARD_H_MARGIN * 2;
 
 export const RecentlyUploadedHeading = React.memo(
   function RecentlyUploadedHeading() {
-    const { lastOutfits } = useOutfitAnalysisStore();
-    if (lastOutfits.length === 0) return null;
     return (
       <Text className="text-[#1D1A27] text-lg font-bold mx-8 mt-4">
         Recently Styled
@@ -144,7 +142,36 @@ export const OutfitPreviewCard = React.memo(function OutfitPreviewCard() {
     viewAreaCoveragePercentThreshold: 50,
   }).current;
 
-  if (lastOutfits.length === 0) return null;
+  if (lastOutfits.length === 0) {
+    return (
+      <View
+        className="mx-5 mt-2 mb-2 flex-row rounded-3xl border border-[#E9EBF8] bg-white overflow-hidden h-40"
+        style={{
+          shadowColor: "#000000",
+          shadowOpacity: 0.06,
+          shadowRadius: 16,
+          shadowOffset: { width: 0, height: 3 },
+          elevation: 2,
+        }}
+      >
+        <View
+          className="justify-center items-center"
+          style={{ width: 115, height: 160, backgroundColor: "#F0F0F2" }}
+        >
+          <View className="h-[10px] rounded-full bg-[#DCDCDF] w-3/5 mb-2" />
+          <View className="h-[10px] rounded-full bg-[#DCDCDF] w-2/5" />
+        </View>
+        <View className="flex-1 justify-center px-4 gap-[10px]">
+          <View className="h-[10px] rounded-full bg-[#EBEBEB] w-3/4" />
+          <View className="h-[10px] rounded-full bg-[#EBEBEB] w-1/2" />
+          <View className="h-[10px] rounded-full bg-[#EBEBEB] w-2/3" />
+          <Text className="text-[#BBBBC8] mt-1" style={{ fontSize: 11 }}>
+            No outfits scanned yet
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   const safeIndex = Math.min(activeIndex, lastOutfits.length - 1);
 
