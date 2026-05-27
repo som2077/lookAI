@@ -88,7 +88,7 @@ export default function BodyTypesScreen() {
 
   return (
     // <SafeAreaView className="flex-1 bg-white">
-    <View className="flex-1 px-5 pb-6 pt-2">
+    <View className="flex-1 px-5 pb-6 pt-2 ">
       <OnboardingHeader step={4} />
       <Text className="text-4xl font-semibold px-3 tracking-tight text-[#1D1A27]">
         Body types

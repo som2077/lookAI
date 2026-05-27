@@ -104,7 +104,7 @@ export function WeeklyCalendarStrip({
   );
 
   return (
-    <View className="px-[3px] py-1">
+    <View className="px-[4px] py-1">
       <View className="flex-row items-center justify-between">
         {weekDates.map((date, index) => (
           <DayCell

@@ -32,7 +32,7 @@ export default function GenderScreen() {
   }, [gender]);
 
   return (
-    <View className="flex-1 px-5 pb-6 pt-2">
+    <View className="flex-1 mx-7 pb-6 pt-2">
       <OnboardingHeader step={1} showBack={false} />
       <Text className="text-4xl font-semibold tracking-tight px-3 text-[#1D1A27]">
         Choose your Gender
@@ -41,7 +41,7 @@ export default function GenderScreen() {
         This will be used to calibrate your custom plan
       </Text>
 
-      <View className="mt-14 items-center gap-8">
+      <View className="mt-40 items-center gap-8">
         {GENDER_OPTIONS.map((o) => {
           const isSelected = gender === o.label;
           return (

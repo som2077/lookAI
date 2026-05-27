@@ -10,7 +10,7 @@ export default function AgeScreen() {
   const { age, setAge } = useOnboardingState();
 
   return (
-    <View className="flex-1 pb-6 pt-2">
+    <View className="flex-1 pb-6 mx-auto pt-2">
       {/* Header */}
       <View className="px-6">
         <OnboardingHeader step={2} />

@@ -88,7 +88,7 @@ export default function HomeScreen() {
             contentContainerStyle={{ paddingBottom: 24 }}
           >
             {/* Header & calendar keep their own padding */}
-            <View className="mx-7">
+            <View className="px-7">
               <HomeHeader />
               <WeeklyCalendarStrip />
             </View>
