@@ -131,11 +131,12 @@ export default function HomeScreen() {
               ))}
             </View>
 
+            {/* Recently uploaded — heading + card shown after analysis completes */}
+            <RecentlyUploadedHeading />
+
             {/* Outfit analyzing card — visible while background analysis runs */}
             <OutfitAnalyzingCard />
 
-            {/* Recently uploaded — heading + card shown after analysis completes */}
-            <RecentlyUploadedHeading />
             <OutfitPreviewCard />
           </ScrollView>
         </SafeAreaView>

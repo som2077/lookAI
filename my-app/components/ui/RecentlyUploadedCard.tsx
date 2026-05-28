@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, FlatList, Pressable, Text, View } from "react-native";
 import { Image as ExpoImage } from "expo-image";
+import { IconBell, IconX } from "@tabler/icons-react-native";
 import {
   LastOutfit,
   useOutfitAnalysisStore,
@@ -122,6 +123,7 @@ function CardItem({ item, index, onWearIt }: CardItemProps) {
 export const OutfitPreviewCard = React.memo(function OutfitPreviewCard() {
   const { lastOutfits, removeOutfit } = useOutfitAnalysisStore();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isBannerDismissed, setIsBannerDismissed] = useState(false);
   const flatListRef = useRef<FlatList<LastOutfit>>(null);
 
   useEffect(() => {
@@ -144,31 +146,32 @@ export const OutfitPreviewCard = React.memo(function OutfitPreviewCard() {
 
   if (lastOutfits.length === 0) {
     return (
-      <View
-        className="mx-5 mt-2 mb-2 flex-row rounded-3xl border border-[#E9EBF8] bg-white overflow-hidden h-40"
-        style={{
-          shadowColor: "#000000",
-          shadowOpacity: 0.06,
-          shadowRadius: 16,
-          shadowOffset: { width: 0, height: 3 },
-          elevation: 2,
-        }}
-      >
-        <View
-          className="justify-center items-center"
-          style={{ width: 115, height: 160, backgroundColor: "#F0F0F2" }}
-        >
-          <View className="h-[10px] rounded-full bg-[#DCDCDF] w-3/5 mb-2" />
-          <View className="h-[10px] rounded-full bg-[#DCDCDF] w-2/5" />
-        </View>
-        <View className="flex-1 justify-center px-4 gap-[10px]">
-          <View className="h-[10px] rounded-full bg-[#EBEBEB] w-3/4" />
-          <View className="h-[10px] rounded-full bg-[#EBEBEB] w-1/2" />
-          <View className="h-[10px] rounded-full bg-[#EBEBEB] w-2/3" />
-          <Text className="text-[#BBBBC8] mt-1" style={{ fontSize: 11 }}>
-            No outfits scanned yet
-          </Text>
-        </View>
+      <View>
+        {!isBannerDismissed && (
+          <View
+            className="mx-5 mt-2 mb-2 flex-row items-center justify-between bg-white rounded-[16px] px-4 py-4"
+            style={{
+              shadowColor: "#000000",
+              shadowOpacity: 0.04,
+              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 1,
+            }}
+          >
+            <View className="flex-row items-center flex-1 pr-3">
+              <IconBell size={24} color="#000000" strokeWidth={1.5} />
+              <Text
+                className="ml-3 text-[#1D1A27]"
+                style={{ fontSize: 13, lineHeight: 18, flex: 1 }}
+              >
+                You can switch apps or turn off your phone. We'll notify you when the analysis is done.
+              </Text>
+            </View>
+            <Pressable onPress={() => setIsBannerDismissed(true)} hitSlop={10}>
+              <IconX size={20} color="#000000" strokeWidth={1.5} />
+            </Pressable>
+          </View>
+        )}
       </View>
     );
   }
