@@ -1,5 +1,11 @@
-import React, { useMemo, useRef, useState } from "react";
-import { Dimensions, FlatList, ScrollView, View } from "react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import {
+  Animated,
+  Dimensions,
+  FlatList,
+  View,
+} from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
@@ -10,10 +16,15 @@ import { WardrobeRingSummaryCard } from "../../../components/ui/WardrobeRingSumm
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
 import { OutfitAnalyzingCard } from "../../../components/ui/OutfitAnalyzingCard";
-import { RecentlyUploadedHeading } from "../../../components/ui/RecentlyUploadedCard";
+import {
+  RecentlyUploadedHeading,
+  NotifyBanner,
+} from "../../../components/ui/RecentlyUploadedCard";
+import { TrendFeed } from "../../../components/ui/TrendFeed";
+import { WardrobeHighlights } from "../../../components/ui/WardrobeHighlights";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const H_PADDING = 20; // matches px-5 (5 * 4 = 20)
+const H_PADDING = 20;
 
 const RING_SEGMENT_BASE: readonly Omit<RingProgressSegment, "progress">[] = [
   { id: "outer", color: "#F5B93A", radius: 58, strokeWidth: 8 },
@@ -30,11 +41,39 @@ const clampRatio = (value: number): number => {
 const CARDS = ["wardrobe", "blank1", "blank2"] as const;
 type CardKey = (typeof CARDS)[number];
 
+// Scroll distance after which header fully fades out
+const FADE_DISTANCE = 90;
+
 export default function HomeScreen() {
   const { user } = useUser();
   const { summary } = useWardrobeSummary(user?.id);
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+
+  // Animated.Value to track scroll position
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Simple callback — sets scrollY directly, no Animated.event conflict
+  const handleScroll = useCallback(
+    (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+      scrollY.setValue(e.nativeEvent.contentOffset.y);
+    },
+    [scrollY],
+  );
+
+  // Opacity: 1 at top → 0.15 after FADE_DISTANCE px scroll
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, FADE_DISTANCE],
+    outputRange: [1, 0.15],
+    extrapolate: "clamp",
+  });
+
+  // Slight upward shift as header fades
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, FADE_DISTANCE],
+    outputRange: [0, -6],
+    extrapolate: "clamp",
+  });
 
   const ringSegments = useMemo<readonly RingProgressSegment[]>(() => {
     const totalTracked = summary.wearCount + summary.neverCount;
@@ -60,7 +99,6 @@ export default function HomeScreen() {
   }).current;
 
   const renderCard = ({ item }: { item: CardKey }) => (
-    // Each item is full SCREEN_WIDTH; padding pushes card inward — keeps pagingEnabled snapping correct
     <View style={{ width: SCREEN_WIDTH, paddingHorizontal: H_PADDING }}>
       {item === "wardrobe" ? (
         <WardrobeRingSummaryCard
@@ -71,7 +109,7 @@ export default function HomeScreen() {
           ringSegments={ringSegments}
         />
       ) : (
-        <View className="bg-white shadow rounded-[20px] h-40 border border-[#E9EBF8] mt-3 " />
+        <View className="bg-white shadow rounded-[20px] h-40 border border-[#E9EBF8] mt-3" />
       )}
     </View>
   );
@@ -81,16 +119,25 @@ export default function HomeScreen() {
       <AppGradientBackground>
         <SafeAreaView className="flex-1">
           <ScrollView
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
             showsVerticalScrollIndicator={false}
+            decelerationRate="normal"
             contentContainerStyle={{ paddingBottom: 24 }}
           >
-            {/* Header & calendar keep their own padding */}
-            <View className="px-7">
+            {/* Header & calendar — fade on scroll, runs on UI thread via native driver */}
+            <Animated.View
+              className="px-7"
+              style={{
+                opacity: headerOpacity,
+                transform: [{ translateY: headerTranslateY }],
+              }}
+            >
               <HomeHeader />
               <WeeklyCalendarStrip />
-            </View>
+            </Animated.View>
 
-            {/* FlatList is full-width — no parent padding — so pagingEnabled snaps perfectly */}
+            {/* FlatList full-width — no parent padding — pagingEnabled snaps perfectly */}
             <FlatList
               ref={flatListRef}
               data={[...CARDS] as CardKey[]}
@@ -128,11 +175,20 @@ export default function HomeScreen() {
               ))}
             </View>
 
-            {/* Recently uploaded — heading + card shown after analysis completes */}
+            {/* Recently uploaded */}
             <RecentlyUploadedHeading />
 
-            {/* Unified analysis card — shows analyzing + completed outfits */}
+            {/* Notify banner */}
+            <NotifyBanner />
+
+            {/* Analysis card */}
             <OutfitAnalyzingCard />
+
+            {/* Wardrobe Highlights */}
+            <WardrobeHighlights />
+
+            {/* Trend Feed */}
+            <TrendFeed />
           </ScrollView>
         </SafeAreaView>
       </AppGradientBackground>
