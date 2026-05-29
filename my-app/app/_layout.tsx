@@ -15,6 +15,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import * as SecureStore from "expo-secure-store";
 import { memo, useCallback, useEffect, useState } from "react";
 
+
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 if (!publishableKey) {
@@ -91,6 +92,7 @@ const RootNavigator = memo(function RootNavigator() {
     isSignedIn,
     userId,
   ]);
+
 
   useEffect(() => {
     if (!isSignedIn) {

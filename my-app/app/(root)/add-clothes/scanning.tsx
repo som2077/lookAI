@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import { useAnalysisCompleteNotification } from "@/src/services/notificationService";
 import { Text, View } from "react-native";
 import { Image as ExpoImage } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -50,6 +51,9 @@ export default function AddClothesScanningScreen() {
   const scan = useSharedValue(0);
   const progress = useSharedValue(0);
   const spin = useSharedValue(0);
+  const notifyComplete = useAnalysisCompleteNotification();
+  const notifyRef = useRef(notifyComplete);
+  notifyRef.current = notifyComplete;
 
   useEffect(() => {
     scan.value = withRepeat(
@@ -71,16 +75,20 @@ export default function AddClothesScanningScreen() {
     );
 
     const t = setTimeout(() => {
-      router.replace({
-        pathname: "/(root)/add-clothes/form",
-        params: {
-          mode: "scanned",
-          photoUri: photoUri ?? "",
-          name: "Blue kurta",
-          category: "ethnic",
-          color: "Blue",
-        },
-      } as never);
+      notifyRef.current();
+      // Small delay so the chime is audible before unmount
+      setTimeout(() => {
+        router.replace({
+          pathname: "/(root)/add-clothes/form",
+          params: {
+            mode: "scanned",
+            photoUri: photoUri ?? "",
+            name: "Blue kurta",
+            category: "ethnic",
+            color: "Blue",
+          },
+        } as never);
+      }, 600);
     }, 3200);
     return () => clearTimeout(t);
   }, [router, photoUri, scan, progress, spin]);

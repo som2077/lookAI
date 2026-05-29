@@ -13,7 +13,9 @@
     },
     "jsEngine": "hermes",
     "android": {
-      "permissions": ["READ_MEDIA_IMAGES"],
+      "permissions": [
+        "READ_MEDIA_IMAGES"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -58,7 +60,8 @@
         {
           "paymentProvider": "Play Store"
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -10,10 +10,7 @@ import { WardrobeRingSummaryCard } from "../../../components/ui/WardrobeRingSumm
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
 import { OutfitAnalyzingCard } from "../../../components/ui/OutfitAnalyzingCard";
-import {
-  RecentlyUploadedHeading,
-  OutfitPreviewCard,
-} from "../../../components/ui/RecentlyUploadedCard";
+import { RecentlyUploadedHeading } from "../../../components/ui/RecentlyUploadedCard";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const H_PADDING = 20; // matches px-5 (5 * 4 = 20)
@@ -134,10 +131,8 @@ export default function HomeScreen() {
             {/* Recently uploaded — heading + card shown after analysis completes */}
             <RecentlyUploadedHeading />
 
-            {/* Outfit analyzing card — visible while background analysis runs */}
+            {/* Unified analysis card — shows analyzing + completed outfits */}
             <OutfitAnalyzingCard />
-
-            <OutfitPreviewCard />
           </ScrollView>
         </SafeAreaView>
       </AppGradientBackground>
