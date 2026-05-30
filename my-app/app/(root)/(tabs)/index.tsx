@@ -1,11 +1,5 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import {
-  Animated,
-  Dimensions,
-  FlatList,
-  View,
-} from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import React, { useMemo, useRef, useState } from "react";
+import { Dimensions, FlatList, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
@@ -41,39 +35,11 @@ const clampRatio = (value: number): number => {
 const CARDS = ["wardrobe", "blank1", "blank2"] as const;
 type CardKey = (typeof CARDS)[number];
 
-// Scroll distance after which header fully fades out
-const FADE_DISTANCE = 90;
-
 export default function HomeScreen() {
   const { user } = useUser();
   const { summary } = useWardrobeSummary(user?.id);
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
-
-  // Animated.Value to track scroll position
-  const scrollY = useRef(new Animated.Value(0)).current;
-
-  // Simple callback — sets scrollY directly, no Animated.event conflict
-  const handleScroll = useCallback(
-    (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-      scrollY.setValue(e.nativeEvent.contentOffset.y);
-    },
-    [scrollY],
-  );
-
-  // Opacity: 1 at top → 0.15 after FADE_DISTANCE px scroll
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, FADE_DISTANCE],
-    outputRange: [1, 0.15],
-    extrapolate: "clamp",
-  });
-
-  // Slight upward shift as header fades
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, FADE_DISTANCE],
-    outputRange: [0, -6],
-    extrapolate: "clamp",
-  });
 
   const ringSegments = useMemo<readonly RingProgressSegment[]>(() => {
     const totalTracked = summary.wearCount + summary.neverCount;
@@ -119,25 +85,16 @@ export default function HomeScreen() {
       <AppGradientBackground>
         <SafeAreaView className="flex-1">
           <ScrollView
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
             showsVerticalScrollIndicator={false}
-            decelerationRate="normal"
             contentContainerStyle={{ paddingBottom: 24 }}
           >
-            {/* Header & calendar — fade on scroll, runs on UI thread via native driver */}
-            <Animated.View
-              className="px-7"
-              style={{
-                opacity: headerOpacity,
-                transform: [{ translateY: headerTranslateY }],
-              }}
-            >
+            {/* Header & calendar */}
+            <View className="px-7">
               <HomeHeader />
               <WeeklyCalendarStrip />
-            </Animated.View>
+            </View>
 
-            {/* FlatList full-width — no parent padding — pagingEnabled snaps perfectly */}
+            {/* FlatList full-width — pagingEnabled snaps correctly */}
             <FlatList
               ref={flatListRef}
               data={[...CARDS] as CardKey[]}
@@ -175,19 +132,10 @@ export default function HomeScreen() {
               ))}
             </View>
 
-            {/* Recently uploaded */}
             <RecentlyUploadedHeading />
-
-            {/* Notify banner */}
             <NotifyBanner />
-
-            {/* Analysis card */}
             <OutfitAnalyzingCard />
-
-            {/* Wardrobe Highlights */}
             <WardrobeHighlights />
-
-            {/* Trend Feed */}
             <TrendFeed />
           </ScrollView>
         </SafeAreaView>
