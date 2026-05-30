@@ -13,6 +13,7 @@ import { OutfitAnalyzingCard } from "../../../components/ui/OutfitAnalyzingCard"
 import {
   RecentlyUploadedHeading,
   NotifyBanner,
+  EmptyStyleBanner,
 } from "../../../components/ui/RecentlyUploadedCard";
 import { TrendFeed } from "../../../components/ui/TrendFeed";
 import { WardrobeHighlights } from "../../../components/ui/WardrobeHighlights";
@@ -134,6 +135,7 @@ export default function HomeScreen() {
 
             <RecentlyUploadedHeading />
             <NotifyBanner />
+            <EmptyStyleBanner />
             <OutfitAnalyzingCard />
             <WardrobeHighlights />
             <TrendFeed />
