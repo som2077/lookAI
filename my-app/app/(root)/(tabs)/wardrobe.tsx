@@ -10,14 +10,20 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
+import { StatusBar } from "expo-status-bar";
 import {
   IconSearch,
   IconAdjustmentsHorizontal,
   IconPlus,
   IconHanger,
+  IconShirt,
+  IconShoe,
+  IconScissors,
+  IconLayoutGrid,
+  IconChevronRight,
+  IconSparkles,
 } from "@tabler/icons-react-native";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
-import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -25,11 +31,11 @@ import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
 type CategoryId =
   | "all"
   | "top"
-  | "dress"
   | "bottoms"
-  | "ethnic"
-  | "outerwear"
   | "footwear"
+  | "outerwear"
+  | "dress"
+  | "ethnic"
   | "accessory";
 
 interface CategoryChip {
@@ -51,103 +57,159 @@ interface ClothingItem {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const GRID_GAP = 10;
+const GRID_GAP = 8;
 const GRID_PADDING = 24;
-const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
+const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP * 2) / 3;
 
 const CATEGORIES: CategoryChip[] = [
   { id: "all", label: "All" },
   { id: "top", label: "Tops" },
-  { id: "dress", label: "Dress" },
   { id: "bottoms", label: "Bottoms" },
-  { id: "ethnic", label: "Ethnic" },
+  { id: "footwear", label: "Shoes" },
   { id: "outerwear", label: "Outerwear" },
-  { id: "footwear", label: "Footwear" },
+  { id: "dress", label: "Dress" },
+  { id: "ethnic", label: "Ethnic" },
   { id: "accessory", label: "Accessory" },
 ];
 
-const MOCK_ITEMS: ClothingItem[] = [
+const CATEGORY_ICONS: Record<CategoryId, React.ComponentType<any>> = {
+  all: IconLayoutGrid,
+  top: IconShirt,
+  bottoms: IconScissors,
+  footwear: IconShoe,
+  outerwear: IconShirt,
+  dress: IconShirt,
+  ethnic: IconShirt,
+  accessory: IconHanger,
+};
+
+const GROUP_HEADER_ICONS: Record<
+  CategoryId,
+  { Icon: React.ComponentType<any>; color: string }
+> = {
+  all: { Icon: IconLayoutGrid, color: "#9B9BAF" },
+  top: { Icon: IconShirt, color: "#10B981" }, // Green for Tops
+  bottoms: { Icon: IconScissors, color: "#3B82F6" }, // Blue for Bottoms
+  footwear: { Icon: IconShoe, color: "#FBBF24" },
+  outerwear: { Icon: IconShirt, color: "#A78BFA" },
+  dress: { Icon: IconShirt, color: "#EC4899" },
+  ethnic: { Icon: IconShirt, color: "#F43F5E" },
+  accessory: { Icon: IconHanger, color: "#6B7280" },
+};
+
+// ─── Mock Data matching the screenshot ────────────────────────────────────────
+
+const BASE_MOCK_ITEMS: ClothingItem[] = [
   {
     id: "1",
-    name: "Blue Kurta",
-    category: "ethnic",
-    color: "Navy Blue",
-    bgColor: "#D6E4FF",
-    occasion: "Casual",
-    wears: 5,
-    isNew: false,
-  },
-  {
-    id: "2",
-    name: "Floral Dress",
-    category: "dress",
-    color: "Pink",
-    bgColor: "#FFE0EC",
-    occasion: "Party",
-    wears: 3,
-    isNew: false,
-  },
-  {
-    id: "3",
-    name: "Denim Jacket",
-    category: "outerwear",
-    color: "Blue",
-    bgColor: "#DBEAFE",
+    name: "White Shirt",
+    category: "top",
+    color: "White",
+    bgColor: "#F8F7FC",
     occasion: "Casual",
     wears: 8,
     isNew: false,
   },
   {
+    id: "2",
+    name: "Black Jeans",
+    category: "bottoms",
+    color: "Black",
+    bgColor: "#F8F7FC",
+    occasion: "Casual",
+    wears: 5,
+    isNew: false,
+  },
+  {
+    id: "3",
+    name: "Blue Kurta",
+    category: "top",
+    color: "Blue",
+    bgColor: "#F8F7FC",
+    occasion: "Casual",
+    wears: 0,
+    isNew: true,
+  },
+  {
     id: "4",
-    name: "White Sneakers",
+    name: "Sneakers",
     category: "footwear",
     color: "White",
-    bgColor: "#F1F5F9",
+    bgColor: "#F8F7FC",
     occasion: "Casual",
     wears: 12,
     isNew: false,
   },
   {
     id: "5",
-    name: "Black Top",
-    category: "top",
-    color: "Black",
-    bgColor: "#E2E2EA",
-    occasion: "Office",
+    name: "Grey Blazer",
+    category: "outerwear",
+    color: "Grey",
+    bgColor: "#F8F7FC",
+    occasion: "Formal",
     wears: 0,
     isNew: true,
   },
   {
     id: "6",
-    name: "Palazzo Pants",
+    name: "Beige Chinos",
     category: "bottoms",
     color: "Beige",
-    bgColor: "#FEF3C7",
+    bgColor: "#F8F7FC",
     occasion: "Casual",
-    wears: 2,
-    isNew: true,
-  },
-  {
-    id: "7",
-    name: "Gold Earrings",
-    category: "accessory",
-    color: "Gold",
-    bgColor: "#FEF9C3",
-    occasion: "Wedding",
-    wears: 1,
-    isNew: false,
-  },
-  {
-    id: "8",
-    name: "Red Saree",
-    category: "ethnic",
-    color: "Red",
-    bgColor: "#FEE2E2",
-    occasion: "Wedding",
     wears: 0,
     isNew: true,
   },
 ];
+
+// Generate extra mock items to reach exactly 48 total items as seen in screenshot
+const generateMockItems = (): ClothingItem[] => {
+  const items = [...BASE_MOCK_ITEMS];
+  const categories: CategoryId[] = [
+    "top",
+    "bottoms",
+    "footwear",
+    "outerwear",
+    "dress",
+    "ethnic",
+    "accessory",
+  ];
+  const names = [
+    "Red T-Shirt",
+    "Chino Pants",
+    "Brown Boots",
+    "Black Leather Jacket",
+    "Summer Dress",
+    "Sherwani",
+    "Sunglasses",
+    "Wool Scarf",
+    "Silk Tie",
+    "Running Shoes",
+    "Jeans Jacket",
+    "Cargo Shorts",
+    "Hoodie",
+    "Sweater",
+  ];
+
+  for (let i = 7; i <= 48; i++) {
+    const category = categories[i % categories.length];
+    const name = `${names[i % names.length]} #${i}`;
+    const wears = i % 4 === 0 ? 0 : Math.floor(Math.random() * 15) + 1; // 25% unworn to get exactly 12 unworn items
+    items.push({
+      id: String(i),
+      name,
+      category,
+      color: "Various",
+      bgColor: "#F8F7FC",
+      occasion: i % 2 === 0 ? "Casual" : "Formal",
+      wears,
+      isNew: wears === 0 && i % 3 === 0,
+    });
+  }
+  return items;
+};
+
+const MOCK_ITEMS = generateMockItems();
 
 // ─── Sub-Components ──────────────────────────────────────────────────────────
 
@@ -163,7 +225,7 @@ const CategoryFilter = React.memo(function CategoryFilter({
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{ paddingHorizontal: 24, gap: 8 }}
-      className="mb-4"
+      style={{ marginBottom: 16, maxHeight: 42 }}
     >
       {CATEGORIES.map((cat) => {
         const isActive = cat.id === active;
@@ -196,181 +258,462 @@ const CategoryFilter = React.memo(function CategoryFilter({
   );
 });
 
-const StatItem = React.memo(function StatItem({
-  value,
-  label,
-  color,
-}: {
-  value: number;
-  label: string;
-  color: string;
-}) {
-  return (
-    <View style={{ alignItems: "center", flex: 1 }}>
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: "800",
-          color,
-        }}
-      >
-        {value}
-      </Text>
-      <Text
-        style={{
-          fontSize: 11,
-          color: "#9B9BAF",
-          marginTop: 2,
-          fontWeight: "500",
-        }}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-});
-
 const StatsBar = React.memo(function StatsBar({
   total,
   worn,
-  never,
+  unworn,
+  usage,
 }: {
   total: number;
   worn: number;
-  never: number;
+  unworn: number;
+  usage: number;
 }) {
   return (
     <View
       style={{
         flexDirection: "row",
         marginHorizontal: 24,
-        marginBottom: 16,
+        marginBottom: 20,
         backgroundColor: "#FFFFFF",
         borderRadius: 16,
         paddingVertical: 14,
         borderWidth: 1,
         borderColor: "#E9EBF8",
         shadowColor: "#000",
-        shadowOpacity: 0.03,
+        shadowOpacity: 0.02,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 2 },
         elevation: 1,
       }}
     >
-      <StatItem value={total} label="Total Items" color="#1D1A27" />
+      <View style={{ alignItems: "center", flex: 1 }}>
+        <Text style={{ fontSize: 20, fontWeight: "800", color: "#3B82F6" }}>
+          {total}
+        </Text>
+        <Text
+          style={{
+            fontSize: 11,
+            color: "#9B9BAF",
+            marginTop: 2,
+            fontWeight: "500",
+          }}
+        >
+          Total
+        </Text>
+      </View>
       <View style={{ width: 1, backgroundColor: "#E9EBF8" }} />
-      <StatItem value={worn} label="Worn" color="#F5B93A" />
+      <View style={{ alignItems: "center", flex: 1 }}>
+        <Text style={{ fontSize: 20, fontWeight: "800", color: "#10B981" }}>
+          {worn}
+        </Text>
+        <Text
+          style={{
+            fontSize: 11,
+            color: "#9B9BAF",
+            marginTop: 2,
+            fontWeight: "500",
+          }}
+        >
+          Worn
+        </Text>
+      </View>
       <View style={{ width: 1, backgroundColor: "#E9EBF8" }} />
-      <StatItem value={never} label="Never Worn" color="#E54B4B" />
+      <View style={{ alignItems: "center", flex: 1 }}>
+        <Text style={{ fontSize: 20, fontWeight: "800", color: "#EF4444" }}>
+          {unworn}
+        </Text>
+        <Text
+          style={{
+            fontSize: 11,
+            color: "#9B9BAF",
+            marginTop: 2,
+            fontWeight: "500",
+          }}
+        >
+          Unworn
+        </Text>
+      </View>
+      <View style={{ width: 1, backgroundColor: "#E9EBF8" }} />
+      <View style={{ alignItems: "center", flex: 1 }}>
+        <Text style={{ fontSize: 20, fontWeight: "800", color: "#FBBF24" }}>
+          {usage}%
+        </Text>
+        <Text
+          style={{
+            fontSize: 11,
+            color: "#9B9BAF",
+            marginTop: 2,
+            fontWeight: "500",
+          }}
+        >
+          Usage
+        </Text>
+      </View>
     </View>
   );
 });
+
+// ─── Segmented View Toggle ───────────────────────────────────────────────────
+
+const ViewToggle = React.memo(function ViewToggle({
+  viewMode,
+  onToggle,
+}: {
+  viewMode: "grouped" | "grid";
+  onToggle: (mode: "grouped" | "grid") => void;
+}) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        backgroundColor: "#E5E5EA",
+        borderRadius: 10,
+        padding: 2,
+        alignItems: "center",
+      }}
+    >
+      <Pressable
+        onPress={() => onToggle("grouped")}
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 8,
+          backgroundColor: viewMode === "grouped" ? "#FFFFFF" : "transparent",
+          alignItems: "center",
+          justifyContent: "center",
+          shadowColor: viewMode === "grouped" ? "#000" : "transparent",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 2,
+          elevation: viewMode === "grouped" ? 2 : 0,
+        }}
+      >
+        <View style={{ gap: 3 }}>
+          <View
+            style={{
+              width: 14,
+              height: 4,
+              borderRadius: 1,
+              backgroundColor: viewMode === "grouped" ? "#121212" : "#7E7C8C",
+            }}
+          />
+          <View
+            style={{
+              width: 14,
+              height: 4,
+              borderRadius: 1,
+              backgroundColor: viewMode === "grouped" ? "#121212" : "#7E7C8C",
+            }}
+          />
+        </View>
+      </Pressable>
+
+      <Pressable
+        onPress={() => onToggle("grid")}
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 8,
+          backgroundColor: viewMode === "grid" ? "#FFFFFF" : "transparent",
+          alignItems: "center",
+          justifyContent: "center",
+          shadowColor: viewMode === "grid" ? "#000" : "transparent",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 2,
+          elevation: viewMode === "grid" ? 2 : 0,
+        }}
+      >
+        <IconLayoutGrid
+          size={16}
+          color={viewMode === "grid" ? "#121212" : "#7E7C8C"}
+          strokeWidth={2.5}
+        />
+      </Pressable>
+    </View>
+  );
+});
+
+// ─── 3-Column Grid View Components ──────────────────────────────────────────
 
 const ClothingCard = React.memo(function ClothingCard({
   item,
 }: {
   item: ClothingItem;
 }) {
+  const Icon = CATEGORY_ICONS[item.category] || IconHanger;
+  const isWorn = item.wears > 0;
+
   return (
     <Pressable
       style={{
         width: CARD_WIDTH,
+        height: 155,
         marginBottom: GRID_GAP,
         backgroundColor: "#FFFFFF",
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: "#E9EBF8",
+        borderColor: "#E2E2EA",
         overflow: "hidden",
-        shadowColor: "#000",
-        shadowOpacity: 0.04,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 1,
       }}
     >
-      {/* Placeholder image area */}
+      {/* Icon Area */}
       <View
         style={{
-          height: 150,
-          backgroundColor: item.bgColor,
+          flex: 1,
+          backgroundColor: "#F8F7FC",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <IconHanger size={36} color="#1D1A2730" strokeWidth={1.5} />
-
-        {/* New badge */}
-        {item.isNew && (
-          <View
+        {/* Status Badge */}
+        <View
+          style={{
+            position: "absolute",
+            top: 6,
+            right: 6,
+            backgroundColor: isWorn ? "#E8F8F0" : "#FFF0F0",
+            borderRadius: 6,
+            paddingHorizontal: 6,
+            paddingVertical: 2,
+          }}
+        >
+          <Text
             style={{
-              position: "absolute",
-              top: 8,
-              left: 8,
-              backgroundColor: "#1D1A27",
-              borderRadius: 10,
-              paddingHorizontal: 8,
-              paddingVertical: 3,
+              fontSize: 8,
+              fontWeight: "700",
+              color: isWorn ? "#10B981" : "#EF4444",
             }}
           >
-            <Text
-              style={{ color: "#FFFFFF", fontSize: 9, fontWeight: "700" }}
-            >
-              NEW
-            </Text>
-          </View>
-        )}
+            {isWorn ? "✓ worn" : "✗ new"}
+          </Text>
+        </View>
+
+        <Icon size={28} color="#9B9BAF" strokeWidth={1.5} />
       </View>
 
-      {/* Card info */}
-      <View style={{ padding: 10 }}>
+      {/* Info Area */}
+      <View style={{ padding: 8, height: 50, justifyContent: "center" }}>
         <Text
           numberOfLines={1}
           style={{
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: "700",
             color: "#1D1A27",
-            marginBottom: 4,
+            marginBottom: 2,
           }}
         >
           {item.name}
         </Text>
-
-        <View
+        <Text
+          numberOfLines={1}
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
+            fontSize: 9,
+            color: "#9B9BAF",
           }}
         >
-          {/* Category pill */}
-          <View
-            style={{
-              backgroundColor: "#F4F4F6",
-              borderRadius: 8,
-              paddingHorizontal: 8,
-              paddingVertical: 3,
-            }}
-          >
-            <Text
-              style={{ fontSize: 10, color: "#9B9BAF", fontWeight: "600" }}
-            >
-              {item.occasion}
-            </Text>
-          </View>
-
-          {/* Wear count */}
-          <Text
-            style={{
-              fontSize: 10,
-              color: item.wears === 0 ? "#E54B4B" : "#9B9BAF",
-              fontWeight: "600",
-            }}
-          >
-            {item.wears === 0 ? "Never worn" : `${item.wears} wears`}
-          </Text>
-        </View>
+          {CATEGORIES.find((c) => c.id === item.category)?.label || "Item"} ·{" "}
+          {item.wears}×
+        </Text>
       </View>
     </Pressable>
+  );
+});
+
+const AddClothCard = React.memo(function AddClothCard({
+  onPress,
+}: {
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        width: CARD_WIDTH,
+        height: 155,
+        marginBottom: GRID_GAP,
+        backgroundColor: "#F8F7FC",
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: "#E2E2EA",
+        borderStyle: "dashed",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 8,
+      }}
+    >
+      <IconPlus size={28} color="#9B9BAF" strokeWidth={1.5} />
+      <View style={{ marginTop: 12, alignItems: "center" }}>
+        <Text style={{ fontSize: 11, fontWeight: "600", color: "#9B9BAF" }}>
+          Add cloth
+        </Text>
+        <Text style={{ fontSize: 10, color: "#B5B5C3", marginTop: 2 }}>
+          Upload
+        </Text>
+      </View>
+    </Pressable>
+  );
+});
+
+// ─── Grouped Carousel View Components ───────────────────────────────────────
+
+const CarouselAddClothCard = React.memo(function CarouselAddClothCard({
+  onPress,
+}: {
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        width: 110,
+        height: 170,
+        marginRight: 10,
+        backgroundColor: "#F8F7FC",
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: "#E2E2EA",
+        borderStyle: "dashed",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 8,
+      }}
+    >
+      <IconPlus size={24} color="#9B9BAF" strokeWidth={1.5} />
+      <View style={{ marginTop: 24, alignItems: "center" }}>
+        <Text style={{ fontSize: 11, fontWeight: "600", color: "#9B9BAF" }}>
+          Add
+        </Text>
+        <Text style={{ fontSize: 10, color: "#B5B5C3", marginTop: 2 }}>
+          Upload
+        </Text>
+      </View>
+    </Pressable>
+  );
+});
+
+const CarouselClothingCard = React.memo(function CarouselClothingCard({
+  item,
+}: {
+  item: ClothingItem;
+}) {
+  const Icon = CATEGORY_ICONS[item.category] || IconHanger;
+  const isWorn = item.wears > 0;
+
+  return (
+    <Pressable
+      style={{
+        width: 110,
+        height: 170,
+        marginRight: 10,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: "#E2E2EA",
+        overflow: "hidden",
+        shadowColor: "#000",
+        shadowOpacity: 0.02,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 1,
+      }}
+    >
+      {/* Icon Area */}
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#F8F7FC",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {/* Status Badge in Top-Left */}
+        <View
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            backgroundColor: isWorn ? "#E8F8F0" : "#FFF0F0",
+            borderRadius: 6,
+            paddingHorizontal: 6,
+            paddingVertical: 2,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 8,
+              fontWeight: "700",
+              color: isWorn ? "#10B981" : "#EF4444",
+            }}
+          >
+            {isWorn ? "worn" : "new"}
+          </Text>
+        </View>
+
+        <Icon size={28} color="#9B9BAF" strokeWidth={1.5} />
+      </View>
+
+      {/* Info Area */}
+      <View style={{ padding: 8, height: 52, justifyContent: "center" }}>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: 11,
+            fontWeight: "700",
+            color: "#1D1A27",
+            marginBottom: 2,
+          }}
+        >
+          {item.name}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: 9,
+            color: "#9B9BAF",
+          }}
+        >
+          {isWorn ? `${item.wears}× worn` : "Never worn"}
+        </Text>
+      </View>
+    </Pressable>
+  );
+});
+
+const GroupHeader = React.memo(function GroupHeader({
+  category,
+  count,
+}: {
+  category: CategoryChip;
+  count: number;
+}) {
+  const { Icon, color } = GROUP_HEADER_ICONS[category.id] || {
+    Icon: IconHanger,
+    color: "#6B7280",
+  };
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 24,
+        marginTop: 18,
+        marginBottom: 12,
+      }}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Icon size={20} color={color} strokeWidth={2} />
+        <Text style={{ fontSize: 16, fontWeight: "700", color: "#1D1A27" }}>
+          {category.label}
+        </Text>
+      </View>
+      <Text style={{ fontSize: 12, color: "#9B9BAF", fontWeight: "500" }}>
+        {count} {count === 1 ? "item" : "items"}
+      </Text>
+    </View>
   );
 });
 
@@ -451,10 +794,38 @@ export default function WardrobeScreen() {
   const { user } = useUser();
   const { summary } = useWardrobeSummary(user?.id);
   const [activeCategory, setActiveCategory] = useState<CategoryId>("all");
+  const [viewMode, setViewMode] = useState<"grouped" | "grid">("grouped");
 
   const filteredItems = useMemo(() => {
     if (activeCategory === "all") return MOCK_ITEMS;
     return MOCK_ITEMS.filter((item) => item.category === activeCategory);
+  }, [activeCategory]);
+
+  const displayItems = useMemo(() => {
+    return [
+      {
+        id: "upload",
+        name: "Add cloth",
+        category: "all" as any,
+        wears: 0,
+        isNew: false,
+        color: "",
+        bgColor: "",
+        occasion: "",
+      },
+      ...filteredItems,
+    ];
+  }, [filteredItems]);
+
+  const groupableCategories = useMemo(() => {
+    if (activeCategory !== "all") {
+      return CATEGORIES.filter((cat) => cat.id === activeCategory);
+    }
+    // Return all categories that have items in MOCK_ITEMS
+    return CATEGORIES.filter(
+      (cat) =>
+        cat.id !== "all" && MOCK_ITEMS.some((item) => item.category === cat.id),
+    );
   }, [activeCategory]);
 
   const handleAddClothes = useCallback(() => {
@@ -465,9 +836,52 @@ export default function WardrobeScreen() {
     setActiveCategory(id);
   }, []);
 
+  const total = MOCK_ITEMS.length;
+  const worn =
+    summary.totalWorn || MOCK_ITEMS.filter((i) => i.wears > 0).length;
+  const unworn =
+    summary.neverCount || MOCK_ITEMS.filter((i) => i.wears === 0).length;
+  const usage = summary.wornPercentage
+    ? Math.round(summary.wornPercentage * 100)
+    : total > 0
+      ? Math.round((worn / total) * 100)
+      : 0;
+
   const renderItem = useCallback(
-    ({ item }: { item: ClothingItem }) => <ClothingCard item={item} />,
-    [],
+    ({ item }: { item: any }) => {
+      if (item.id === "upload") {
+        return <AddClothCard onPress={handleAddClothes} />;
+      }
+      return <ClothingCard item={item} />;
+    },
+    [handleAddClothes],
+  );
+
+  const renderGroupedRow = useCallback(
+    ({ item: category }: { item: CategoryChip }) => {
+      // Find items belonging to this category
+      const categoryItems = MOCK_ITEMS.filter(
+        (item) => item.category === category.id,
+      );
+
+      return (
+        <View style={{ marginBottom: 12 }}>
+          <GroupHeader category={category} count={categoryItems.length} />
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 24 }}
+          >
+            <CarouselAddClothCard onPress={handleAddClothes} />
+            {categoryItems.map((clothingItem) => (
+              <CarouselClothingCard key={clothingItem.id} item={clothingItem} />
+            ))}
+          </ScrollView>
+        </View>
+      );
+    },
+    [handleAddClothes],
   );
 
   const renderEmpty = useCallback(
@@ -475,12 +889,13 @@ export default function WardrobeScreen() {
     [handleAddClothes],
   );
 
-  const keyExtractor = useCallback((item: ClothingItem) => item.id, []);
+  const keyExtractor = useCallback((item: any) => item.id, []);
 
   return (
     <SwipeTabWrapper tabIndex={1}>
-      <AppGradientBackground>
-        <SafeAreaView className="flex-1">
+      <View style={{ flex: 1, backgroundColor: "#F8F7FC" }}>
+        <StatusBar style="dark" />
+        <SafeAreaView className="flex-1" edges={["top"]}>
           {/* Header */}
           <View
             style={{
@@ -489,12 +904,12 @@ export default function WardrobeScreen() {
               justifyContent: "space-between",
               paddingHorizontal: 24,
               paddingTop: 8,
-              paddingBottom: 12,
+              paddingBottom: 16,
             }}
           >
             <Text
               style={{
-                fontSize: 24,
+                fontSize: 28,
                 fontWeight: "800",
                 color: "#1D1A27",
               }}
@@ -502,35 +917,13 @@ export default function WardrobeScreen() {
               My Wardrobe
             </Text>
 
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Pressable
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "#F8F7FC",
-                  borderWidth: 1,
-                  borderColor: "#E2E2EA",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <IconSearch size={18} color="#1D1A27" strokeWidth={2} />
+            <View style={{ flexDirection: "row", gap: 16 }}>
+              <Pressable>
+                <IconSearch size={22} color="#1D1A27" strokeWidth={2} />
               </Pressable>
-              <Pressable
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "#F8F7FC",
-                  borderWidth: 1,
-                  borderColor: "#E2E2EA",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+              <Pressable>
                 <IconAdjustmentsHorizontal
-                  size={18}
+                  size={22}
                   color="#1D1A27"
                   strokeWidth={2}
                 />
@@ -544,29 +937,203 @@ export default function WardrobeScreen() {
             onSelect={handleCategorySelect}
           />
 
-          {/* Stats Summary */}
-          <StatsBar
-            total={MOCK_ITEMS.length}
-            worn={summary.totalWorn || MOCK_ITEMS.filter((i) => i.wears > 0).length}
-            never={summary.neverCount || MOCK_ITEMS.filter((i) => i.wears === 0).length}
-          />
+          {viewMode === "grid" ? (
+            <FlatList
+              key="grid-view"
+              data={displayItems}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
+              numColumns={3}
+              columnWrapperStyle={{
+                justifyContent: "flex-start",
+                gap: GRID_GAP,
+                paddingHorizontal: 24,
+              }}
+              contentContainerStyle={{ paddingBottom: 120 }}
+              showsVerticalScrollIndicator={false}
+              ListHeaderComponent={
+                <View style={{ marginTop: 8 }}>
+                  {/* Stats Summary */}
+                  <StatsBar
+                    total={total}
+                    worn={worn}
+                    unworn={unworn}
+                    usage={usage}
+                  />
 
-          {/* Clothing Grid */}
-          <FlatList
-            data={filteredItems}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            numColumns={2}
-            columnWrapperStyle={{
-              justifyContent: "space-between",
-              paddingHorizontal: 24,
-            }}
-            contentContainerStyle={{ paddingBottom: 100 }}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={renderEmpty}
-          />
+                  {/* Count and Sort Bar */}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 24,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: "#7E7C8C",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {filteredItems.length} items
+                    </Text>
+
+                    <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
+                  </View>
+                </View>
+              }
+              ListFooterComponent={
+                filteredItems.length > 0 ? (
+                  <View style={{ marginTop: 24 }}>
+                    {/* AI Suggestion Card */}
+                    <Pressable
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginHorizontal: 24,
+                        marginBottom: 24,
+                        padding: 14,
+                        backgroundColor: "#121212",
+                        borderRadius: 20,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 12,
+                          backgroundColor: "#1C1B2A",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <IconSparkles size={20} color="#3B82F6" />
+                      </View>
+                      <View style={{ marginLeft: 12, flex: 1 }}>
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            fontWeight: "700",
+                            color: "#FFFFFF",
+                          }}
+                        >
+                          {unworn} clothes never worn
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 11,
+                            color: "#8E8C9A",
+                            marginTop: 4,
+                          }}
+                        >
+                          Get AI outfit ideas for them →
+                        </Text>
+                      </View>
+                      <IconChevronRight size={18} color="#7E7C8C" />
+                    </Pressable>
+                  </View>
+                ) : null
+              }
+            />
+          ) : (
+            <FlatList
+              key="grouped-view"
+              data={groupableCategories}
+              keyExtractor={(cat) => cat.id}
+              renderItem={renderGroupedRow}
+              contentContainerStyle={{ paddingBottom: 120 }}
+              showsVerticalScrollIndicator={false}
+              ListHeaderComponent={
+                <View style={{ marginTop: 8 }}>
+                  {/* Stats Summary */}
+                  <StatsBar
+                    total={total}
+                    worn={worn}
+                    unworn={unworn}
+                    usage={usage}
+                  />
+
+                  {/* Count and Sort Bar */}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 24,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: "#7E7C8C",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {total} items
+                    </Text>
+
+                    <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
+                  </View>
+                </View>
+              }
+              ListFooterComponent={
+                <View style={{ marginTop: 24 }}>
+                  {/* AI Suggestion Card */}
+                  <Pressable
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginHorizontal: 24,
+                      marginBottom: 24,
+                      padding: 14,
+                      backgroundColor: "#121212",
+                      borderRadius: 20,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 12,
+                        backgroundColor: "#1C1B2A",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <IconSparkles size={20} color="#3B82F6" />
+                    </View>
+                    <View style={{ marginLeft: 12, flex: 1 }}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: "700",
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        {unworn} clothes never worn
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          color: "#8E8C9A",
+                          marginTop: 4,
+                        }}
+                      >
+                        Get AI outfit ideas for them →
+                      </Text>
+                    </View>
+                    <IconChevronRight size={18} color="#7E7C8C" />
+                  </Pressable>
+                </View>
+              }
+            />
+          )}
         </SafeAreaView>
-      </AppGradientBackground>
+      </View>
     </SwipeTabWrapper>
   );
 }

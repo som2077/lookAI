@@ -128,7 +128,7 @@ export function AddActionMenu({
       statusBarTranslucent
     >
       <Animated.View className="flex-1" style={backdropStyle}>
-        <BlurView intensity={135} tint="dark" className="absolute inset-0" />
+        <BlurView intensity={140} tint="dark" className="absolute inset-0" />
         <Animated.View
           className="flex-1 px-[16px] mb-[-8px] justify-end"
           style={[
