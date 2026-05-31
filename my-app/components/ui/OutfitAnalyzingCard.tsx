@@ -59,16 +59,7 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
 }) {
   return (
     <View style={{ width: CARD_WIDTH }}>
-      <View
-        className="flex-row rounded-[20px] border border-[#E9EBF8] bg-white overflow-hidden h-40"
-        style={{
-          shadowColor: "#000",
-          shadowOpacity: 0.09,
-          shadowRadius: 16,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 5,
-        }}
-      >
+      <View className="flex-row rounded-[20px] border border-[#E9EBF8] bg-white overflow-hidden h-40 ">
         <View
           className="justify-center items-center"
           style={{ width: 115, height: 160, backgroundColor: "#C8C7C6" }}
@@ -152,7 +143,7 @@ const AnalyzingCardSlide = React.memo(function AnalyzingCardSlide({
       <View
         className="flex-row rounded-[20px] border border-[#E9EBF8] bg-white overflow-hidden h-40"
         style={{
-          shadowColor: "#000",
+          shadowColor: "#000000",
           shadowOpacity: 0.09,
           shadowRadius: 16,
           shadowOffset: { width: 0, height: 4 },

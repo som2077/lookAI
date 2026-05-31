@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { IconBell, IconX, IconShirt } from "@tabler/icons-react-native";
 import { useOutfitAnalysisStore } from "@/backend/store/outfit-analysis-store";
+// import Svg, { Polygon, Defs, LinearGradient, Stop } from "react-native-svg";
 
 export const RecentlyUploadedHeading = React.memo(
   function RecentlyUploadedHeading() {

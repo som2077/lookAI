@@ -2,8 +2,9 @@ import React from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { useRouter } from "expo-router";
+import { ChevronRight } from "lucide-react-native";
 
-const SVG_SIZE = 40;
+const SVG_SIZE = 49;
 const STROKE_WIDTH = 3;
 const RADIUS = (SVG_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -75,14 +76,14 @@ const HighlightCard = React.memo(function HighlightCard({
 
   return (
     <View
-      className="bg-white rounded-[12px] border border-[#E9EBF8] px-3 py-6 mb-2"
-      style={{
-        shadowColor: "#000",
-        shadowOpacity: 0.04,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 1,
-      }}
+      className="bg-white rounded-[12px] border border-[#E9EBF8] px-2 py-6 mb-2"
+      // style={{
+      //   shadowColor: "#000",
+      //   shadowOpacity: 0.04,
+      //   shadowRadius: 10,
+      //   shadowOffset: { width: 0, height: 2 },
+      //   elevation: 1,
+      // }}
     >
       {/* Header with title and tag */}
       <View className="flex-row items-center justify-between mb-3 mt-[-7] ml-2">
@@ -98,7 +99,7 @@ const HighlightCard = React.memo(function HighlightCard({
       </View>
 
       {/* Progress and subtitle */}
-      <View className="flex-row items-center gap-2 ml-1">
+      <View className="flex-row items-center gap-3 ml-1">
         <ProgressCircle progress={progress} color={progressColor} />
         <Text className="text-[#9B9BAF]" style={{ fontSize: 11 }}>
           {subtitle}
@@ -121,9 +122,7 @@ export const WardrobeHighlights = React.memo(function WardrobeHighlights() {
         <TouchableOpacity
           onPress={() => router.navigate("/(root)/(tabs)/wardrobe" as never)}
         >
-          <Text className="text-[#6C63FF] text-sm font-semibold">
-            All items
-          </Text>
+          <ChevronRight size={20} color="#000000" strokeWidth={2} />
         </TouchableOpacity>
       </View>
 

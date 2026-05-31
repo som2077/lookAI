@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { IconChartLine, IconCrown } from "@tabler/icons-react-native";
+import { ChevronRight } from "lucide-react-native";
 
 const MOCK_TRENDS = [
   {
@@ -25,21 +26,21 @@ const MOCK_TRENDS = [
 
 export const TrendFeed = React.memo(function TrendFeed() {
   return (
-    <View className="mt-4 mb-2">
+    <View className="mt-4 mb-20">
       {/* Header with title and see all */}
       <View className="flex-row items-center justify-between mx-8 mb-3">
-        <Text className="text-[#1D1A27] text-lg font-bold">Trend Feed</Text>
+        <Text className="text-[#1D1A27] text-xl font-bold">Trend Feed</Text>
         <Pressable>
-          <Text className="text-[#9B9BAF] text-sm">see all</Text>
+          <ChevronRight size={20} color="#000000" strokeWidth={2} />
         </Pressable>
       </View>
 
       {/* Trend cards */}
-      <View className="flex-row gap-3 mx-5">
+      <View className="flex-row gap-3 mx-6">
         {MOCK_TRENDS.map((trend) => (
           <View
             key={trend.id}
-            className="flex-1 bg-white rounded-[16px] border border-[#E9EBF8] px-3 py-10"
+            className="flex-1 bg-white rounded-[16px] border border-[#E9EBF8] p-1"
             style={{
               shadowColor: "#000",
               shadowOpacity: 0.04,
@@ -48,30 +49,32 @@ export const TrendFeed = React.memo(function TrendFeed() {
               elevation: 1,
             }}
           >
-            {/* Icon */}
+            {/* Inner card with icon */}
             <View
-              className="w-8 h-8 rounded-full items-center justify-center mb-2"
+              className="w-full aspect-square rounded-[12px] items-center justify-center mb-3"
               style={{
-                backgroundColor: trend.icon === "crown" ? "#F5B93A" : "#E54B4B",
+                backgroundColor: "#F4F4F6",
+                borderWidth: 1,
+                borderColor: "#E9EBF8",
               }}
             >
               {trend.icon === "crown" ? (
-                <IconCrown size={16} color="#ffffff" strokeWidth={2} />
+                <IconCrown size={32} color="#1D1A27" strokeWidth={1.5} />
               ) : (
-                <IconChartLine size={16} color="#ffffff" strokeWidth={2} />
+                <IconChartLine size={32} color="#1D1A27" strokeWidth={1.5} />
               )}
             </View>
 
             {/* Title */}
             <Text
-              className="text-[#1D1A27] font-bold mb-1"
+              className="text-[#1D1A27] font-bold mb-1 ml-1"
               style={{ fontSize: 13 }}
             >
               {trend.title}
             </Text>
 
             {/* Subtitle */}
-            <Text className="text-[#9B9BAF]" style={{ fontSize: 11 }}>
+            <Text className="text-[#9B9BAF] mb-2 ml-1" style={{ fontSize: 11 }}>
               {trend.subtitle}
             </Text>
           </View>
