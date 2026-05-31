@@ -23,6 +23,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
+      "navigationBarColor": "#2C2C2E",
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.myapp",
       "enableProguardInReleaseBuilds": true,

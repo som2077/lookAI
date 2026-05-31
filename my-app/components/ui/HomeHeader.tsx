@@ -19,16 +19,16 @@ export const HomeHeader = React.memo(function HomeHeader() {
     <View className="flex-row items-center justify-between ">
       <ExpoImage
         source={require("../../assets/images/getStartedLogo.png")}
-        style={{ height: 64, width: 224, marginLeft: -40 }}
+        style={{ height: 70, width: 224, marginLeft: -40 }}
         contentFit="contain"
         cachePolicy="memory-disk"
       />
 
-      <View className="flex-row items-center gap-2">
+      <View className="flex-row items-center gap-3">
         <TouchableOpacity
           onPress={() => router.push("/(root)/streak" as never)}
           activeOpacity={0.7}
-          className="flex-row items-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-4 py-2"
+          className="flex-row items-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-4 py-[9.9px]"
         >
           <Text className="text-base">
             <IconFlameFilled size={18} />
@@ -40,10 +40,10 @@ export const HomeHeader = React.memo(function HomeHeader() {
 
         <TouchableOpacity
           onPress={onCalendarPress}
-          className="items-center justify-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] px-2 py-2"
+          className="items-center justify-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] p-[9.2px]"
           activeOpacity={0.7}
         >
-          <IconCalendarWeekFilled size={18} color="#171421" />
+          <IconCalendarWeekFilled size={21} color="#171421" />
         </TouchableOpacity>
       </View>
     </View>

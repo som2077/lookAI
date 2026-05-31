@@ -2,13 +2,7 @@ import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Image as ExpoImage } from "expo-image";
 import { Pressable, View, Animated, Text } from "react-native";
 import { useRouter, type Href } from "expo-router";
-import React, {
-  ReactNode,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { ReactNode, useCallback, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   IconSmartHome,
@@ -114,10 +108,6 @@ export function CustomTabBar({
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const bottom = useMemo(
-    () => Math.max(16, insets.bottom + 8),
-    [insets.bottom],
-  );
   const [menuVisible, setMenuVisible] = useState(false);
 
   const handleNavigate = useCallback(
@@ -134,45 +124,105 @@ export function CustomTabBar({
         position: "absolute",
         left: 0,
         right: 0,
-        bottom,
-        paddingHorizontal: 16,
+        bottom: -50,
+        backgroundColor: "#2C2C2E",
+        // borderWidth: 1,
+        paddingBottom: 50,
       }}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {/* Main Tab Bar Pill */}
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderRadius: 999,
-            borderWidth: 0.5,
-            borderColor: "rgba(200, 200, 208, 0.6)",
-            backgroundColor: "rgba(255, 255, 255)",
-            paddingHorizontal: 7,
-            paddingVertical: 8,
-            height: 60,
-          }}
-        >
-          {state.routes.map((route, index) => {
-            const focused = state.index === index;
-            const options = descriptors[route.key]?.options;
-            const onPress = () => {
-              const event = navigation.emit({
-                type: "tabPress",
-                target: route.key,
-                canPreventDefault: true,
-              });
-              if (!focused && !event.defaultPrevented) {
-                navigation.navigate(route.name, route.params);
+      {/* Dark background strip */}
+      <View
+        style={{
+          backgroundColor: "#FFFFFF",
+          // borderColor:
+          // borderWidth: 1,
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: insets.bottom + 12,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {/* Main Tab Bar Pill */}
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderRadius: 999,
+              backgroundColor: "#FFFFFF",
+              borderWidth: 1,
+              borderColor: "#E5E5EA",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+              paddingHorizontal: 7,
+              paddingVertical: 8,
+              height: 60,
+            }}
+          >
+            {state.routes.map((route, index) => {
+              const focused = state.index === index;
+              const options = descriptors[route.key]?.options;
+              const onPress = () => {
+                const event = navigation.emit({
+                  type: "tabPress",
+                  target: route.key,
+                  canPreventDefault: true,
+                });
+                if (!focused && !event.defaultPrevented) {
+                  navigation.navigate(route.name, route.params);
+                }
+              };
+
+              const label = options?.title ?? route.name;
+
+              // Profile tab — avatar icon
+              if (route.name === "profile") {
+                return (
+                  <AnimatedTabButton
+                    key={route.key}
+                    focused={focused}
+                    onPress={onPress}
+                    label={label}
+                    testID={options?.tabBarButtonTestID}
+                  >
+                    <View
+                      style={[
+                        {
+                          height: 28,
+                          width: 28,
+                          borderRadius: 14,
+                          overflow: "hidden",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        },
+                        {
+                          borderWidth: 14,
+                          borderColor: focused ? "#5ECFC2" : "#C8C8D0",
+                        },
+                      ]}
+                    >
+                      <ExpoImage
+                        source={require("../../assets/images/kribb.png")}
+                        style={{ height: 28, width: 28, borderRadius: 14 }}
+                        contentFit="cover"
+                        cachePolicy="memory-disk"
+                      />
+                    </View>
+                  </AnimatedTabButton>
+                );
               }
-            };
 
-            const label = options?.title ?? route.name;
+              const IconComponent = TAB_CONFIG[route.name];
+              const iconColor = focused ? "#000000" : "#9898A6";
+              if (!IconComponent) return null;
 
-            // Profile tab — avatar icon
-            if (route.name === "profile") {
               return (
                 <AnimatedTabButton
                   key={route.key}
@@ -181,66 +231,32 @@ export function CustomTabBar({
                   label={label}
                   testID={options?.tabBarButtonTestID}
                 >
-                  <View
-                    style={[
-                      {
-                        height: 28,
-                        width: 28,
-                        borderRadius: 14,
-                        overflow: "hidden",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      },
-                      {
-                        borderWidth: 14,
-                        borderColor: focused ? "#5ECFC2" : "#C8C8D0",
-                      },
-                    ]}
-                  >
-                    <ExpoImage
-                      source={require("../../assets/images/kribb.png")}
-                      style={{ height: 28, width: 28, borderRadius: 14 }}
-                      contentFit="cover"
-                      cachePolicy="memory-disk"
-                    />
-                  </View>
+                  <IconComponent
+                    size={25}
+                    color={iconColor}
+                    strokeWidth={1.5}
+                  />
                 </AnimatedTabButton>
               );
-            }
+            })}
+          </View>
 
-            const IconComponent = TAB_CONFIG[route.name];
-            const iconColor = focused ? "#161421" : "#9898A6";
-            if (!IconComponent) return null;
-
-            return (
-              <AnimatedTabButton
-                key={route.key}
-                focused={focused}
-                onPress={onPress}
-                label={label}
-                testID={options?.tabBarButtonTestID}
-              >
-                <IconComponent size={25} color={iconColor} strokeWidth={1.5} />
-              </AnimatedTabButton>
-            );
-          })}
+          {/* Plus / Add Button */}
+          <Pressable
+            onPress={() => setMenuVisible(true)}
+            style={{
+              marginLeft: 12,
+              height: 60,
+              width: 60,
+              borderRadius: 30,
+              backgroundColor: "#1A1827",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <IconPlus size={30} color="#FFFFFF" strokeWidth={2.5} />
+          </Pressable>
         </View>
-
-        {/* Plus / Add Button */}
-        <Pressable
-          onPress={() => setMenuVisible(true)}
-          style={{
-            marginLeft: 12,
-            height: 60,
-            width: 60,
-            borderRadius: 30,
-            backgroundColor: "#1A1827",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <IconPlus size={30} color="#FFFFFF" strokeWidth={2.5} />
-        </Pressable>
       </View>
 
       <AddActionMenu

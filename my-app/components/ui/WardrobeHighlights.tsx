@@ -85,12 +85,12 @@ const HighlightCard = React.memo(function HighlightCard({
       }}
     >
       {/* Header with title and tag */}
-      <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-[#1D1A27] font-bold" style={{ fontSize: 13 }}>
+      <View className="flex-row items-center justify-between mb-3 mt-[-7] ml-2">
+        <Text className="text-[#1D1A27] font-bold" style={{ fontSize: 14 }}>
           {title}
         </Text>
         <View
-          className="px-2 py-[2px] rounded-full"
+          className="px-3 py-1.5 mr-1 rounded-full"
           style={{ backgroundColor: tagColor }}
         >
           <Text className="text-white text-[10px] font-bold">{tag}</Text>
@@ -98,7 +98,7 @@ const HighlightCard = React.memo(function HighlightCard({
       </View>
 
       {/* Progress and subtitle */}
-      <View className="flex-row items-center gap-2">
+      <View className="flex-row items-center gap-2 ml-1">
         <ProgressCircle progress={progress} color={progressColor} />
         <Text className="text-[#9B9BAF]" style={{ fontSize: 11 }}>
           {subtitle}
@@ -112,11 +112,11 @@ export const WardrobeHighlights = React.memo(function WardrobeHighlights() {
   const router = useRouter();
 
   return (
-    <View className="mt-4 mb-2">
+    <View className="mt-8 mb-2">
       {/* Header */}
       <View className="flex-row items-center justify-between mx-8 mb-3">
-        <Text className="text-[#1D1A27] text-lg font-bold">
-          Wardrobe highlights
+        <Text className="text-[#1D1A27] text-xl font-bold">
+          Wardrobe Highlights
         </Text>
         <TouchableOpacity
           onPress={() => router.navigate("/(root)/(tabs)/wardrobe" as never)}
@@ -128,7 +128,7 @@ export const WardrobeHighlights = React.memo(function WardrobeHighlights() {
       </View>
 
       {/* Two columns */}
-      <View className="flex-row gap-3 mx-5">
+      <View className="flex-row gap-2 mx-6">
         {/* New column */}
         <View className="flex-1">
           {MOCK_HIGHLIGHTS.new.map((item) => (
@@ -137,7 +137,7 @@ export const WardrobeHighlights = React.memo(function WardrobeHighlights() {
               title={item.title}
               wears={item.wears}
               tag="new"
-              tagColor="#E54B4B"
+              tagColor="#000000"
               progressColor="#E54B4B"
               subtitle={`${item.wears} wears / Added today`}
             />

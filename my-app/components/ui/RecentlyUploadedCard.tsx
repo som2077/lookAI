@@ -6,7 +6,7 @@ import { useOutfitAnalysisStore } from "@/backend/store/outfit-analysis-store";
 export const RecentlyUploadedHeading = React.memo(
   function RecentlyUploadedHeading() {
     return (
-      <Text className="text-[#1D1A27] text-lg font-bold mx-8 mt-4">
+      <Text className="text-[#1D1A27] text-xl font-bold mx-8 mt-4">
         Recently Styled
       </Text>
     );
@@ -22,7 +22,7 @@ export const NotifyBanner = React.memo(function NotifyBanner() {
 
   return (
     <View
-      className="mx-5 mt-2 mb-2 flex-row items-center justify-between bg-white rounded-[16px] px-4 py-4"
+      className="mx-6  mt-2 mb-2 flex-row items-center justify-between bg-white rounded-[16px] px-4 py-4"
       style={{
         shadowColor: "#000000",
         shadowOpacity: 0.04,
@@ -32,12 +32,15 @@ export const NotifyBanner = React.memo(function NotifyBanner() {
       }}
     >
       <View className="flex-row items-center flex-1 pr-3">
-        <IconBell size={24} color="#000000" strokeWidth={1.5} />
+        <IconBell size={23} color="#000000" strokeWidth={1.5} />
         <Text
           className="ml-3 text-[#1D1A27]"
-          style={{ fontSize: 13, lineHeight: 18, flex: 1 }}
+          style={{ fontSize: 12, lineHeight: 18, flex: 1 }}
         >
-          We&apos;ll notify you when the analysis is done.
+          Feel free to leave this screen or use other apps.{"\n"}
+          We&apos;ll send you a notification when your analysis is ready.
+          {/* You can switch apps or turn off your phone.
+          We&apos;ll notify you when the analysis is done. */}
         </Text>
       </View>
       <Pressable onPress={() => setIsDismissed(true)} hitSlop={10}>
@@ -55,7 +58,7 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
 
   return (
     <View
-      className="mx-5 mt-2 mb-2 items-center justify-center bg-white rounded-[16px] px-4 py-8"
+      className="mx-6 mt-3 mb-2 items-center justify-center bg-white rounded-[16px] px-4 py-6"
       style={{
         shadowColor: "#000000",
         shadowOpacity: 0.04,
@@ -66,9 +69,9 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
     >
       <View
         className="items-center justify-center rounded-full"
-        style={{ width: 64, height: 64, backgroundColor: "#EBEBEB" }}
+        style={{ width: 64, height: 64, backgroundColor: "#F8F7FC" }}
       >
-        <IconShirt size={32} color="#000000" strokeWidth={1.5} />
+        <IconShirt size={30} color="#000000" strokeWidth={1.5} />
       </View>
       <Text
         className="text-[#1D1A27] mt-4 text-center"
