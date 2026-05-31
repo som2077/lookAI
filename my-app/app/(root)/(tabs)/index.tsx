@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Dimensions, FlatList, ScrollView, View } from "react-native";
+import { Animated, Dimensions, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
@@ -21,6 +21,9 @@ import { WardrobeHighlights } from "../../../components/ui/WardrobeHighlights";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const H_PADDING = 20;
 
+// Approximate height of HomeHeader + WeeklyCalendarStrip combined
+const HEADER_HEIGHT = 140;
+
 const RING_SEGMENT_BASE: readonly Omit<RingProgressSegment, "progress">[] = [
   { id: "outer", color: "#F5B93A", radius: 58, strokeWidth: 8 },
   { id: "middle", color: "#E54B4B", radius: 48, strokeWidth: 8 },
@@ -41,6 +44,7 @@ export default function HomeScreen() {
   const { summary } = useWardrobeSummary(user?.id);
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const ringSegments = useMemo<readonly RingProgressSegment[]>(() => {
     const totalTracked = summary.wearCount + summary.neverCount;
@@ -81,65 +85,94 @@ export default function HomeScreen() {
     </View>
   );
 
+  // Header stays in place (translateY counteracts scroll), clamped to HEADER_HEIGHT
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, HEADER_HEIGHT],
+    outputRange: [0, HEADER_HEIGHT],
+    extrapolate: "clamp",
+  });
+
+  // Fade out header as content scrolls over it
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, HEADER_HEIGHT * 0.6, HEADER_HEIGHT],
+    outputRange: [1, 0.6, 0],
+    extrapolate: "clamp",
+  });
+
   return (
     <SwipeTabWrapper tabIndex={0}>
       <AppGradientBackground>
         <SafeAreaView className="flex-1">
-          <ScrollView
+          <Animated.ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 24 }}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: true },
+            )}
+            scrollEventThrottle={16}
           >
-            {/* Header & calendar */}
-            <View className="px-7">
-              <HomeHeader />
-              <WeeklyCalendarStrip />
-            </View>
-
-            {/* FlatList full-width — pagingEnabled snaps correctly */}
-            <FlatList
-              ref={flatListRef}
-              data={[...CARDS] as CardKey[]}
-              keyExtractor={(item) => item}
-              renderItem={renderCard}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              onViewableItemsChanged={onViewableItemsChanged}
-              viewabilityConfig={viewabilityConfig}
-              style={{ flexGrow: 0 }}
-              scrollEnabled
-            />
-
-            {/* Pagination dots */}
-            <View
+            {/* Header & calendar — parallax: stays in place, content scrolls over */}
+            <Animated.View
               style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: 10,
-                gap: 7,
+                paddingHorizontal: 28,
+                transform: [{ translateY: headerTranslateY }],
+                opacity: headerOpacity,
+                zIndex: 0,
               }}
             >
-              {CARDS.map((_, i) => (
-                <View
-                  key={i}
-                  style={{
-                    width: i === activeIndex ? 8 : 7,
-                    height: i === activeIndex ? 8 : 7,
-                    borderRadius: 5,
-                    backgroundColor: i === activeIndex ? "#1C1C1E" : "#C7C7C7",
-                  }}
-                />
-              ))}
-            </View>
+              <HomeHeader />
+              <WeeklyCalendarStrip />
+            </Animated.View>
 
-            <RecentlyUploadedHeading />
-            <NotifyBanner />
-            <EmptyStyleBanner />
-            <OutfitAnalyzingCard />
-            <WardrobeHighlights />
-            <TrendFeed />
-          </ScrollView>
+            {/* Scrollable content — scrolls over the header */}
+            <View style={{ zIndex: 1, position: "relative" }}>
+              {/* FlatList full-width — pagingEnabled snaps correctly */}
+              <FlatList
+                ref={flatListRef}
+                data={[...CARDS] as CardKey[]}
+                keyExtractor={(item) => item}
+                renderItem={renderCard}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onViewableItemsChanged={onViewableItemsChanged}
+                viewabilityConfig={viewabilityConfig}
+                style={{ flexGrow: 0 }}
+                scrollEnabled
+              />
+
+              {/* Pagination dots */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 10,
+                  gap: 7,
+                }}
+              >
+                {CARDS.map((_, i) => (
+                  <View
+                    key={i}
+                    style={{
+                      width: i === activeIndex ? 8 : 7,
+                      height: i === activeIndex ? 8 : 7,
+                      borderRadius: 5,
+                      backgroundColor: i === activeIndex ? "#1C1C1E" : "#C7C7C7",
+                    }}
+                  />
+                ))}
+              </View>
+
+              <RecentlyUploadedHeading />
+              <NotifyBanner />
+              <EmptyStyleBanner />
+              <OutfitAnalyzingCard />
+              <WardrobeHighlights />
+              <TrendFeed />
+            </View>
+          </Animated.ScrollView>
         </SafeAreaView>
       </AppGradientBackground>
     </SwipeTabWrapper>
