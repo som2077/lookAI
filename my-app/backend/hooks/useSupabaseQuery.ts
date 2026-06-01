@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { useSupabase } from "./useSupabase";
+import { useErrorStore } from "../../components/ui/ErrorStateView";
 
 type QueryBuilder = ReturnType<
   ReturnType<
@@ -52,11 +53,18 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
 
       setData((rows ?? []) as unknown as T[]);
     } catch (unknownError) {
-      setError(
+      const err =
         unknownError instanceof Error
           ? unknownError
-          : new Error("Failed to fetch Supabase data."),
-      );
+          : new Error("Failed to fetch Supabase data.");
+      setError(err);
+
+      // Trigger global offline or server down flags on fetch failure
+      if (err.message.includes("Network request failed") || err.message.includes("fetch")) {
+        useErrorStore.getState().setOffline(true);
+      } else {
+        useErrorStore.getState().setServerError(true);
+      }
     } finally {
       setLoading(false);
     }

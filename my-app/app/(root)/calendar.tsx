@@ -29,8 +29,18 @@ const PADDING = 20;
 const CELL_WIDTH = (SCREEN_WIDTH - PADDING * 2 - CELL_GAP * 6) / 7;
 
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
@@ -53,7 +63,8 @@ const LOGGED_OUTFITS_DATA: Record<string, LoggedOutfit> = {
     itemsWorn: "Beige Knit Polo · Charcoal Chinos · White Sneakers",
     itemCount: 3,
     score: 94,
-    description: "Worn for daily activities. Structured texture and clean color contrasts provided A-grade coordination.",
+    description:
+      "Worn for daily activities. Structured texture and clean color contrasts provided A-grade coordination.",
   },
   // Yesterday's log
   [new Date(Date.now() - 86400000).toDateString()]: {
@@ -62,7 +73,8 @@ const LOGGED_OUTFITS_DATA: Record<string, LoggedOutfit> = {
     itemsWorn: "White Shirt · Grey Blazer · Chinos",
     itemCount: 3,
     score: 92,
-    description: "Worn for meetings. Crisp white base layered with structured blazers keeps style consistency high.",
+    description:
+      "Worn for meetings. Crisp white base layered with structured blazers keeps style consistency high.",
   },
   // Three days ago
   [new Date(Date.now() - 86400000 * 3).toDateString()]: {
@@ -71,7 +83,8 @@ const LOGGED_OUTFITS_DATA: Record<string, LoggedOutfit> = {
     itemsWorn: "White Linen Shirt · Navy Trousers · Tan Derby",
     itemCount: 3,
     score: 98,
-    description: "Worn for casual brunch. Extreme comfort linen fabrics coordinate perfectly with sunny clear weather.",
+    description:
+      "Worn for casual brunch. Extreme comfort linen fabrics coordinate perfectly with sunny clear weather.",
   },
 };
 
@@ -85,20 +98,20 @@ const isSameDay = (a: Date, b: Date) =>
 function buildCalendarDays(year: number, month: number): Date[] {
   const firstDay = new Date(year, month, 1);
   const startOffset = firstDay.getDay(); // Sunday = 0
-  
+
   const days: Date[] = [];
-  
+
   // Padding previous month's final days
   for (let i = startOffset - 1; i >= 0; i--) {
     days.push(new Date(year, month, -i));
   }
-  
+
   // Current month days
   const lastDay = new Date(year, month + 1, 0);
   for (let d = 1; d <= lastDay.getDate(); d++) {
     days.push(new Date(year, month, d));
   }
-  
+
   // Padding next month's starting days
   const remaining = 7 - (days.length % 7);
   if (remaining < 7) {
@@ -106,7 +119,7 @@ function buildCalendarDays(year: number, month: number): Date[] {
       days.push(new Date(year, month + 1, d));
     }
   }
-  
+
   return days;
 }
 
@@ -122,7 +135,7 @@ export default function CalendarScreen() {
 
   const days = useMemo(
     () => buildCalendarDays(viewYear, viewMonth),
-    [viewYear, viewMonth]
+    [viewYear, viewMonth],
   );
 
   const handleDaySelect = useCallback((date: Date) => {
@@ -141,7 +154,10 @@ export default function CalendarScreen() {
   }, [selected]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F7FC" }} edges={["top"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "#FFFFFF" }}
+      edges={["top"]}
+    >
       <StatusBar style="dark" />
 
       {/* Nav Header */}
@@ -254,12 +270,14 @@ export default function CalendarScreen() {
                 width: CELL_WIDTH,
                 height: CELL_WIDTH,
                 borderRadius: 12,
-                backgroundColor: "#F1F1F5",
+                backgroundColor: "#000000",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Text style={{ fontSize: 12, fontWeight: "700", color: "#9B9BAF" }}>
+              <Text
+                style={{ fontSize: 12, fontWeight: "700", color: "#9B9BAF" }}
+              >
                 {label}
               </Text>
             </View>
@@ -269,7 +287,14 @@ export default function CalendarScreen() {
         {/* Calendar days cells grid */}
         <View style={{ paddingHorizontal: 20 }}>
           {Array.from({ length: days.length / 7 }, (_, weekIdx) => (
-            <View key={weekIdx} style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: CELL_GAP }}>
+            <View
+              key={weekIdx}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: CELL_GAP,
+              }}
+            >
               {days.slice(weekIdx * 7, weekIdx * 7 + 7).map((date) => {
                 const isSelected = isSameDay(date, selected);
                 const isToday = isSameDay(date, today);
@@ -338,14 +363,16 @@ export default function CalendarScreen() {
                 }}
               >
                 {selectedLog.wornTime.split(" ")[0]}
-                <Text style={{ fontSize: 10, fontWeight: "600", color: "#9B9BAF" }}>
-                  {" "}{selectedLog.wornTime.split(" ")[1]}
+                <Text
+                  style={{ fontSize: 10, fontWeight: "600", color: "#9B9BAF" }}
+                >
+                  {" "}
+                  {selectedLog.wornTime.split(" ")[1]}
                 </Text>
               </Text>
 
               {/* Right Cards Stack */}
               <View style={{ flex: 1, gap: 12 }}>
-                
                 {/* 1. Main log card description */}
                 <View
                   style={{
@@ -360,20 +387,47 @@ export default function CalendarScreen() {
                     shadowOffset: { width: 0, height: 1 },
                   }}
                 >
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                    <Text style={{ fontSize: 15, fontWeight: "800", color: "#1D1A27" }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        fontWeight: "800",
+                        color: "#1D1A27",
+                      }}
+                    >
                       {selectedLog.title}
                     </Text>
                     <TouchableOpacity style={{ padding: 4 }}>
                       <IconDots size={16} color="#9B9BAF" />
                     </TouchableOpacity>
                   </View>
-                  
-                  <Text style={{ fontSize: 11, color: "#5A5A6A", marginTop: 4, fontWeight: "500" }}>
+
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      color: "#5A5A6A",
+                      marginTop: 4,
+                      fontWeight: "500",
+                    }}
+                  >
                     {selectedLog.itemsWorn}
                   </Text>
-                  
-                  <Text style={{ fontSize: 11, color: "#9B9BAF", marginTop: 8, lineHeight: 15, fontWeight: "500" }}>
+
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      color: "#9B9BAF",
+                      marginTop: 8,
+                      lineHeight: 15,
+                      fontWeight: "500",
+                    }}
+                  >
                     {selectedLog.description}
                   </Text>
                 </View>
@@ -390,23 +444,55 @@ export default function CalendarScreen() {
                     borderColor: "#EAE8FF",
                   }}
                 >
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     {/* Item count */}
                     <View>
-                      <Text style={{ fontSize: 10, color: "#9B9BAF", fontWeight: "600" }}>
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          color: "#9B9BAF",
+                          fontWeight: "600",
+                        }}
+                      >
                         Items Worn
                       </Text>
-                      <Text style={{ fontSize: 24, fontWeight: "800", color: "#4C36F5", marginTop: 2 }}>
+                      <Text
+                        style={{
+                          fontSize: 24,
+                          fontWeight: "800",
+                          color: "#4C36F5",
+                          marginTop: 2,
+                        }}
+                      >
                         {selectedLog.itemCount}
                       </Text>
                     </View>
 
                     {/* Usage score */}
                     <View>
-                      <Text style={{ fontSize: 10, color: "#9B9BAF", fontWeight: "600" }}>
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          color: "#9B9BAF",
+                          fontWeight: "600",
+                        }}
+                      >
                         Usage Score
                       </Text>
-                      <Text style={{ fontSize: 24, fontWeight: "800", color: "#4C36F5", marginTop: 2 }}>
+                      <Text
+                        style={{
+                          fontSize: 24,
+                          fontWeight: "800",
+                          color: "#4C36F5",
+                          marginTop: 2,
+                        }}
+                      >
                         {selectedLog.score}%
                       </Text>
                     </View>
@@ -444,11 +530,14 @@ export default function CalendarScreen() {
                 }}
               >
                 09:00
-                <Text style={{ fontSize: 10, fontWeight: "600", color: "#9B9BAF" }}>
-                  {" "}AM
+                <Text
+                  style={{ fontSize: 10, fontWeight: "600", color: "#9B9BAF" }}
+                >
+                  {" "}
+                  AM
                 </Text>
               </Text>
-              
+
               <View
                 style={{
                   flex: 1,
@@ -462,11 +551,25 @@ export default function CalendarScreen() {
                   height: 120,
                 }}
               >
-                <Text style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27", marginBottom: 4 }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "700",
+                    color: "#1D1A27",
+                    marginBottom: 4,
+                  }}
+                >
                   No outfit logged
                 </Text>
-                <Text style={{ fontSize: 11, color: "#9B9BAF", textAlign: "center", fontWeight: "500" }}>
-                  Tap the '+' icon above to log what you wore today.
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: "#9B9BAF",
+                    textAlign: "center",
+                    fontWeight: "500",
+                  }}
+                >
+                  Tap the &#39;+&#39; icon above to log what you wore today.
                 </Text>
               </View>
             </View>
@@ -503,10 +606,24 @@ export default function CalendarScreen() {
               shadowOffset: { width: 0, height: 4 },
             }}
           >
-            <Text style={{ fontSize: 16, fontWeight: "800", color: "#1D1A27", marginBottom: 14, textAlign: "center" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "800",
+                color: "#1D1A27",
+                marginBottom: 14,
+                textAlign: "center",
+              }}
+            >
               Select Month
             </Text>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+              }}
+            >
               {MONTH_NAMES.map((m, idx) => (
                 <TouchableOpacity
                   key={idx}

@@ -14,6 +14,11 @@ import { BillingService } from "@/billing/BillingService";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import * as SecureStore from "expo-secure-store";
 import { memo, useCallback, useEffect, useState } from "react";
+import {
+  useErrorStore,
+  ErrorStateView,
+  AppErrorBoundary,
+} from "../components/ui/ErrorStateView";
 
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -159,11 +164,46 @@ const RootNavigator = memo(function RootNavigator() {
 });
 
 export default function RootLayout() {
+  const { setOffline, setServerError } = useErrorStore();
+
+  const checkConnectivity = useCallback(async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      
+      const targetUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "https://google.com";
+      const response = await fetch(targetUrl, {
+        method: "HEAD",
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+
+      if (response.status >= 500) {
+        setServerError(true);
+        setOffline(false);
+      } else {
+        setOffline(false);
+        setServerError(false);
+      }
+    } catch (err) {
+      console.warn("Connectivity check failed:", err);
+      setOffline(true);
+    }
+  }, [setOffline, setServerError]);
+
   useEffect(() => {
+    // Initial check on mount
+    checkConnectivity();
+
+    // Periodic check every 15 seconds
+    const interval = setInterval(checkConnectivity, 15000);
+    
     return () => {
+      clearInterval(interval);
       void BillingService.disconnect();
     };
-  }, []);
+  }, [checkConnectivity]);
 
   return (
     <GestureHandlerRootView className="flex-1">
@@ -171,7 +211,10 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <StatusBar style="dark" />
           <OnboardingProvider>
-            <RootNavigator />
+            <AppErrorBoundary>
+              <RootNavigator />
+              <ErrorStateView onRetry={checkConnectivity} />
+            </AppErrorBoundary>
           </OnboardingProvider>
         </SafeAreaProvider>
       </ClerkProvider>
