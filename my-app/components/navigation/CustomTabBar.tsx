@@ -11,6 +11,7 @@ import {
   IconHanger,
   IconSparkles,
   IconTrendingUp,
+  IconBookmark,
   type IconProps,
 } from "@tabler/icons-react-native";
 import { AddActionMenu } from "./AddActionMenu";
@@ -20,7 +21,7 @@ type TabConfig = Record<string, TabIconComponent>;
 
 const TAB_CONFIG: TabConfig = {
   index: IconSmartHome,
-  saved: IconHanger,
+  saved: IconBookmark,
   wardrobe: IconMesh,
 };
 

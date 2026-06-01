@@ -12,14 +12,11 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   IconSearch,
-  IconAdjustmentsHorizontal,
   IconHeart,
-  IconHanger,
-  IconShirt,
-  IconShoe,
-  IconScissors,
-  IconLayoutGrid,
+  IconPlus,
+  IconSparkles,
 } from "@tabler/icons-react-native";
+import { Image as ExpoImage } from "expo-image";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -29,139 +26,101 @@ interface SavedOutfit {
   name: string;
   occasion: string;
   wears: number;
-  items: {
+  image: string;
+  match: number;
+  tags: string[];
+  bgColor?: string;
+  items?: {
     id: string;
     name: string;
     category: "top" | "bottoms" | "footwear" | "outerwear" | "accessory";
   }[];
-  bgColor: string;
+}
+
+interface SavedCollection {
+  id: string;
+  name: string;
+  count: number;
+  image: string;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const GRID_GAP = 12;
+const GRID_GAP = 16;
 const GRID_PADDING = 24;
 const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
 
-const CATEGORY_ICONS = {
-  top: IconShirt,
-  bottoms: IconScissors,
-  footwear: IconShoe,
-  outerwear: IconShirt,
-  accessory: IconHanger,
-};
+const FILTER_CHIPS = ["All", "Outfits", "Clothes", "Inspo"];
 
-const FILTER_CHIPS = ["All", "Casual", "Office", "Festive", "Formal"];
+const INITIAL_COLLECTIONS: SavedCollection[] = [
+  {
+    id: "col-1",
+    name: "Work Fits",
+    count: 12,
+    image:
+      "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=500&auto=format&fit=crop&q=60",
+  },
+  {
+    id: "col-2",
+    name: "Casual",
+    count: 8,
+    image:
+      "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500&auto=format&fit=crop&q=60",
+  },
+  {
+    id: "col-3",
+    name: "Party",
+    count: 5,
+    image:
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=500&auto=format&fit=crop&q=60",
+  },
+];
 
 const INITIAL_OUTFITS: SavedOutfit[] = [
   {
     id: "outfit-1",
-    name: "Summer Chic",
-    occasion: "Casual",
+    name: "Office Sharp",
+    occasion: "Office",
     wears: 8,
-    bgColor: "#FFF4E6", // Light Orange
-    items: [
-      { id: "1", name: "White Shirt", category: "top" },
-      { id: "2", name: "Black Jeans", category: "bottoms" },
-      { id: "4", name: "Sneakers", category: "footwear" },
-    ],
+    image:
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=500&auto=format&fit=crop&q=60",
+    match: 96,
+    tags: ["Work", "Formal"],
   },
   {
     id: "outfit-2",
-    name: "Work Classic",
-    occasion: "Office",
+    name: "Weekend Vibe",
+    occasion: "Casual",
     wears: 4,
-    bgColor: "#EBF3FE", // Light Blue
-    items: [
-      { id: "5", name: "Grey Blazer", category: "outerwear" },
-      { id: "1", name: "White Shirt", category: "top" },
-      { id: "6", name: "Beige Chinos", category: "bottoms" },
-    ],
+    image:
+      "https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=500&auto=format&fit=crop&q=60",
+    match: 91,
+    tags: ["Casual", "Denim"],
   },
   {
     id: "outfit-3",
-    name: "Festive Vibes",
+    name: "Night Out",
     occasion: "Festive",
     wears: 2,
-    bgColor: "#FFF0F5", // Light Pink
-    items: [
-      { id: "3", name: "Blue Kurta", category: "top" },
-      { id: "6", name: "Beige Chinos", category: "bottoms" },
-    ],
+    image:
+      "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=500&auto=format&fit=crop&q=60",
+    match: 88,
+    tags: ["Party", "Bold"],
   },
   {
     id: "outfit-4",
-    name: "Weekend Chill",
+    name: "Summer Light",
     occasion: "Casual",
     wears: 12,
-    bgColor: "#EBFBEE", // Light Green
-    items: [
-      { id: "1", name: "White Shirt", category: "top" },
-      { id: "6", name: "Beige Chinos", category: "bottoms" },
-      { id: "4", name: "Sneakers", category: "footwear" },
-    ],
+    image:
+      "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=500&auto=format&fit=crop&q=60",
+    match: 93,
+    tags: ["Casual", "Light"],
   },
 ];
 
 // ─── Sub-Components ──────────────────────────────────────────────────────────
-
-const OutfitPreview = React.memo(function OutfitPreview({
-  items,
-  bgColor,
-}: {
-  items: SavedOutfit["items"];
-  bgColor: string;
-}) {
-  return (
-    <View
-      style={{
-        height: 110,
-        backgroundColor: bgColor,
-        borderRadius: 16,
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "row",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {items.slice(0, 3).map((item, index) => {
-        const Icon = CATEGORY_ICONS[item.category] || IconHanger;
-
-        const rotate = index === 0 ? "-8deg" : index === 2 ? "8deg" : "0deg";
-        const translateX = index === 0 ? -10 : index === 2 ? 10 : 0;
-        const zIndex = index === 1 ? 2 : 1;
-        const scale = index === 1 ? 1.05 : 0.95;
-
-        return (
-          <View
-            key={item.id}
-            style={{
-              width: 44,
-              height: 54,
-              backgroundColor: "#FFFFFF",
-              borderRadius: 10,
-              borderWidth: 1,
-              borderColor: "#E2E2EA",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex,
-              shadowColor: "#000",
-              shadowOpacity: 0.03,
-              shadowRadius: 2,
-              shadowOffset: { width: 0, height: 1 },
-              transform: [{ rotate }, { translateX }, { scale }],
-              elevation: zIndex,
-            }}
-          >
-            <Icon size={18} color="#9B9BAF" strokeWidth={1.5} />
-          </View>
-        );
-      })}
-    </View>
-  );
-});
 
 const OutfitCard = React.memo(function OutfitCard({
   outfit,
@@ -177,70 +136,127 @@ const OutfitCard = React.memo(function OutfitCard({
         backgroundColor: "#FFFFFF",
         borderRadius: 24,
         borderWidth: 1,
-        borderColor: "#E2E2EA",
-        padding: 12,
-        marginBottom: GRID_GAP,
+        borderColor: "#E9EBF8",
+        padding: 6,
+        marginBottom: 16,
+        shadowColor: "#000",
+        shadowOpacity: 0.03,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 1,
       }}
     >
-      {/* Visual overlapping cards */}
-      <OutfitPreview items={outfit.items} bgColor={outfit.bgColor} />
+      {/* Visual aspect-ratio vertical block (nested inner card) */}
+      <View
+        style={{
+          width: "100%",
+          height: 190,
+          borderRadius: 18,
+          // margin: 2,
+          overflow: "hidden",
+          position: "relative",
+          backgroundColor: "#F4F4F6",
+        }}
+      >
+        <ExpoImage
+          source={{ uri: outfit.image }}
+          style={{ width: "100%", height: "100%" }}
+          contentFit="cover"
+        />
 
-      {/* Outfit Title & Occasion */}
-      <View style={{ marginTop: 12 }}>
+        {/* Overlapping top-left match rating badge */}
         <View
           style={{
+            position: "absolute",
+            top: 12,
+            left: 12,
             flexDirection: "row",
-            justifyContent: "space-between",
             alignItems: "center",
+            backgroundColor: "rgba(29, 26, 39, 0.6)",
+            borderRadius: 12,
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            gap: 4,
           }}
         >
+          <IconSparkles size={11} color="#10B981" fill="#10B981" />
           <Text
-            numberOfLines={1}
             style={{
-              fontSize: 14,
+              color: "#FFFFFF",
+              fontSize: 11,
               fontWeight: "700",
-              color: "#1D1A27",
-              flex: 1,
-              marginRight: 6,
             }}
           >
-            {outfit.name}
+            {outfit.match}%
           </Text>
-
-          <Pressable onPress={() => onUnsave(outfit.id)} style={{ padding: 4 }}>
-            <IconHeart
-              size={18}
-              color="#EF4444"
-              fill="#EF4444"
-              strokeWidth={1.5}
-            />
-          </Pressable>
         </View>
+
+        {/* Overlapping top-right heart badge */}
+        <Pressable
+          onPress={() => onUnsave(outfit.id)}
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: "rgba(29, 26, 39, 0.4)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconHeart
+            size={16}
+            color="#FFFFFF"
+            fill="#FFFFFF"
+            strokeWidth={1.5}
+          />
+        </Pressable>
+      </View>
+
+      {/* Outfit Title & Tags */}
+      <View style={{ marginTop: 10, paddingHorizontal: 4 }}>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: 14,
+            fontWeight: "700",
+            color: "#1D1A27",
+          }}
+        >
+          {outfit.name}
+        </Text>
 
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 6,
             marginTop: 8,
           }}
         >
-          <View
-            style={{
-              backgroundColor: "#F4F4F6",
-              borderRadius: 6,
-              paddingHorizontal: 6,
-              paddingVertical: 2,
-            }}
-          >
-            <Text style={{ fontSize: 9, color: "#9B9BAF", fontWeight: "600" }}>
-              {outfit.occasion}
-            </Text>
-          </View>
-
-          <Text style={{ fontSize: 9, color: "#9B9BAF", fontWeight: "500" }}>
-            Worn {outfit.wears}×
-          </Text>
+          {outfit.tags.map((tag) => (
+            <View
+              key={tag}
+              style={{
+                backgroundColor: "#F4F4F6",
+                borderRadius: 12,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 10,
+                  color: "#5A5A6A",
+                  fontWeight: "600",
+                }}
+              >
+                {tag}
+              </Text>
+            </View>
+          ))}
         </View>
       </View>
     </Pressable>
@@ -324,8 +340,8 @@ export default function SavedScreen() {
   const [outfits, setOutfits] = useState<SavedOutfit[]>(INITIAL_OUTFITS);
 
   const filteredOutfits = useMemo(() => {
-    if (activeChip === "All") return outfits;
-    return outfits.filter((outfit) => outfit.occasion === activeChip);
+    if (activeChip === "All" || activeChip === "Outfits") return outfits;
+    return [];
   }, [activeChip, outfits]);
 
   const handleUnsave = useCallback((id: string) => {
@@ -347,7 +363,7 @@ export default function SavedScreen() {
 
   return (
     <SwipeTabWrapper tabIndex={2}>
-      <View style={{ flex: 1, backgroundColor: "#F8F7FC" }}>
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <StatusBar style="dark" />
         <SafeAreaView className="flex-1" edges={["top"]}>
           {/* Header */}
@@ -357,32 +373,34 @@ export default function SavedScreen() {
               alignItems: "center",
               justifyContent: "space-between",
               paddingHorizontal: 24,
-              paddingTop: 8,
+              paddingTop: 16,
               paddingBottom: 16,
             }}
           >
-            <Text
+            <View>
+              <Text
+                style={{
+                  fontSize: 32,
+                  fontWeight: "800",
+                  color: "#1D1A27",
+                }}
+              >
+                Saved
+              </Text>
+            </View>
+
+            <Pressable
               style={{
-                fontSize: 28,
-                fontWeight: "800",
-                color: "#1D1A27",
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "#F4F4F6",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              Saved Outfits
-            </Text>
-
-            <View style={{ flexDirection: "row", gap: 16 }}>
-              <Pressable>
-                <IconSearch size={22} color="#1D1A27" strokeWidth={2} />
-              </Pressable>
-              <Pressable>
-                <IconAdjustmentsHorizontal
-                  size={22}
-                  color="#1D1A27"
-                  strokeWidth={2}
-                />
-              </Pressable>
-            </View>
+              <IconSearch size={20} color="#1D1A27" strokeWidth={2.5} />
+            </Pressable>
           </View>
 
           {/* Grid Layout list */}
@@ -399,12 +417,12 @@ export default function SavedScreen() {
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <View style={{ marginTop: 4 }}>
-                {/* Occasion Filter Chips */}
+                {/* Occasion/Type Filter Chips */}
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{ paddingHorizontal: 24, gap: 8 }}
-                  style={{ marginBottom: 18, maxHeight: 42 }}
+                  style={{ marginBottom: 24, maxHeight: 42 }}
                 >
                   {FILTER_CHIPS.map((chip) => {
                     const isActive = chip === activeChip;
@@ -413,19 +431,21 @@ export default function SavedScreen() {
                         key={chip}
                         onPress={() => setActiveChip(chip)}
                         style={{
-                          backgroundColor: isActive ? "#1D1A27" : "#FFFFFF",
-                          borderWidth: 1,
-                          borderColor: isActive ? "#1D1A27" : "#E9EBF8",
+                          backgroundColor: isActive ? "#1D1A27" : "#F4F4F6",
+                          borderWidth: isActive ? 0 : 1,
+                          borderColor: "#EAEAEF",
                           borderRadius: 20,
-                          paddingHorizontal: 16,
-                          paddingVertical: 8,
+                          paddingHorizontal: 20,
+                          paddingVertical: 10,
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
                         <Text
                           style={{
                             fontSize: 13,
                             fontWeight: "600",
-                            color: isActive ? "#FFFFFF" : "#9B9BAF",
+                            color: isActive ? "#FFFFFF" : "#7E7C8C",
                           }}
                         >
                           {chip}
@@ -435,21 +455,142 @@ export default function SavedScreen() {
                   })}
                 </ScrollView>
 
-                {/* Subtitle Count */}
-                {filteredOutfits.length > 0 && (
+                {/* Collections Section */}
+                <View style={{ marginBottom: 28 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 24,
+                      marginBottom: 14,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "700",
+                        color: "#1D1A27",
+                      }}
+                    >
+                      Collections
+                    </Text>
+                    <Pressable
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      <IconPlus size={14} color="#7E7C8C" strokeWidth={2.5} />
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: "600",
+                          color: "#7E7C8C",
+                        }}
+                      >
+                        New
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+                  >
+                    {INITIAL_COLLECTIONS.map((col) => (
+                      <Pressable
+                        key={col.id}
+                        style={{
+                          width: 140,
+                          height: 90,
+                          borderRadius: 16,
+                          overflow: "hidden",
+                          position: "relative",
+                          backgroundColor: "#E2E2EA",
+                        }}
+                      >
+                        <ExpoImage
+                          source={{ uri: col.image }}
+                          style={{ width: "100%", height: "100%" }}
+                          contentFit="cover"
+                        />
+                        {/* Semi-transparent dark overlay */}
+                        <View
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: "rgba(0, 0, 0, 0.4)",
+                          }}
+                        />
+                        <View
+                          style={{
+                            position: "absolute",
+                            bottom: 12,
+                            left: 12,
+                            right: 12,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "#FFFFFF",
+                              fontSize: 14,
+                              fontWeight: "700",
+                            }}
+                          >
+                            {col.name}
+                          </Text>
+                          <Text
+                            style={{
+                              color: "rgba(255, 255, 255, 0.8)",
+                              fontSize: 10,
+                              fontWeight: "500",
+                              marginTop: 2,
+                            }}
+                          >
+                            {col.count} outfits
+                          </Text>
+                        </View>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+
+                {/* Saved Outfits Header */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingHorizontal: 24,
+                    marginBottom: 16,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "700",
+                      color: "#1D1A27",
+                    }}
+                  >
+                    Saved Outfits
+                  </Text>
                   <Text
                     style={{
                       fontSize: 13,
-                      color: "#7E7C8C",
+                      color: "#9B9BAF",
                       fontWeight: "500",
-                      paddingHorizontal: 24,
-                      marginBottom: 12,
                     }}
                   >
                     {filteredOutfits.length}{" "}
-                    {filteredOutfits.length === 1 ? "saved look" : "saved looks"}
+                    {filteredOutfits.length === 1 ? "look" : "looks"}
                   </Text>
-                )}
+                </View>
               </View>
             }
             ListEmptyComponent={<EmptyState onExplore={handleExplore} />}
