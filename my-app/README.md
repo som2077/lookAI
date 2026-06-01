@@ -1,4 +1,4 @@
-  # LookAI — Your Personal AI Stylist
+# LookAI — Your Personal AI Stylist
 
 A React Native mobile application built with Expo that helps users discover their personal style, organize their wardrobe, and receive AI-powered outfit recommendations.
 
@@ -6,17 +6,17 @@ A React Native mobile application built with Expo that helps users discover thei
 
 ## 🚀 Tech Stack
 
-| Layer              | Technology                                                 |
-| ------------------ | ---------------------------------------------------------- |
-| **Framework**      | Expo SDK 54 + React Native 0.81.5                          |
-| **Language**       | TypeScript                                                 |
-| **Routing**        | Expo Router (file-based navigation)                        |
-| **Auth**           | Clerk (Google SSO + Email OTP passwordless login)          |
-| **Backend**        | Supabase (PostgreSQL + RLS + Database Functions)           |
-| **State**          | Zustand v5 (persisted via `expo-secure-store`)             |
-| **Styling**        | NativeWind v4 + TailwindCSS 3                              |
-| **Animations**     | React Native Reanimated (layout transitions & fades)       |
-| **In-App Purchase**| Google Play Billing / App Store (`react-native-iap` + Webhooks) |
+| Layer               | Technology                                                      |
+| ------------------- | --------------------------------------------------------------- |
+| **Framework**       | Expo SDK 54 + React Native 0.81.5                               |
+| **Language**        | TypeScript                                                      |
+| **Routing**         | Expo Router (file-based navigation)                             |
+| **Auth**            | Clerk (Google SSO + Email OTP passwordless login)               |
+| **Backend**         | Supabase (PostgreSQL + RLS + Database Functions)                |
+| **State**           | Zustand v5 (persisted via `expo-secure-store`)                  |
+| **Styling**         | NativeWind v4 + TailwindCSS 3                                   |
+| **Animations**      | React Native Reanimated (layout transitions & fades)            |
+| **In-App Purchase** | Google Play Billing / App Store (`react-native-iap` + Webhooks) |
 
 ---
 
@@ -41,9 +41,10 @@ my-app/
 │       │   ├── _layout.tsx     # Tab setup & navigation index mapping
 │       │   ├── index.tsx       # Home: Highlights, trend feeds, and stats overview
 │       │   ├── wardrobe.tsx    # Wardrobe: Toggle between Grid & Grouped Carousels
-│       │   ├── outfit.tsx      # Outfit: AI Outfit Planner (Premium feature gate)
-│       │   ├── saved.tsx       # Saved: Overlapping fanned outfit preview cards
-│       │   ├── profile.tsx     # Profile: User info, subscription details, and settings
+│       │   ├── outfit.tsx      # Outfit: AI Outfit Suggester (only accessible via Action Menu)
+│       │   ├── saved.tsx       # Saved: Outfits screen with overlapping fanned decks
+│       │   ├── score.tsx       # Score: Style Score metrics & achievements dashboard
+│       │   ├── profile.tsx     # Profile: Redesigned bio summary, body stats, and settings
 │       │   ├── subscription.tsx # Paywall pricing screen options
 │       │   └── manage-subscription.tsx # Subscription billing history & cancel options
 │       ├── onboarding/         # Onboarding questionnaire wizard
@@ -112,16 +113,18 @@ my-app/
 
 ## 🛠 File Explanations of Key Modules
 
-*   **`app/_layout.tsx`**: The main application file. Configures Clerk auth context, registers global font assets, and executes the **Auth Guard** redirect routing logic (watches user authorization and checks onboarding completion flag from `SecureStore` to route users appropriately).
-*   **`components/navigation/AddActionMenu.tsx`**: Renders the overlay menu modal when the bottom tab "+" button is clicked. It uses a translucent dark `BlurView` backdrop. To fit this dark layout, it leverages the `expo-status-bar` and `expo-navigation-bar` libraries to dynamically style both the **top status bar** and the **Android bottom system navigation bar** to a dark style (`#1A1827` with white icons) while the modal is open, and reverts them back to light style when closed.
-*   **`app/(root)/(tabs)/wardrobe.tsx`**: Main wardrobe interface. Combines dynamic statistics (Total, Worn, Unworn, Usage) with:
-    *   **Text-only category filter chips** at the top.
-    *   A Segmented Toggle switch allowing users to swap between **Grouped View** (vertical category headers with horizontal scroll carousels) and **Grid View** (a clean 3-column items grid).
-    *   A custom dotted **"Add cloth" card** placed at index 0 of the grid and carousels for easy upload.
-    *   An **AI Suggestion** card styled dark at the footer.
-*   **`app/(root)/(tabs)/saved.tsx`**: Favorites screen displaying saved looks. Uses a customized `OutfitPreview` component that dynamically positions clothing cards in an **overlapping fanned deck** with tilt angles (`transform: [{ rotate: '8deg' }]`), providing a premium look. It includes heart icons to unsave favorited items and an empty-state screen directing users to the AI Planner.
-*   **`app/(root)/(tabs)/profile.tsx`**: User profile screen. Integrates Clerk (`useUser()`) to show user avatar, full name, and email. Features a purple **"PRO" badge** if `isPremium` is active, a mini wardrobe stats row, and a setting list for subscriptions, analytics, and sign-out.
-*   **`backend/hooks/useSupabaseQuery.ts`**: A generic data-fetching hook that handles Supabase querying, returns loading and error states, and supports conditional query building (`apply` parameter) using the Clerk JWT-authenticated client.
+- **`app/_layout.tsx`**: The main application file. Configures Clerk auth context, registers global font assets, and executes the **Auth Guard** redirect routing logic (watches user authorization and checks onboarding completion flag from `SecureStore` to route users appropriately).
+- **`components/navigation/AddActionMenu.tsx`**: Renders the overlay menu modal when the bottom tab "+" button is clicked. It uses a translucent dark `BlurView` backdrop. To fit this dark layout, it leverages the `expo-status-bar` and `expo-navigation-bar` libraries to dynamically style both the **top status bar** and the **Android bottom system navigation bar** to a dark style (`#1A1827` with white icons) while the modal is open, and reverts them back to light style when closed.
+- **`app/(root)/(tabs)/wardrobe.tsx`**: Main wardrobe interface. Combines dynamic statistics (Total, Worn, Unworn, Usage) with:
+  - **Text-only category filter chips** at the top.
+  - A Segmented Toggle switch allowing users to swap between **Grouped View** (vertical category headers with horizontal scroll carousels) and **Grid View** (a clean 3-column items grid).
+  - A custom dotted **"Add cloth" card** placed at index 0 of the grid and carousels for easy upload.
+  - An **AI Suggestion** card styled dark at the footer.
+- **`app/(root)/(tabs)/saved.tsx`**: Favorites screen displaying saved looks. Uses a customized `OutfitPreview` component that dynamically positions clothing cards in an **overlapping fanned deck** with tilt angles (`transform: [{ rotate: '8deg' }]`), providing a premium look. It includes heart icons to unsave favorited items and an empty-state screen directing users to the AI Planner.
+- **`app/(root)/(tabs)/outfit.tsx`**: Redesigned **AI Outfit Suggester** screen (light themed `#F8F7FC`). Renders weather/style pills, a 3-item collage, checkmark badges, and a custom note explanation panel. Features interactive reload cycling (simulate AI planning) and alternative scrolling cards that load into the main screen on click. Hidden from the tab bar navigation.
+- **`app/(root)/(tabs)/score.tsx`**: The new **Style Score** dashboard. Features interactive segmented period selectors (Daily, Weekly, Monthly), a custom circular score ring built with `react-native-svg`, 6 progress-bar category breakdowns, improvement recommendations, and a scrolling achievements badge panel. Hidden from the tab bar navigation.
+- **`app/(root)/(tabs)/profile.tsx`**: Redesigned **User Profile** tab. Built using clean grid components. Displays centered avatar with online indicator, user bio and style badges, clothes summary statistics, Body Profile emoji cards (Height, Body Type, Skin Tone, Age), preference tastes pills, referral Copy invitation code (`ZARA2026`), and settings menu logs.
+- **`backend/hooks/useSupabaseQuery.ts`**: A generic data-fetching hook that handles Supabase querying, returns loading and error states, and supports conditional query building (`apply` parameter) using the Clerk JWT-authenticated client.
 
 ---
 
@@ -137,6 +140,7 @@ my-app/
 ```
 
 ### 1. Authentication & Onboarding
+
 1.  Users land on `get-started.tsx` and navigate to sign in via **Google SSO** or **Email OTP**.
 2.  If signed in but onboarding is incomplete, they are routed to the **Onboarding Wizard** (`app/(root)/onboarding`), passing through a 6-step progress bar collecting age, height, gender, body shape, and style tastes.
 3.  On step 6, data is upserted to the Supabase database (`user_profiles`), and an onboarding completion flag is saved locally to the device's secure storage.
@@ -152,6 +156,7 @@ my-app/
 ```
 
 ### 2. Add Clothes Flow
+
 1.  Opening the camera inside `add-clothes` allows users to snap a photo of their clothing.
 2.  The app shows a pulsing scanning animation backdrop (`scanning.tsx`) while analyzing the cloth.
 3.  The results populate the metadata form (`form.tsx`), auto-detecting the category, occasion, and dominant color.
@@ -170,9 +175,10 @@ my-app/
 ```
 
 ### 3. Wardrobe View Modes Toggle
-*   **Grouped View (Default)**: The list shows item categories vertically, with each category displaying its items in a horizontal scroll carousel. Selecting a category filter chip at the top dynamically narrows the view down to show only that category's carousel.
-*   **Grid View**: Changes the layout to a uniform 3-column scrollable grid. Prepend the dashed add card at the top-left index.
-*   **How it works**: Swapping view modes changes a `viewMode` state, which swaps between two separate `FlatList` components mapped to unique `key` parameters (`grid-view` vs `grouped-view`). This forces React Native to cleanly remount the list, preventing layout calculation crashes.
+
+- **Grouped View (Default)**: The list shows item categories vertically, with each category displaying its items in a horizontal scroll carousel. Selecting a category filter chip at the top dynamically narrows the view down to show only that category's carousel.
+- **Grid View**: Changes the layout to a uniform 3-column scrollable grid. Prepend the dashed add card at the top-left index.
+- **How it works**: Swapping view modes changes a `viewMode` state, which swaps between two separate `FlatList` components mapped to unique `key` parameters (`grid-view` vs `grouped-view`). This forces React Native to cleanly remount the list, preventing layout calculation crashes.
 
 ---
 
@@ -186,6 +192,7 @@ my-app/
 ```
 
 ### 4. Billing & Premium Flow
+
 1.  Features like the **AI Outfit Planner** check the local `useBillingStore` state for `isPremium` authorization. If the user is on the free tier, a locked premium message is displayed.
 2.  If the user clicks "View Plans" or "Manage Subscription", the paywall (`subscription.tsx`) renders the subscription package.
 3.  Clicking a package executes purchase sequences via `BillingService.ts` (wraps native Apple App Store or Google Play Store billing APIs).
@@ -196,18 +203,22 @@ my-app/
 ## 💻 Getting Started
 
 ### Prerequisites
--   **Node.js 18+**
--   **Expo CLI** (`npx expo`)
--   **Clerk Account** (for user management API keys)
--   **Supabase Project** (Postgres DB)
+
+- **Node.js 18+**
+- **Expo CLI** (`npx expo`)
+- **Clerk Account** (for user management API keys)
+- **Supabase Project** (Postgres DB)
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Set Up Environment Variables
+
 Create a `.env` file in the root directory:
+
 ```env
 EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxxx
 EXPO_PUBLIC_SUPABASE_URL=https://xxxxxxx.supabase.co
@@ -215,18 +226,20 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJxxxxxxx
 ```
 
 ### 3. Run the Development Server
+
 ```bash
 npx expo start
 ```
+
 Run `a` to load on Android Emulator, `i` to load on iOS Simulator, or scan the QR code to open inside the Expo Go client.
 
 ---
 
 ## 📜 Available Scripts
 
-*   `npm start`: Launches the Expo development server.
-*   `npm run android`: Opens the application inside the connected Android emulator.
-*   `npm run ios`: Opens the application inside the iOS simulator.
-*   `npm run web`: Launches the web-browser preview dev client.
-*   `npm run lint`: Scans source files for syntax and stylistic issues.
-*   `npm run reset-project`: Resets workspace to a blank boilerplate configuration.
+- `npm start`: Launches the Expo development server.
+- `npm run android`: Opens the application inside the connected Android emulator.
+- `npm run ios`: Opens the application inside the iOS simulator.
+- `npm run web`: Launches the web-browser preview dev client.
+- `npm run lint`: Scans source files for syntax and stylistic issues.
+- `npm run reset-project`: Resets workspace to a blank boilerplate configuration.

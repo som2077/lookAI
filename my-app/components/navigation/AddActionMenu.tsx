@@ -57,7 +57,7 @@ const ACTION_CARDS: ActionCard[] = [
     title: "Style score",
     subtitle: "Face + outfit match",
     icon: IconTrendingUp,
-    route: "/(root)/(tabs)/outfit",
+    route: "/(root)/(tabs)/score",
     color: "#FBBF24",
   },
 ];

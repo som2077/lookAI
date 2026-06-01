@@ -6,11 +6,13 @@ import React, { ReactNode, useCallback, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   IconSmartHome,
-  IconBookmark,
   IconPlus,
+  IconMesh,
+  IconHanger,
+  IconSparkles,
+  IconTrendingUp,
   type IconProps,
 } from "@tabler/icons-react-native";
-import { IconMesh } from "@tabler/icons-react-native";
 import { AddActionMenu } from "./AddActionMenu";
 
 type TabIconComponent = React.ComponentType<IconProps>;
@@ -18,8 +20,8 @@ type TabConfig = Record<string, TabIconComponent>;
 
 const TAB_CONFIG: TabConfig = {
   index: IconSmartHome,
+  saved: IconHanger,
   wardrobe: IconMesh,
-  saved: IconBookmark,
 };
 
 const AnimatedTabButton = React.memo(function AnimatedTabButton({
@@ -180,9 +182,7 @@ export function CustomTabBar({
                 }
               };
 
-              const label = options?.title ?? route.name;
-
-              // Profile tab — avatar icon
+              const label = options?.title ?? route.name;              // Profile tab — avatar icon
               if (route.name === "profile") {
                 return (
                   <AnimatedTabButton
@@ -218,7 +218,6 @@ export function CustomTabBar({
                   </AnimatedTabButton>
                 );
               }
-
               const IconComponent = TAB_CONFIG[route.name];
               const iconColor = focused ? "#000000" : "#9898A6";
               if (!IconComponent) return null;
