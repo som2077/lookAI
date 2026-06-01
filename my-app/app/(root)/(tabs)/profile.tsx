@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   IconSettings,
   IconBell,
@@ -22,8 +23,11 @@ import {
   IconLogout,
   IconTrash,
   IconSparkles,
+  IconChevronRight,
+  IconArrowLeft,
 } from "@tabler/icons-react-native";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
+import Svg, { Circle } from "react-native-svg";
 
 // ─── Constants & Types ────────────────────────────────────────────────────────
 
@@ -40,7 +44,6 @@ interface PreferencePill {
 const PREFERENCE_PILLS: PreferencePill[] = [
   { text: "Minimal", type: "purple" },
   { text: "Casual", type: "green" },
-  { text: "Smart Casual", type: "yellow" },
   { text: "Formal", type: "pink" },
   { text: "Streetwear", type: "blue" },
 ];
@@ -103,6 +106,55 @@ const PreferenceTag = React.memo(function PreferenceTag({
   );
 });
 
+const MiniProgressCircle = React.memo(function MiniProgressCircle({
+  score,
+  size = 54,
+  strokeWidth = 5,
+}: {
+  score: number;
+  size?: number;
+  strokeWidth?: number;
+}) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (score / 100) * circumference;
+
+  return (
+    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
+      <Svg width={size} height={size} style={{ transform: [{ rotate: "-90deg" }] }}>
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#EAE8FF"
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#4C36F5"
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          fill="none"
+        />
+      </Svg>
+      
+      <View style={{ position: "absolute", alignItems: "center", justifyContent: "center" }}>
+        <Text style={{ fontSize: 13, fontWeight: "800", color: "#1D1A27" }}>
+          {score}
+        </Text>
+        <Text style={{ fontSize: 7, color: "#9B9BAF", fontWeight: "600", marginTop: 0.5 }}>
+          /100
+        </Text>
+      </View>
+    </View>
+  );
+});
+
 // ─── Main Profile Screen ───────────────────────────────────────────────────────
 
 export default function ProfileScreen() {
@@ -143,69 +195,80 @@ export default function ProfileScreen() {
     <SwipeTabWrapper tabIndex={3}>
       <View style={{ flex: 1, backgroundColor: "#F8F7FC" }}>
         <StatusBar style="dark" />
-        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <SafeAreaView style={{ flex: 1 }} edges={[]}>
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 110 }}
           >
-            {/* Header section */}
-            <View style={{ paddingHorizontal: 24, paddingTop: 16, marginBottom: 20 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ fontSize: 26, fontWeight: "800", color: "#1D1A27" }}>
-                  Profile
-                </Text>
+            {/* Gradient Header Banner */}
+            <LinearGradient
+              colors={["#E1EBFE", "#EAE3FC", "#FFF4DF"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                height: 110,
+                width: "100%",
+                paddingHorizontal: 24,
+                justifyContent: "center",
+                position: "relative",
+              }}
+            >
+              {/* Floating top buttons */}
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 24 }}>
+                <Pressable
+                  onPress={() => router.back()}
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 12,
+                    backgroundColor: "#FFFFFFEE",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    shadowColor: "#000",
+                    shadowOpacity: 0.04,
+                    shadowRadius: 3,
+                    shadowOffset: { width: 0, height: 1 },
+                  }}
+                >
+                  <IconArrowLeft size={18} color="#1D1A27" />
+                </Pressable>
                 
-                {/* Top Action Settings and Bells */}
-                <View style={{ flexDirection: "row", gap: 10 }}>
-                  <Pressable
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 21,
-                      backgroundColor: "#FFFFFF",
-                      borderWidth: 1,
-                      borderColor: "#E2E2EA",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconSettings size={18} color="#9B9BAF" />
-                  </Pressable>
-                  <Pressable
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 21,
-                      backgroundColor: "#FFFFFF",
-                      borderWidth: 1,
-                      borderColor: "#E2E2EA",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconBell size={18} color="#9B9BAF" />
-                  </Pressable>
-                </View>
+                <Pressable
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 12,
+                    backgroundColor: "#FFFFFFEE",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    shadowColor: "#000",
+                    shadowOpacity: 0.04,
+                    shadowRadius: 3,
+                    shadowOffset: { width: 0, height: 1 },
+                  }}
+                >
+                  <IconSettings size={18} color="#1D1A27" />
+                </Pressable>
               </View>
-            </View>
+            </LinearGradient>
 
-            {/* Avatar Centered Bio Card */}
-            <View style={{ alignItems: "center", paddingHorizontal: 24, marginBottom: 24 }}>
-              <View style={{ position: "relative" }}>
+            {/* Overlapping Avatar and Bio Action Row */}
+            <View style={{ paddingHorizontal: 24, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14 }}>
+              <View style={{ position: "relative", marginTop: -38 }}>
                 <View
                   style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius: 50,
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
                     backgroundColor: "#EAE8FF",
                     overflow: "hidden",
                     alignItems: "center",
                     justifyContent: "center",
-                    borderWidth: 2,
+                    borderWidth: 3,
                     borderColor: "#FFFFFF",
                     shadowColor: "#000",
-                    shadowOpacity: 0.05,
-                    shadowRadius: 5,
+                    shadowOpacity: 0.04,
+                    shadowRadius: 4,
                     shadowOffset: { width: 0, height: 2 },
                   }}
                 >
@@ -215,16 +278,16 @@ export default function ProfileScreen() {
                       style={{ width: "100%", height: "100%" }}
                     />
                   ) : (
-                    <IconUser size={40} color="#9B9BAF" />
+                    <IconUser size={34} color="#9B9BAF" />
                   )}
                 </View>
 
-                {/* Overlapping status indicator badge at bottom right */}
+                {/* Overlapping status badge */}
                 <View
                   style={{
                     position: "absolute",
-                    bottom: 2,
-                    right: 4,
+                    bottom: 0,
+                    right: 0,
                     width: 18,
                     height: 18,
                     borderRadius: 9,
@@ -235,35 +298,62 @@ export default function ProfileScreen() {
                 />
               </View>
 
-              {/* User Identity */}
-              <Text style={{ fontSize: 20, fontWeight: "800", color: "#1D1A27", marginTop: 12 }}>
+              {/* Share & Edit Profile buttons row next to avatar */}
+              <View style={{ flexDirection: "row", gap: 8, paddingBottom: 4 }}>
+                <Pressable
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    borderWidth: 1,
+                    borderColor: "#E2E2EA",
+                    borderRadius: 12,
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                  }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: "700", color: "#5A5A6A" }}>
+                    Share
+                  </Text>
+                </Pressable>
+                
+                <Pressable
+                  style={{
+                    backgroundColor: "#4C36F5",
+                    borderRadius: 12,
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                  }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: "700", color: "#FFFFFF" }}>
+                    Edit Profile
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Left-aligned Bio Slogans */}
+            <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
+              <Text style={{ fontSize: 22, fontWeight: "800", color: "#1D1A27" }}>
                 {user?.fullName || "Zara Ahmed"}
               </Text>
               
-              <Text style={{ fontSize: 12, color: "#9B9BAF", fontWeight: "600", marginTop: 3 }}>
-                @{user?.username || "zara.looks"} · Indore
+              <Text style={{ fontSize: 12, color: "#9B9BAF", fontWeight: "600", marginTop: 2 }}>
+                @{user?.username || "zara.looks"} · Indore 📍
               </Text>
 
-              {/* Style score badge */}
-              <View
-                style={{
-                  backgroundColor: "#F4F3FF",
-                  borderWidth: 1,
-                  borderColor: "#EAE8FF",
-                  borderRadius: 20,
-                  paddingHorizontal: 16,
-                  paddingVertical: 6,
-                  marginTop: 10,
-                }}
-              >
-                <Text style={{ fontSize: 11, fontWeight: "700", color: "#4C36F5" }}>
-                  Style Score 78 · Grade A-
-                </Text>
+              <Text style={{ fontSize: 13, color: "#5A5A6A", marginTop: 8, lineHeight: 18, fontWeight: "500" }}>
+                Fashion lover 👗 Dressing for my vibe, not the crowd.
+              </Text>
+
+              {/* Preferences Tag Flow (left aligned) */}
+              <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 12 }}>
+                {PREFERENCE_PILLS.map((pill, idx) => (
+                  <PreferenceTag key={idx} text={pill.text} type={pill.type} />
+                ))}
               </View>
             </View>
 
             {/* Summary statistics row card */}
-            <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
+            <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -313,20 +403,62 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            {/* Body Profile section */}
-            <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <Text style={{ fontSize: 15, fontWeight: "800", color: "#1D1A27" }}>
-                  Body Profile
-                </Text>
-                <Pressable>
-                  <Text style={{ fontSize: 12, fontWeight: "700", color: "#4C36F5" }}>
-                    Edit ✎
-                  </Text>
-                </Pressable>
-              </View>
+            {/* Clickable Style Score Card */}
+            <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
+              <Pressable
+                onPress={() => router.push("/(root)/(tabs)/score" as never)}
+                style={({ pressed }) => ({
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: "#EAE8FF",
+                  padding: 16,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  shadowColor: "#000",
+                  shadowOpacity: pressed ? 0.01 : 0.015,
+                  shadowRadius: 5,
+                  shadowOffset: { width: 0, height: 2 },
+                  elevation: 1,
+                  opacity: pressed ? 0.9 : 1,
+                })}
+              >
+                {/* SVG Mini Progress Circle */}
+                <MiniProgressCircle score={78} />
 
-              {/* Grid cards */}
+                {/* Center text block */}
+                <View style={{ flex: 1, marginLeft: 16 }}>
+                  <View style={{ flexDirection: "row", marginBottom: 3 }}>
+                    <View
+                      style={{
+                        backgroundColor: "#E8F8F0",
+                        borderWidth: 0.8,
+                        borderColor: "#C6EFD9",
+                        borderRadius: 8,
+                        paddingHorizontal: 6,
+                        paddingVertical: 2,
+                      }}
+                    >
+                      <Text style={{ fontSize: 9, fontWeight: "800", color: "#0F824A" }}>
+                        Grade A-
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: 14, fontWeight: "800", color: "#1D1A27" }}>
+                    Great Dresser!
+                  </Text>
+                  <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
+                    +6 pts this week · See full score
+                  </Text>
+                </View>
+
+                {/* Right chevron */}
+                <IconChevronRight size={18} color="#C8C8D3" />
+              </Pressable>
+            </View>
+
+            {/* Body Profile Grid Cards (Rendered directly, no title header) */}
+            <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 {BODY_STATS.map((stat, idx) => (
                   <View
@@ -362,51 +494,28 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            {/* Style Preferences Section */}
-            <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <Text style={{ fontSize: 15, fontWeight: "800", color: "#1D1A27" }}>
-                  Style Preferences
-                </Text>
-                <Pressable>
-                  <Text style={{ fontSize: 12, fontWeight: "700", color: "#4C36F5" }}>
-                    Edit ✎
-                  </Text>
-                </Pressable>
-              </View>
-
-              {/* Flow wrap layout pills */}
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                {PREFERENCE_PILLS.map((pill, idx) => (
-                  <PreferenceTag key={idx} text={pill.text} type={pill.type} />
-                ))}
-              </View>
-            </View>
-
-            {/* Invite Friends & Earn Card */}
+            {/* Invite Friends & Earn Card (Solid blue bg banner) */}
             <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
               <View
                 style={{
-                  backgroundColor: "#F0F4FF",
+                  backgroundColor: "#4C36F5",
                   borderRadius: 24,
-                  borderWidth: 1,
-                  borderColor: "#D3E0FF",
                   padding: 16,
                   shadowColor: "#000",
-                  shadowOpacity: 0.015,
-                  shadowRadius: 5,
+                  shadowOpacity: 0.04,
+                  shadowRadius: 6,
                   shadowOffset: { width: 0, height: 2 },
-                  elevation: 1,
+                  elevation: 2,
                 }}
               >
                 {/* Header row */}
-                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 14 }}>
                   <View
                     style={{
-                      width: 44,
-                      height: 44,
+                      width: 42,
+                      height: 42,
                       borderRadius: 12,
-                      backgroundColor: "#4C36F5",
+                      backgroundColor: "#FFFFFF30",
                       alignItems: "center",
                       justifyContent: "center",
                       marginRight: 12,
@@ -415,11 +524,11 @@ export default function ProfileScreen() {
                     <IconSparkles size={20} color="#FFFFFF" fill="#FFFFFF" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 14, fontWeight: "800", color: "#1D1A27" }}>
+                    <Text style={{ fontSize: 14, fontWeight: "800", color: "#FFFFFF" }}>
                       Invite Friends & Earn
                     </Text>
-                    <Text style={{ fontSize: 10, color: "#5A5A6A", marginTop: 2, fontWeight: "500" }}>
-                      Share your code — both get 1 month free Pro
+                    <Text style={{ fontSize: 10, color: "#E0DBFF", marginTop: 2, fontWeight: "600" }}>
+                      Both get 1 month free Pro 🎁
                     </Text>
                   </View>
                 </View>
@@ -427,7 +536,7 @@ export default function ProfileScreen() {
                 {/* Code Copy Slot */}
                 <View
                   style={{
-                    backgroundColor: "#FFFFFF",
+                    backgroundColor: "#FFFFFF15",
                     borderRadius: 14,
                     padding: 8,
                     paddingHorizontal: 12,
@@ -435,14 +544,14 @@ export default function ProfileScreen() {
                     justifyContent: "space-between",
                     alignItems: "center",
                     borderWidth: 1,
-                    borderColor: "#D3E0FF",
+                    borderColor: "#FFFFFF25",
                   }}
                 >
                   <View>
-                    <Text style={{ fontSize: 9, color: "#9B9BAF", fontWeight: "600" }}>
+                    <Text style={{ fontSize: 9, color: "#C3BCFF", fontWeight: "600" }}>
                       Your referral code
                     </Text>
-                    <Text style={{ fontSize: 16, fontWeight: "800", color: "#4C36F5", marginTop: 2 }}>
+                    <Text style={{ fontSize: 16, fontWeight: "800", color: "#FFFFFF", marginTop: 2 }}>
                       ZARA2026
                     </Text>
                   </View>
@@ -450,21 +559,21 @@ export default function ProfileScreen() {
                   <Pressable
                     onPress={handleCopyReferral}
                     style={{
-                      backgroundColor: "#4C36F5",
-                      paddingHorizontal: 16,
+                      backgroundColor: "#FFFFFF",
+                      paddingHorizontal: 14,
                       paddingVertical: 8,
                       borderRadius: 10,
                     }}
                   >
-                    <Text style={{ fontSize: 12, fontWeight: "700", color: "#FFFFFF" }}>
-                      Copy
+                    <Text style={{ fontSize: 12, fontWeight: "700", color: "#4C36F5" }}>
+                      Copy Code
                     </Text>
                   </Pressable>
                 </View>
               </View>
             </View>
 
-            {/* Settings Card List Container */}
+            {/* Settings Card List Container (All rows contain chevrons) */}
             <View style={{ paddingHorizontal: 24 }}>
               <View
                 style={{
@@ -503,11 +612,12 @@ export default function ProfileScreen() {
                       Daily outfit reminders
                     </Text>
                   </View>
+                  <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
                 <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
 
-                {/* 2. Privacy */}
+                {/* 2. Privacy & Security */}
                 <Pressable style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 16 }}>
                   <View
                     style={{
@@ -524,12 +634,13 @@ export default function ProfileScreen() {
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27" }}>
-                      Privacy
+                      Privacy & Security
                     </Text>
                     <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
                       Manage your data
                     </Text>
                   </View>
+                  <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
                 <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
@@ -554,9 +665,10 @@ export default function ProfileScreen() {
                       Help & Support
                     </Text>
                     <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
-                      FAQs, contact us
+                      FAQs · Contact us
                     </Text>
                   </View>
+                  <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
                 <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
@@ -589,6 +701,7 @@ export default function ProfileScreen() {
                       Log Out
                     </Text>
                   </View>
+                  <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
                 <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
@@ -619,6 +732,7 @@ export default function ProfileScreen() {
                       Permanently remove all data
                     </Text>
                   </View>
+                  <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
               </View>
             </View>
