@@ -61,10 +61,10 @@ export function WardrobeRingSummaryCard({
   const formattedPercentage = Math.round(clampProgress(wornPercentage) * 100);
 
   return (
-    <View className="mt-3 bg-[#FFFFFF] border border-[#E9EBF8] shadow rounded-3xl py-5 ml-1">
-      <View className="flex-row items-center justify-between gap-6  ml-1 mr-2">
+    <View className="mt-3 bg-[#ffffff] border border-[#E9EBF8] shadow rounded-3xl py-4 ml-1 ">
+      <View className="flex-row items-center justify-between gap-5  ml-1 mr-2">
         {/* Left Stats */}
-        <View className="flex-1 items-end gap-5 mb-3 mt-2">
+        <View className="flex-1 items-end gap-9 py-1">
           <View className="items-end">
             <Text className="text-2xl  font-black text-[#F5B93A]">
               {formattedPercentage}
@@ -122,7 +122,7 @@ export function WardrobeRingSummaryCard({
         </View>
 
         {/* Right Stats */}
-        <View className="flex-1 items-start gap-5 mb-3 mt-2">
+        <View className="flex-1 items-start gap-9 py-1">
           <View>
             <Text className="text-2xl font-black text-[#2A78FF]">
               {wearCount}

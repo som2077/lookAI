@@ -17,6 +17,10 @@ import {
 } from "../../../components/ui/RecentlyUploadedCard";
 import { TrendFeed } from "../../../components/ui/TrendFeed";
 import { WardrobeHighlights } from "../../../components/ui/WardrobeHighlights";
+import { WeatherOutfitCard } from "../../../components/ui/WeatherOutfitCard";
+import { AIPickOfTheDayCard } from "../../../components/ui/AIPickOfTheDayCard";
+import { LookAIBanner } from "../../../components/ui/LookAIBanner";
+import { WardrobeFilterTabs } from "../../../components/ui/WardrobeFilterTabs";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const H_PADDING = 20;
@@ -25,9 +29,9 @@ const H_PADDING = 20;
 const HEADER_HEIGHT = 140;
 
 const RING_SEGMENT_BASE: readonly Omit<RingProgressSegment, "progress">[] = [
-  { id: "outer", color: "#F5B93A", radius: 58, strokeWidth: 8 },
-  { id: "middle", color: "#E54B4B", radius: 48, strokeWidth: 8 },
-  { id: "inner", color: "#2A78FF", radius: 38, strokeWidth: 8 },
+  { id: "outer", color: "#F5B93A", radius: 78, strokeWidth: 8 },
+  { id: "middle", color: "#E54B4B", radius: 68, strokeWidth: 8 },
+  { id: "inner", color: "#2A78FF", radius: 58, strokeWidth: 8 },
 ] as const;
 
 const clampRatio = (value: number): number => {
@@ -66,21 +70,30 @@ export default function HomeScreen() {
   ).current;
 
   const viewabilityConfig = useRef({
-    viewAreaCoveragePercentThreshold: 50,
+    viewAreaCoveragePercentThreshold: 60,
+    waitForInteraction: false,
   }).current;
 
   const renderCard = ({ item }: { item: CardKey }) => (
     <View style={{ width: SCREEN_WIDTH, paddingHorizontal: H_PADDING }}>
       {item === "wardrobe" ? (
-        <WardrobeRingSummaryCard
-          wornPercentage={clampRatio(summary.wornPercentage)}
-          totalWorn={summary.totalWorn}
-          wearCount={summary.wearCount}
-          neverCount={summary.neverCount}
-          ringSegments={ringSegments}
-        />
+        <>
+          <WardrobeRingSummaryCard
+            wornPercentage={clampRatio(summary.wornPercentage)}
+            totalWorn={summary.totalWorn}
+            wearCount={summary.wearCount}
+            neverCount={summary.neverCount}
+            ringSegments={ringSegments}
+          />
+          <WardrobeFilterTabs />
+        </>
+      ) : item === "blank1" ? (
+        <>
+          <WeatherOutfitCard />
+          <LookAIBanner />
+        </>
       ) : (
-        <View className="bg-white shadow rounded-[20px] h-40 border border-[#E9EBF8] mt-3" />
+        <AIPickOfTheDayCard />
       )}
     </View>
   );
@@ -159,7 +172,8 @@ export default function HomeScreen() {
                       width: i === activeIndex ? 8 : 7,
                       height: i === activeIndex ? 8 : 7,
                       borderRadius: 5,
-                      backgroundColor: i === activeIndex ? "#1C1C1E" : "#C7C7C7",
+                      backgroundColor:
+                        i === activeIndex ? "#1C1C1E" : "#C7C7C7",
                     }}
                   />
                 ))}
