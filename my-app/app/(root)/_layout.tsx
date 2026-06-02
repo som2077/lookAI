@@ -23,6 +23,7 @@ export default function RootLayout() {
         name="calendar"
         options={{ animation: "slide_from_right" }}
       />
+      <Stack.Screen name="trend-feed" options={{ animation: "slide_from_right" }} />
     </Stack>
   );
 }
