@@ -1,32 +1,77 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 
 export const LookAIBanner = React.memo(function LookAIBanner() {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.text}>
-        It&apos;s 32°C and sunny today in Indore! ☀️ I&apos;d suggest going with
-        light linen or cotton fabrics in white or pastel tones — they&apos;ll
-        keep you cool and still look sharp.
-      </Text>
-    </View>
-  );
-});
+  const router = useRouter();
 
-const styles = StyleSheet.create({
-  card: {
-    // marginTop: 1,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E9EBF8",
-    borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderWidth: 1,
-  },
-  text: {
-    fontSize: 13,
-    lineHeight: 20,
-    color: "#171421",
-    fontWeight: "400",
-  },
+  return (
+    <Pressable
+      onPress={() => router.push("/(root)/look-ai")}
+      style={{
+        marginTop: 7,
+        backgroundColor: "#FFFFFF",
+        borderWidth: 1,
+        borderColor: "#E2E2E2",
+        borderRadius: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+      }}
+    >
+      {/* Row 1: Outfit Score */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 8,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            color: "#1A1A1A",
+            fontFamily: "TikTokSans16pt-Bold",
+          }}
+        >
+          Outfit Score
+        </Text>
+        <Text
+          style={{
+            fontSize: 15,
+            color: "#1A1A1A",
+            fontFamily: "TikTokSans16pt-Bold",
+          }}
+        >
+          0/10
+        </Text>
+      </View>
+
+      {/* Row 2: Progress Bar — solid gray pill (score 0/10 = empty track) */}
+      <View
+        style={{
+          width: "100%",
+          height: 10,
+          // backgroundColor: "#E2E2E2",
+          borderRadius: 100,
+          borderWidth: 1,
+          borderColor: "#E2E2E2",
+          marginBottom: 10,
+        }}
+      />
+
+      {/* Row 3: Helper Text */}
+      <Text
+        style={{
+          fontSize: 13,
+          color: "#1A1A1A",
+          fontFamily: "TikTokSans16pt-Regular",
+          // textAlign: "center",
+        }}
+      >
+        Weather-friendly style starts here. Find outfits curated for
+        today&apos;s forecast. Tap to see outfit suggestions.
+      </Text>
+    </Pressable>
+  );
 });

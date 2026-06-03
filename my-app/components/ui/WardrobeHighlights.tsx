@@ -101,7 +101,7 @@ const HighlightCard = React.memo(function HighlightCard({
       {/* Progress and subtitle */}
       <View className="flex-row items-center gap-3 ml-1">
         <ProgressCircle progress={progress} color={progressColor} />
-        <Text className="text-[#9B9BAF]" style={{ fontSize: 11 }}>
+        <Text className="text-[#9B9BAF] font-sans" style={{ fontSize: 11 }}>
           {subtitle}
         </Text>
       </View>

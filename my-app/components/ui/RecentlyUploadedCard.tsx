@@ -35,7 +35,7 @@ export const NotifyBanner = React.memo(function NotifyBanner() {
       <View className="flex-row items-center flex-1 pr-3">
         <IconBell size={23} color="#000000" strokeWidth={1.5} />
         <Text
-          className="ml-3 text-[#1D1A27]"
+          className="ml-3 text-[#1D1A27] font-sans"
           style={{ fontSize: 12, lineHeight: 18, flex: 1 }}
         >
           Feel free to leave this screen or use other apps.{"\n"}
@@ -75,7 +75,7 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
         <IconShirt size={30} color="#000000" strokeWidth={1.5} />
       </View>
       <Text
-        className="text-[#1D1A27] mt-4 text-center"
+        className="text-[#1D1A27] mt-4 text-center font-sans"
         style={{ fontSize: 14, lineHeight: 20 }}
       >
         Tap + add you first style look of the day

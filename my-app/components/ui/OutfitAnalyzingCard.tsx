@@ -82,11 +82,11 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
               >
                 {MOCK_NAME}
               </Text>
-              <Text className="text-[#9B9BAF] text-[11px] mt-1 mr-2">
+              <Text className="text-[#9B9BAF] text-[11px] mt-1 mr-2 font-sans">
                 {outfit.time}
               </Text>
             </View>
-            <Text className="text-[#9B9BAF] text-[11px] mb-3 mt-1">
+            <Text className="text-[#9B9BAF] text-[11px] mb-3 mt-1 font-sans">
               {MOCK_SUBTITLE}
             </Text>
             <View className="flex-row flex-wrap gap-[6px]">
@@ -204,7 +204,7 @@ const AnalyzingCardSlide = React.memo(function AnalyzingCardSlide({
           <View className="h-[9px] rounded-full bg-[#EBEBEB] w-4/5 mb-[7px]" />
           <View className="h-[9px] rounded-full bg-[#EBEBEB] w-3/5 mb-[7px]" />
           <View className="h-[9px] rounded-full bg-[#EBEBEB] w-2/5 mb-[10px]" />
-          <Text className="text-[#9B9BAF]" style={{ fontSize: 11 }}>
+          <Text className="text-[#9B9BAF] font-sans" style={{ fontSize: 11 }}>
             {"We'll notify you when done!"}
           </Text>
         </View>

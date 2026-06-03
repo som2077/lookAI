@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: "700",
+    fontFamily: "TikTokSans16pt-Bold",
     color: "#1C1C1E",
     letterSpacing: 0.2,
   },
@@ -273,13 +273,13 @@ const styles = StyleSheet.create({
   ringTextBox: { alignItems: "center" },
   ringPercent: {
     fontSize: 17,
-    fontWeight: "800",
+    fontFamily: "TikTokSans16pt-ExtraBold",
     color: "#1C1C1E",
     lineHeight: 20,
   },
   ringLabel: {
     fontSize: 8.5,
-    fontWeight: "600",
+    fontFamily: "TikTokSans16pt-SemiBold",
     color: "rgba(0,0,0,0.6)",
     letterSpacing: 0.3,
   },
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   titleBlock: { marginTop: 10, gap: 8 },
   outfitTitle: {
     fontSize: 24,
-    fontWeight: "900",
+    fontFamily: "TikTokSans16pt-Black",
     color: "#1C1C1E",
     lineHeight: 30,
     letterSpacing: -0.5,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  tagText: { fontSize: 11, fontWeight: "600", color: "#1C1C1E" },
+  tagText: { fontSize: 11, fontFamily: "TikTokSans16pt-SemiBold", color: "#1C1C1E" },
 
   // ── Bottom section
   bottomCard: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 13,
   },
-  tryText: { fontSize: 13, fontWeight: "600", color: "#9CA3AF" },
+  tryText: { fontSize: 13, fontFamily: "TikTokSans16pt-SemiBold", color: "#9CA3AF" },
   wearBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   },
   wearText: {
     fontSize: 13,
-    fontWeight: "700",
+    fontFamily: "TikTokSans16pt-Bold",
     color: "#FFFFFF",
     letterSpacing: 0.1,
   },

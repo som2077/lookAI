@@ -58,11 +58,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: "500",
+    fontFamily: "TikTokSans16pt-Medium",
     color: "#1C1C1E",
   },
   labelActive: {
-    fontWeight: "700",
+    fontFamily: "TikTokSans16pt-Bold",
     color: "#1C1C1E",
   },
 });

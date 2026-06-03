@@ -24,6 +24,7 @@ export default function RootLayout() {
         options={{ animation: "slide_from_right" }}
       />
       <Stack.Screen name="trend-feed" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen name="look-ai" options={{ animation: "slide_from_right" }} />
     </Stack>
   );
 }

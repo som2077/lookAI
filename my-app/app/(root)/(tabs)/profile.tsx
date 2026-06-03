@@ -120,8 +120,19 @@ const MiniProgressCircle = React.memo(function MiniProgressCircle({
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
   return (
-    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
-      <Svg width={size} height={size} style={{ transform: [{ rotate: "-90deg" }] }}>
+    <View
+      style={{
+        width: size,
+        height: size,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Svg
+        width={size}
+        height={size}
+        style={{ transform: [{ rotate: "-90deg" }] }}
+      >
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -142,12 +153,25 @@ const MiniProgressCircle = React.memo(function MiniProgressCircle({
           fill="none"
         />
       </Svg>
-      
-      <View style={{ position: "absolute", alignItems: "center", justifyContent: "center" }}>
+
+      <View
+        style={{
+          position: "absolute",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <Text style={{ fontSize: 13, fontWeight: "800", color: "#1D1A27" }}>
           {score}
         </Text>
-        <Text style={{ fontSize: 7, color: "#9B9BAF", fontWeight: "600", marginTop: 0.5 }}>
+        <Text
+          style={{
+            fontSize: 7,
+            color: "#9B9BAF",
+            fontWeight: "600",
+            marginTop: 0.5,
+          }}
+        >
           /100
         </Text>
       </View>
@@ -176,7 +200,7 @@ export default function ProfileScreen() {
   const handleCopyReferral = useCallback(() => {
     Alert.alert(
       "Referral Copied",
-      "Referral code 'ZARA2026' has been copied to your clipboard!"
+      "Referral code 'ZARA2026' has been copied to your clipboard!",
     );
   }, []);
 
@@ -186,8 +210,13 @@ export default function ProfileScreen() {
       "Are you sure you want to permanently delete your account? This action cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => Alert.alert("Account Deleted", "Your account has been deleted.") }
-      ]
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () =>
+            Alert.alert("Account Deleted", "Your account has been deleted."),
+        },
+      ],
     );
   }, []);
 
@@ -214,7 +243,14 @@ export default function ProfileScreen() {
               }}
             >
               {/* Floating top buttons */}
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 24 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: 24,
+                }}
+              >
                 <Pressable
                   onPress={() => router.back()}
                   style={{
@@ -232,7 +268,7 @@ export default function ProfileScreen() {
                 >
                   <IconArrowLeft size={18} color="#1D1A27" />
                 </Pressable>
-                
+
                 <Pressable
                   style={{
                     width: 38,
@@ -253,7 +289,15 @@ export default function ProfileScreen() {
             </LinearGradient>
 
             {/* Overlapping Avatar and Bio Action Row */}
-            <View style={{ paddingHorizontal: 24, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14 }}>
+            <View
+              style={{
+                paddingHorizontal: 24,
+                flexDirection: "row",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
+                marginBottom: 14,
+              }}
+            >
               <View style={{ position: "relative", marginTop: -38 }}>
                 <View
                   style={{
@@ -310,11 +354,17 @@ export default function ProfileScreen() {
                     paddingVertical: 8,
                   }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: "700", color: "#5A5A6A" }}>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: "700",
+                      color: "#5A5A6A",
+                    }}
+                  >
                     Share
                   </Text>
                 </Pressable>
-                
+
                 <Pressable
                   style={{
                     backgroundColor: "#4C36F5",
@@ -323,7 +373,13 @@ export default function ProfileScreen() {
                     paddingVertical: 8,
                   }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: "700", color: "#FFFFFF" }}>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: "700",
+                      color: "#FFFFFF",
+                    }}
+                  >
                     Edit Profile
                   </Text>
                 </Pressable>
@@ -332,20 +388,43 @@ export default function ProfileScreen() {
 
             {/* Left-aligned Bio Slogans */}
             <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
-              <Text style={{ fontSize: 22, fontWeight: "800", color: "#1D1A27" }}>
+              <Text
+                style={{ fontSize: 22, fontWeight: "800", color: "#1D1A27" }}
+              >
                 {user?.fullName || "Zara Ahmed"}
               </Text>
-              
-              <Text style={{ fontSize: 12, color: "#9B9BAF", fontWeight: "600", marginTop: 2 }}>
+
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#9B9BAF",
+                  fontWeight: "600",
+                  marginTop: 2,
+                }}
+              >
                 @{user?.username || "zara.looks"} · Indore 📍
               </Text>
 
-              <Text style={{ fontSize: 13, color: "#5A5A6A", marginTop: 8, lineHeight: 18, fontWeight: "500" }}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: "#5A5A6A",
+                  marginTop: 8,
+                  lineHeight: 18,
+                  fontWeight: "500",
+                }}
+              >
                 Fashion lover 👗 Dressing for my vibe, not the crowd.
               </Text>
 
               {/* Preferences Tag Flow (left aligned) */}
-              <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 12 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  marginTop: 12,
+                }}
+              >
                 {PREFERENCE_PILLS.map((pill, idx) => (
                   <PreferenceTag key={idx} text={pill.text} type={pill.type} />
                 ))}
@@ -373,32 +452,100 @@ export default function ProfileScreen() {
               >
                 {/* Stat 1 */}
                 <View style={{ alignItems: "center", flex: 1 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "800", color: "#1D1A27" }}>48</Text>
-                  <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 4, fontWeight: "600" }}>Clothes</Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "800",
+                      color: "#1D1A27",
+                    }}
+                  >
+                    48
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      color: "#9B9BAF",
+                      marginTop: 4,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Clothes
+                  </Text>
                 </View>
-                
+
                 <View style={{ width: 1, backgroundColor: "#E2E2EA" }} />
 
                 {/* Stat 2 */}
                 <View style={{ alignItems: "center", flex: 1 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "800", color: "#4C36F5" }}>36</Text>
-                  <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 4, fontWeight: "600" }}>Outfits</Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "800",
+                      color: "#4C36F5",
+                    }}
+                  >
+                    36
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      color: "#9B9BAF",
+                      marginTop: 4,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Outfits
+                  </Text>
                 </View>
 
                 <View style={{ width: 1, backgroundColor: "#E2E2EA" }} />
 
                 {/* Stat 3 */}
                 <View style={{ alignItems: "center", flex: 1 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "800", color: "#0F824A" }}>214</Text>
-                  <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 4, fontWeight: "600" }}>Wears</Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "800",
+                      color: "#0F824A",
+                    }}
+                  >
+                    214
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      color: "#9B9BAF",
+                      marginTop: 4,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Wears
+                  </Text>
                 </View>
 
                 <View style={{ width: 1, backgroundColor: "#E2E2EA" }} />
 
                 {/* Stat 4 */}
                 <View style={{ alignItems: "center", flex: 1 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "800", color: "#B25E02" }}>75%</Text>
-                  <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 4, fontWeight: "600" }}>Usage</Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "800",
+                      color: "#B25E02",
+                    }}
+                  >
+                    75%
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      color: "#9B9BAF",
+                      marginTop: 4,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Usage
+                  </Text>
                 </View>
               </View>
             </View>
@@ -439,15 +586,34 @@ export default function ProfileScreen() {
                         paddingVertical: 2,
                       }}
                     >
-                      <Text style={{ fontSize: 9, fontWeight: "800", color: "#0F824A" }}>
+                      <Text
+                        style={{
+                          fontSize: 9,
+                          fontWeight: "800",
+                          color: "#0F824A",
+                        }}
+                      >
                         Grade A-
                       </Text>
                     </View>
                   </View>
-                  <Text style={{ fontSize: 14, fontWeight: "800", color: "#1D1A27" }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "800",
+                      color: "#1D1A27",
+                    }}
+                  >
                     Great Dresser!
                   </Text>
-                  <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      color: "#9B9BAF",
+                      marginTop: 2,
+                      fontWeight: "500",
+                    }}
+                  >
                     +6 pts this week · See full score
                   </Text>
                 </View>
@@ -459,7 +625,12 @@ export default function ProfileScreen() {
 
             {/* Body Profile Grid Cards (Rendered directly, no title header) */}
             <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
                 {BODY_STATS.map((stat, idx) => (
                   <View
                     key={idx}
@@ -483,10 +654,24 @@ export default function ProfileScreen() {
                     <Text style={{ fontSize: 18, marginBottom: 6 }}>
                       {stat.emoji}
                     </Text>
-                    <Text numberOfLines={1} style={{ fontSize: 12, fontWeight: "800", color: "#1D1A27" }}>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        fontSize: 12,
+                        fontWeight: "800",
+                        color: "#1D1A27",
+                      }}
+                    >
                       {stat.value}
                     </Text>
-                    <Text style={{ fontSize: 9, color: "#9B9BAF", marginTop: 2, fontWeight: "600" }}>
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        color: "#9B9BAF",
+                        marginTop: 2,
+                        fontWeight: "600",
+                      }}
+                    >
                       {stat.label}
                     </Text>
                   </View>
@@ -509,7 +694,13 @@ export default function ProfileScreen() {
                 }}
               >
                 {/* Header row */}
-                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 14 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 14,
+                  }}
+                >
                   <View
                     style={{
                       width: 42,
@@ -524,10 +715,23 @@ export default function ProfileScreen() {
                     <IconSparkles size={20} color="#FFFFFF" fill="#FFFFFF" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 14, fontWeight: "800", color: "#FFFFFF" }}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "800",
+                        color: "#FFFFFF",
+                      }}
+                    >
                       Invite Friends & Earn
                     </Text>
-                    <Text style={{ fontSize: 10, color: "#E0DBFF", marginTop: 2, fontWeight: "600" }}>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: "#E0DBFF",
+                        marginTop: 2,
+                        fontWeight: "600",
+                      }}
+                    >
                       Both get 1 month free Pro 🎁
                     </Text>
                   </View>
@@ -548,14 +752,27 @@ export default function ProfileScreen() {
                   }}
                 >
                   <View>
-                    <Text style={{ fontSize: 9, color: "#C3BCFF", fontWeight: "600" }}>
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        color: "#C3BCFF",
+                        fontWeight: "600",
+                      }}
+                    >
                       Your referral code
                     </Text>
-                    <Text style={{ fontSize: 16, fontWeight: "800", color: "#FFFFFF", marginTop: 2 }}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "800",
+                        color: "#FFFFFF",
+                        marginTop: 2,
+                      }}
+                    >
                       ZARA2026
                     </Text>
                   </View>
-                  
+
                   <Pressable
                     onPress={handleCopyReferral}
                     style={{
@@ -565,7 +782,13 @@ export default function ProfileScreen() {
                       borderRadius: 10,
                     }}
                   >
-                    <Text style={{ fontSize: 12, fontWeight: "700", color: "#4C36F5" }}>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontWeight: "700",
+                        color: "#4C36F5",
+                      }}
+                    >
                       Copy Code
                     </Text>
                   </Pressable>
@@ -590,7 +813,14 @@ export default function ProfileScreen() {
                 }}
               >
                 {/* 1. Notifications */}
-                <Pressable style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 16 }}>
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                  }}
+                >
                   <View
                     style={{
                       width: 38,
@@ -605,20 +835,46 @@ export default function ProfileScreen() {
                     <IconBell size={18} color="#4C36F5" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27" }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: "#1D1A27",
+                      }}
+                    >
                       Notifications
                     </Text>
-                    <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: "#9B9BAF",
+                        marginTop: 2,
+                        fontWeight: "500",
+                      }}
+                    >
                       Daily outfit reminders
                     </Text>
                   </View>
                   <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
-                <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#F1F1F5",
+                    marginHorizontal: 16,
+                  }}
+                />
 
                 {/* 2. Privacy & Security */}
-                <Pressable style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 16 }}>
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                  }}
+                >
                   <View
                     style={{
                       width: 38,
@@ -633,20 +889,46 @@ export default function ProfileScreen() {
                     <IconLock size={18} color="#B25E02" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27" }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: "#1D1A27",
+                      }}
+                    >
                       Privacy & Security
                     </Text>
-                    <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: "#9B9BAF",
+                        marginTop: 2,
+                        fontWeight: "500",
+                      }}
+                    >
                       Manage your data
                     </Text>
                   </View>
                   <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
-                <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#F1F1F5",
+                    marginHorizontal: 16,
+                  }}
+                />
 
                 {/* 3. Help & Support */}
-                <Pressable style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 16 }}>
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                  }}
+                >
                   <View
                     style={{
                       width: 38,
@@ -661,23 +943,47 @@ export default function ProfileScreen() {
                     <IconHelp size={18} color="#0F824A" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27" }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: "#1D1A27",
+                      }}
+                    >
                       Help & Support
                     </Text>
-                    <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: "#9B9BAF",
+                        marginTop: 2,
+                        fontWeight: "500",
+                      }}
+                    >
                       FAQs · Contact us
                     </Text>
                   </View>
                   <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
-                <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#F1F1F5",
+                    marginHorizontal: 16,
+                  }}
+                />
 
                 {/* 4. Log Out */}
                 <Pressable
                   onPress={onLogoutPress}
                   disabled={isLoggingOut}
-                  style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 16 }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                  }}
                 >
                   <View
                     style={{
@@ -697,19 +1003,36 @@ export default function ProfileScreen() {
                     )}
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#EF4444" }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: "#EF4444",
+                      }}
+                    >
                       Log Out
                     </Text>
                   </View>
                   <IconChevronRight size={16} color="#C8C8D3" />
                 </Pressable>
 
-                <View style={{ height: 1, backgroundColor: "#F1F1F5", marginHorizontal: 16 }} />
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#F1F1F5",
+                    marginHorizontal: 16,
+                  }}
+                />
 
                 {/* 5. Delete Account */}
                 <Pressable
                   onPress={handleDeleteAccount}
-                  style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 16 }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                  }}
                 >
                   <View
                     style={{
@@ -725,10 +1048,23 @@ export default function ProfileScreen() {
                     <IconTrash size={18} color="#EF4444" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#EF4444" }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: "#EF4444",
+                      }}
+                    >
                       Delete Account
                     </Text>
-                    <Text style={{ fontSize: 10, color: "#9B9BAF", marginTop: 2, fontWeight: "500" }}>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: "#9B9BAF",
+                        marginTop: 2,
+                        fontWeight: "500",
+                      }}
+                    >
                       Permanently remove all data
                     </Text>
                   </View>
@@ -736,7 +1072,6 @@ export default function ProfileScreen() {
                 </Pressable>
               </View>
             </View>
-
           </ScrollView>
         </SafeAreaView>
       </View>

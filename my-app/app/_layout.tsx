@@ -19,7 +19,8 @@ import {
   ErrorStateView,
   AppErrorBoundary,
 } from "../components/ui/ErrorStateView";
-
+import { useFonts } from "expo-font";
+import { FONT_ASSETS } from "@/constants/fonts";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -98,7 +99,6 @@ const RootNavigator = memo(function RootNavigator() {
     userId,
   ]);
 
-
   useEffect(() => {
     if (!isSignedIn) {
       setOnboardingComplete(null);
@@ -166,17 +166,28 @@ const RootNavigator = memo(function RootNavigator() {
 export default function RootLayout() {
   const { setOffline, setServerError } = useErrorStore();
 
+  // Load fonts globally
+  const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
+
+  // Handle font loading error
+  useEffect(() => {
+    if (fontError) {
+      console.warn("Failed to load fonts:", fontError);
+    }
+  }, [fontError]);
+
   const checkConnectivity = useCallback(async () => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 4000);
-      
-      const targetUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "https://google.com";
+
+      const targetUrl =
+        process.env.EXPO_PUBLIC_SUPABASE_URL || "https://google.com";
       const response = await fetch(targetUrl, {
         method: "HEAD",
         signal: controller.signal,
       });
-      
+
       clearTimeout(timeoutId);
 
       if (response.status >= 500) {
@@ -198,12 +209,17 @@ export default function RootLayout() {
 
     // Periodic check every 15 seconds
     const interval = setInterval(checkConnectivity, 15000);
-    
+
     return () => {
       clearInterval(interval);
       void BillingService.disconnect();
     };
   }, [checkConnectivity]);
+
+  // Show nothing while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <GestureHandlerRootView className="flex-1">

@@ -288,7 +288,7 @@ export const TrendCard = React.memo(function TrendCard({
             justifyContent: "center",
           }}
         >
-          <Text style={{ fontSize: 10, fontWeight: "800", color: "#FFFFFF" }}>
+          <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-ExtraBold", color: "#FFFFFF" }}>
             #{trend.rank}
           </Text>
         </View>
@@ -342,7 +342,7 @@ export const TrendCard = React.memo(function TrendCard({
           }}
         >
           <IconTrendingUp size={9} color="#FFFFFF" />
-          <Text style={{ fontSize: 9, fontWeight: "700", color: "#FFFFFF" }}>
+          <Text style={{ fontSize: 9, fontFamily: "TikTokSans16pt-Bold", color: "#FFFFFF" }}>
             {trend.trendPercent}%
           </Text>
         </View>
@@ -361,7 +361,7 @@ export const TrendCard = React.memo(function TrendCard({
           }}
         >
           <Text
-            style={{ fontSize: 8, fontWeight: "700", color: trend.tagColor }}
+            style={{ fontSize: 8, fontFamily: "TikTokSans16pt-Bold", color: trend.tagColor }}
           >
             {trend.tag.toUpperCase()}
           </Text>
@@ -371,7 +371,7 @@ export const TrendCard = React.memo(function TrendCard({
           numberOfLines={1}
           style={{
             fontSize: 12,
-            fontWeight: "800",
+            fontFamily: "TikTokSans16pt-ExtraBold",
             color: "#1D1A27",
             marginBottom: 4,
           }}
@@ -381,7 +381,7 @@ export const TrendCard = React.memo(function TrendCard({
 
         <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
           <IconMapPin size={9} color="#9B9BAF" />
-          <Text style={{ fontSize: 9, color: "#9B9BAF", fontWeight: "500" }}>
+          <Text style={{ fontSize: 9, color: "#9B9BAF", fontFamily: "TikTokSans16pt-Medium" }}>
             {trend.location}
           </Text>
         </View>
@@ -428,14 +428,14 @@ const SectionHeader = React.memo(function SectionHeader({
         {icon}
       </View>
       <View>
-        <Text style={{ fontSize: 16, fontWeight: "700", color: "#1D1A27" }}>
+        <Text style={{ fontSize: 16, fontFamily: "TikTokSans16pt-Bold", color: "#1D1A27" }}>
           {label}
         </Text>
         <Text
           style={{
             fontSize: 11,
             color: "#9B9BAF",
-            fontWeight: "500",
+            fontFamily: "TikTokSans16pt-Medium",
             marginTop: 1,
           }}
         >
@@ -468,14 +468,14 @@ export const TrendFeed = React.memo(function TrendFeed() {
         }}
       >
         <View>
-          <Text style={{ fontSize: 18, fontWeight: "800", color: "#1D1A27" }}>
+          <Text style={{ fontSize: 18, fontFamily: "TikTokSans16pt-ExtraBold", color: "#1D1A27" }}>
             Trend Feed
           </Text>
           <Text
             style={{
               fontSize: 11,
               color: "#9B9BAF",
-              fontWeight: "500",
+              fontFamily: "TikTokSans16pt-Medium",
               marginTop: 2,
             }}
           >
@@ -496,7 +496,7 @@ export const TrendFeed = React.memo(function TrendFeed() {
           }}
         >
           <IconChartLine size={12} color="#FFFFFF" />
-          <Text style={{ fontSize: 12, fontWeight: "600", color: "#FFFFFF" }}>
+          <Text style={{ fontSize: 12, fontFamily: "TikTokSans16pt-SemiBold", color: "#FFFFFF" }}>
             See all
           </Text>
         </Pressable>
@@ -524,7 +524,7 @@ export const TrendFeed = React.memo(function TrendFeed() {
         >
           <IconMapPin size={14} color="#6366F1" />
         </View>
-        <Text style={{ fontSize: 13, fontWeight: "600", color: "#7E7C8C" }}>
+        <Text style={{ fontSize: 13, fontFamily: "TikTokSans16pt-SemiBold", color: "#7E7C8C" }}>
           Near You · Indore
         </Text>
       </View>
@@ -578,14 +578,14 @@ export const TrendFeed = React.memo(function TrendFeed() {
           ))}
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27" }}>
+          <Text style={{ fontSize: 13, fontFamily: "TikTokSans16pt-Bold", color: "#1D1A27" }}>
             Celebrity &amp; Global Trends
           </Text>
           <Text
             style={{
               fontSize: 11,
               color: "#9B9BAF",
-              fontWeight: "500",
+              fontFamily: "TikTokSans16pt-Medium",
               marginTop: 2,
             }}
           >
