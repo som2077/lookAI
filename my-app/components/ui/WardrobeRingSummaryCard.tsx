@@ -87,7 +87,10 @@ export function WardrobeRingSummaryCard({
         </View>
 
         {/* Center Ring */}
-        <View className="items-center justify-center" style={{ position: "relative" }}>
+        <View
+          className="items-center justify-center"
+          style={{ position: "relative" }}
+        >
           <Svg width={svgSize} height={svgSize}>
             {sanitizedSegments.map((segment) => {
               const circumference = 2 * Math.PI * segment.radius;
@@ -122,7 +125,7 @@ export function WardrobeRingSummaryCard({
               );
             })}
           </Svg>
-          {/* Absolutely centered fire icon + counter */}
+          {/* Absolutely centered fire icon progress ring */}
           <View
             style={{
               position: "absolute",
@@ -132,48 +135,32 @@ export function WardrobeRingSummaryCard({
               height: 80,
             }}
           >
-            {/* Circular badge container */}
-            <View
-              style={{
-                width: 58,
-                height: 58,
-                borderRadius: 29,
-                borderWidth: 2,
-                borderColor: "#F5B93A",
-                backgroundColor: "#FFFFFF",
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-              }}
-            >
-              <IconFlameFilled size={26} color="#F5B93A" />
-              {/* Counter badge on the border of this circular container */}
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: -5,
-                  right: -5,
-                  backgroundColor: "#E54B4B",
-                  borderRadius: 10,
-                  paddingHorizontal: 5,
-                  paddingVertical: 1.5,
-                  borderWidth: 1.5,
-                  borderColor: "#FFFFFF",
-                  minWidth: 18,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    color: "#FFFFFF",
-                    fontSize: 9,
-                    fontFamily: "TikTokSans16pt-Bold",
-                  }}
-                >
-                  {streak}
-                </Text>
-              </View>
+            <Svg width={54} height={54}>
+              {/* Light gray track circle */}
+              <Circle
+                cx={27}
+                cy={27}
+                r={22}
+                stroke="#F1F1F4"
+                strokeWidth={2.5}
+                fill="transparent"
+              />
+              {/* Black progress arc representing streak progress */}
+              <Circle
+                cx={27}
+                cy={27}
+                r={22}
+                stroke="#000000"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 22} ${2 * Math.PI * 22}`}
+                strokeDashoffset={2 * Math.PI * 22 * (1 - (streak % 7 || 7) / 7)}
+                fill="transparent"
+                transform="rotate(-90 27 27)"
+              />
+            </Svg>
+            <View style={{ position: "absolute" }}>
+              <IconFlameFilled size={22} color="#000000" />
             </View>
           </View>
         </View>
