@@ -67,7 +67,8 @@ export default function HomeScreen() {
     const totalTracked = summary.wearCount + summary.neverCount;
     const wearShare = totalTracked > 0 ? summary.wearCount / totalTracked : 0;
     const neverShare = totalTracked > 0 ? summary.neverCount / totalTracked : 0;
-    const fourthShare = totalTracked > 0 ? (summary.wearCount * 0.5) / totalTracked : 0.45;
+    const fourthShare =
+      totalTracked > 0 ? (summary.wearCount * 0.5) / totalTracked : 0.45;
     return [
       { ...RING_SEGMENT_BASE[0], progress: clampRatio(summary.wornPercentage) },
       { ...RING_SEGMENT_BASE[1], progress: clampRatio(neverShare) },

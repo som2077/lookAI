@@ -125,7 +125,7 @@ export function WardrobeRingSummaryCard({
               );
             })}
           </Svg>
-          {/* Absolutely centered fire icon progress ring */}
+          {/* Absolutely centered fire icon */}
           <View
             style={{
               position: "absolute",
@@ -135,35 +135,7 @@ export function WardrobeRingSummaryCard({
               height: 80,
             }}
           >
-            <Svg width={54} height={54}>
-              {/* Light gray track circle */}
-              <Circle
-                cx={27}
-                cy={27}
-                r={22}
-                // stroke="#F1F1F4"
-                strokeWidth={4.5}
-                fill="transparent"
-              />
-              {/* Black progress arc representing streak progress */}
-              <Circle
-                cx={27}
-                cy={27}
-                r={22}
-                // stroke="#000000"
-                strokeWidth={4.5}
-                strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 22} ${2 * Math.PI * 22}`}
-                strokeDashoffset={
-                  2 * Math.PI * 22 * (1 - (streak % 7 || 7) / 7)
-                }
-                fill="transparent"
-                transform="rotate(-90 27 27)"
-              />
-            </Svg>
-            <View style={{ position: "absolute" }}>
-              <IconFlameFilled size={22} color="#000000" />
-            </View>
+            <IconFlameFilled size={28} color="#000000" />
           </View>
         </View>
 
