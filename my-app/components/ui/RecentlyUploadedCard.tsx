@@ -1,4 +1,5 @@
 import React from "react";
+import { Image as ExpoImage } from "expo-image";
 import { Pressable, Text, View } from "react-native";
 import { IconBell, IconX, IconShirt } from "@tabler/icons-react-native";
 import { useOutfitAnalysisStore } from "@/backend/store/outfit-analysis-store";
@@ -23,7 +24,7 @@ export const NotifyBanner = React.memo(function NotifyBanner() {
 
   return (
     <View
-      className="mx-6  mt-2 mb-2 flex-row items-center justify-between bg-white rounded-[16px] px-4 py-4"
+      className="mx-6  mt-2 mb-2 flex-row  border border-[#E9EBF8]  items-center justify-between bg-[#FFFFFF] rounded-[16px] px-4 py-4"
       style={{
         shadowColor: "#000000",
         shadowOpacity: 0.04,
@@ -33,7 +34,7 @@ export const NotifyBanner = React.memo(function NotifyBanner() {
       }}
     >
       <View className="flex-row items-center flex-1 pr-3">
-        <IconBell size={23} color="#000000" strokeWidth={1.5} />
+        <IconBell size={24} color="#1D1A27" strokeWidth={1.5} />
         <Text
           className="ml-3 text-[#1D1A27] font-sans"
           style={{ fontSize: 12, lineHeight: 18, flex: 1 }}
@@ -45,7 +46,7 @@ export const NotifyBanner = React.memo(function NotifyBanner() {
         </Text>
       </View>
       <Pressable onPress={() => setIsDismissed(true)} hitSlop={10}>
-        <IconX size={20} color="#000000" strokeWidth={1.5} />
+        <IconX size={20} color="#1D1A27" strokeWidth={1.8} />
       </Pressable>
     </View>
   );
@@ -59,20 +60,56 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
 
   return (
     <View
-      className="mx-6 mt-3 mb-2 items-center justify-center bg-white rounded-[16px] px-4 py-6"
+      className="mx-6 mt-1 mb-2 items-center justify-center bg-[#F8F7FC90] border border-[#E9EBF8] rounded-[16px] px-4 py-6"
       style={{
-        shadowColor: "#000000",
-        shadowOpacity: 0.04,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 1,
+        // shadowColor: "#000000",
+        // shadowOpacity: 0.04,
+        // shadowRadius: 10,
+        // shadowOffset: { width: 0, height: 2 },
+        // elevation: 1,
       }}
     >
-      <View
-        className="items-center justify-center rounded-full"
-        style={{ width: 64, height: 64, backgroundColor: "#F8F7FC" }}
-      >
-        <IconShirt size={30} color="#000000" strokeWidth={1.5} />
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", height: 80, width: 140, marginBottom: 4 }}>
+        {/* Left Circle: Guy Selfie */}
+        <View
+          style={{
+            width: 76,
+            height: 76,
+            borderRadius: 38,
+            borderWidth: 2.2,
+            borderColor: "#A1A1AA",
+            overflow: "hidden",
+            backgroundColor: "#F3F4F6",
+          }}
+        >
+          <ExpoImage
+            source={require("../../assets/images/mirror_selfie_guy.png")}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+          />
+        </View>
+
+        {/* Right Circle: Girl Selfie (overlapping) */}
+        <View
+          style={{
+            width: 76,
+            height: 76,
+            borderRadius: 38,
+            borderWidth: 2.2,
+            borderColor: "#A1A1AA",
+            overflow: "hidden",
+            backgroundColor: "#F3F4F6",
+            marginLeft: -24,
+          }}
+        >
+          <ExpoImage
+            source={require("../../assets/images/mirror_selfie_girl.png")}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+          />
+        </View>
       </View>
       <Text
         className="text-[#1D1A27] mt-4 text-center font-sans"

@@ -12,7 +12,7 @@ export const LookAIBanner = React.memo(function LookAIBanner() {
         marginTop: 7,
         backgroundColor: "#FFFFFF",
         borderWidth: 1,
-        borderColor: "#E2E2E2",
+        borderColor: "#E5E7F0",
         borderRadius: 20,
         paddingHorizontal: 20,
         paddingVertical: 16,
@@ -55,7 +55,7 @@ export const LookAIBanner = React.memo(function LookAIBanner() {
           // backgroundColor: "#E2E2E2",
           borderRadius: 100,
           borderWidth: 1,
-          borderColor: "#E2E2E2",
+          borderColor: "#E5E7F0",
           marginBottom: 10,
         }}
       />

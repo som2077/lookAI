@@ -40,7 +40,9 @@ const clampRatio = (value: number): number => {
 };
 
 type CardKey = "wardrobe" | "blank1";
-const CARDS = Array.from({ length: 100 }, (_, i) => (i % 2 === 0 ? "wardrobe" : "blank1")) as CardKey[];
+const CARDS = Array.from({ length: 100 }, (_, i) =>
+  i % 2 === 0 ? "wardrobe" : "blank1",
+) as CardKey[];
 
 export default function HomeScreen() {
   const { user } = useUser();
@@ -170,7 +172,7 @@ export default function HomeScreen() {
                   flexDirection: "row",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginTop: 10,
+                  marginTop: 15,
                   gap: 7,
                 }}
               >
@@ -178,11 +180,13 @@ export default function HomeScreen() {
                   <View
                     key={i}
                     style={{
-                      width: i === indicatorIndex ? 8 : 7,
-                      height: i === indicatorIndex ? 8 : 7,
+                      width: i === indicatorIndex ? 8 : 8,
+                      height: i === indicatorIndex ? 8 : 8,
                       borderRadius: 5,
+                      borderColor: "#000000",
+                      borderWidth: 0.5,
                       backgroundColor:
-                        i === indicatorIndex ? "#1C1C1E" : "#C7C7C7",
+                        i === indicatorIndex ? "#1C1C1E" : "#FFFFFF",
                     }}
                   />
                 ))}
