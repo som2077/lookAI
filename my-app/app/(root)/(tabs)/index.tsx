@@ -28,9 +28,9 @@ const H_PADDING = 20;
 const HEADER_HEIGHT = 140;
 
 const RING_SEGMENT_BASE: readonly Omit<RingProgressSegment, "progress">[] = [
-  { id: "outer", color: "#F5B93A", radius: 78, strokeWidth: 8 },
-  { id: "middle", color: "#E54B4B", radius: 68, strokeWidth: 8 },
-  { id: "inner", color: "#2A78FF", radius: 58, strokeWidth: 8 },
+  { id: "outer", color: "#E5904F", radius: 78, strokeWidth: 8 },
+  { id: "middle", color: "#E26B6B", radius: 68, strokeWidth: 8 },
+  { id: "inner", color: "#6B7AE8", radius: 58, strokeWidth: 8 },
   { id: "innermost", color: "#000000", radius: 48, strokeWidth: 8 },
 ] as const;
 
@@ -177,21 +177,20 @@ export default function HomeScreen() {
                   flexDirection: "row",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginTop: 15,
-                  gap: 7,
+                  marginTop: 14,
+                  marginBottom: 6,
+                  gap: 6,
                 }}
               >
                 {[0, 1].map((i) => (
                   <View
                     key={i}
                     style={{
-                      width: i === indicatorIndex ? 8 : 8,
-                      height: i === indicatorIndex ? 8 : 8,
-                      borderRadius: 5,
-                      borderColor: "#000000",
-                      borderWidth: 0.5,
+                      width: i === indicatorIndex ? 16 : 6,
+                      height: 6,
+                      borderRadius: 3,
                       backgroundColor:
-                        i === indicatorIndex ? "#1C1C1E" : "#FFFFFF",
+                        i === indicatorIndex ? "#1D1A27" : "#E0E2EE",
                     }}
                   />
                 ))}

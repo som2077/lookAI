@@ -1,5 +1,12 @@
-import React, { useCallback } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import {
   IconChartLine,
   IconCrown,
@@ -8,8 +15,20 @@ import {
   IconLock,
   IconStar,
   IconFlame,
+  IconArrowRight,
 } from "@tabler/icons-react-native";
+import { ChevronRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import Svg, {
+  Circle,
+  Path,
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Stop,
+  Line,
+  Text as SvgText,
+} from "react-native-svg";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -222,7 +241,7 @@ export const GLOBAL_TRENDS: TrendItem[] = [
 
 // ─── Reusable Trend Card ──────────────────────────────────────────────────────
 
-const RANK_COLORS = ["#F59E0B", "#9B9BAF", "#CD7C46"];
+const RANK_COLORS = ["#D97706", "#9B9BAF", "#CD7C46"];
 
 export const TrendCard = React.memo(function TrendCard({
   trend,
@@ -231,7 +250,7 @@ export const TrendCard = React.memo(function TrendCard({
   trend: TrendItem;
   compact?: boolean;
 }) {
-  const rankColor = RANK_COLORS[trend.rank - 1] ?? "#E9EBF8";
+  const rankColor = RANK_COLORS[trend.rank - 1] ?? "#9B9BAF";
   const cardWidth = compact ? 130 : 148;
   const imageHeight = compact ? 120 : 140;
 
@@ -243,90 +262,102 @@ export const TrendCard = React.memo(function TrendCard({
         backgroundColor: "#FFFFFF",
         borderRadius: 24,
         borderWidth: 1,
-        borderColor: "#F0EEF8",
+        borderColor: "#E9EBF8",
         overflow: "hidden",
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowRadius: 12,
+        shadowColor: "#000000",
+        shadowOpacity: 0.03,
+        shadowRadius: 10,
         shadowOffset: { width: 0, height: 4 },
-        elevation: 2,
+        elevation: 1.5,
       }}
     >
-      {/* Visual area */}
-      <View
+      {/* Visual Area with Diagonal Gradient Background */}
+      <LinearGradient
+        colors={[trend.colorTop, trend.colorBottom]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={{
           height: imageHeight,
-          backgroundColor: trend.colorTop,
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
         }}
       >
-        <View
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: imageHeight * 0.55,
-            backgroundColor: trend.colorBottom,
-            opacity: 0.55,
-          }}
-        />
-
-        {/* Rank */}
+        {/* Rank Number Circle Badge */}
         <View
           style={{
             position: "absolute",
             top: 10,
             left: 10,
-            width: 26,
-            height: 26,
-            borderRadius: 13,
+            width: 24,
+            height: 24,
+            borderRadius: 12,
             backgroundColor: rankColor,
             alignItems: "center",
             justifyContent: "center",
+            borderWidth: 1.5,
+            borderColor: "#FFFFFF",
+            shadowColor: "#000000",
+            shadowOpacity: 0.1,
+            shadowRadius: 2,
+            shadowOffset: { width: 0, height: 1 },
+            elevation: 1,
           }}
         >
-          <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-ExtraBold", color: "#FFFFFF" }}>
+          <Text
+            style={{
+              fontSize: 9,
+              fontFamily: "TikTokSans16pt-Bold",
+              color: "#FFFFFF",
+            }}
+          >
             #{trend.rank}
           </Text>
         </View>
 
-        {/* Premium lock */}
+        {/* Premium Lock Badge */}
         {trend.isPremium && (
           <View
             style={{
               position: "absolute",
               top: 10,
               right: 10,
-              width: 26,
-              height: 26,
-              borderRadius: 13,
-              backgroundColor: "rgba(0,0,0,0.40)",
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: "rgba(29, 26, 39, 0.45)",
               alignItems: "center",
               justifyContent: "center",
+              borderWidth: 1,
+              borderColor: "rgba(255,255,255,0.2)",
             }}
           >
-            <IconLock size={12} color="#FFFFFF" />
+            <IconLock size={11} color="#FFFFFF" />
           </View>
         )}
 
-        {/* Emoji center */}
+        {/* Floating Glassmorphic Emoji Center */}
         <View
           style={{
-            width: 58,
-            height: 58,
-            borderRadius: 29,
-            backgroundColor: "rgba(255,255,255,0.22)",
+            width: 52,
+            height: 52,
+            borderRadius: 26,
+            backgroundColor: "rgba(255, 255, 255, 0.22)",
+            borderWidth: 1,
+            borderColor: "rgba(255, 255, 255, 0.35)",
             alignItems: "center",
             justifyContent: "center",
+            shadowColor: "#000000",
+            shadowOpacity: 0.08,
+            shadowRadius: 6,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 2,
           }}
         >
-          <Text style={{ fontSize: 27 }}>{trend.emoji}</Text>
+          <Text style={{ fontSize: 25 }}>{trend.emoji}</Text>
         </View>
 
-        {/* Trending % */}
+        {/* Glassmorphic Trending % Pill Badge */}
         <View
           style={{
             position: "absolute",
@@ -334,34 +365,49 @@ export const TrendCard = React.memo(function TrendCard({
             right: 8,
             flexDirection: "row",
             alignItems: "center",
-            gap: 3,
-            backgroundColor: "rgba(0,0,0,0.30)",
-            borderRadius: 10,
-            paddingHorizontal: 7,
+            gap: 2.5,
+            backgroundColor: "rgba(29, 26, 39, 0.62)",
+            borderRadius: 8,
+            paddingHorizontal: 6.5,
             paddingVertical: 3,
+            borderWidth: 0.5,
+            borderColor: "rgba(255, 255, 255, 0.15)",
           }}
         >
-          <IconTrendingUp size={9} color="#FFFFFF" />
-          <Text style={{ fontSize: 9, fontFamily: "TikTokSans16pt-Bold", color: "#FFFFFF" }}>
+          <IconTrendingUp size={9} color="#1D9E75" />
+          <Text
+            style={{
+              fontSize: 9,
+              fontFamily: "TikTokSans16pt-Bold",
+              color: "#FFFFFF",
+            }}
+          >
             {trend.trendPercent}%
           </Text>
         </View>
-      </View>
+      </LinearGradient>
 
-      {/* Text */}
-      <View style={{ padding: 11 }}>
+      {/* Item Metadata */}
+      <View style={{ padding: 12 }}>
         <View
           style={{
             alignSelf: "flex-start",
             backgroundColor: trend.tagBg,
-            borderRadius: 7,
-            paddingHorizontal: 7,
+            borderRadius: 6,
+            borderWidth: 0.5,
+            borderColor: trend.tagColor + "28",
+            paddingHorizontal: 6.5,
             paddingVertical: 2,
-            marginBottom: 7,
+            marginBottom: 6,
           }}
         >
           <Text
-            style={{ fontSize: 8, fontFamily: "TikTokSans16pt-Bold", color: trend.tagColor }}
+            style={{
+              fontSize: 8,
+              fontFamily: "TikTokSans16pt-Bold",
+              color: trend.tagColor,
+              letterSpacing: 0.5,
+            }}
           >
             {trend.tag.toUpperCase()}
           </Text>
@@ -370,8 +416,8 @@ export const TrendCard = React.memo(function TrendCard({
         <Text
           numberOfLines={1}
           style={{
-            fontSize: 12,
-            fontFamily: "TikTokSans16pt-ExtraBold",
+            fontSize: 13,
+            fontFamily: "TikTokSans16pt-Bold",
             color: "#1D1A27",
             marginBottom: 4,
           }}
@@ -379,9 +425,15 @@ export const TrendCard = React.memo(function TrendCard({
           {trend.title}
         </Text>
 
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
-          <IconMapPin size={9} color="#9B9BAF" />
-          <Text style={{ fontSize: 9, color: "#9B9BAF", fontFamily: "TikTokSans16pt-Medium" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 3.5 }}>
+          <IconMapPin size={9.5} color="#9B9BAF" />
+          <Text
+            style={{
+              fontSize: 9.5,
+              color: "#9B9BAF",
+              fontFamily: "TikTokSans16pt-Medium",
+            }}
+          >
             {trend.location}
           </Text>
         </View>
@@ -428,7 +480,13 @@ const SectionHeader = React.memo(function SectionHeader({
         {icon}
       </View>
       <View>
-        <Text style={{ fontSize: 16, fontFamily: "TikTokSans16pt-Bold", color: "#1D1A27" }}>
+        <Text
+          style={{
+            fontSize: 16,
+            fontFamily: "TikTokSans16pt-Bold",
+            color: "#1D1A27",
+          }}
+        >
           {label}
         </Text>
         <Text
@@ -446,10 +504,371 @@ const SectionHeader = React.memo(function SectionHeader({
   );
 });
 
+// ─── Trend Chart Card (Crossing Bezier Curves Comparison) ──────────────────────
+
+type CategoryType = "Near you" | "Celebrity" | "Global";
+
+const CATEGORY_CHART_DATA: Record<
+  CategoryType,
+  {
+    title: string;
+    subtitle: string;
+    points: {
+      yStart: number;
+      yRedDip: number;
+      yRedPeak: number;
+      yBlackPeak: number;
+      yBlackEnd: number;
+    };
+    labels: { red: string; black: string };
+    caption: string;
+  }
+> = {
+  "Near you": {
+    title: "Indore Trend Velocity",
+    subtitle: "Palazzo Pants vs Kurti Sets local growth",
+    points: {
+      yStart: 50,
+      yRedDip: 90,
+      yRedPeak: 25,
+      yBlackPeak: 50,
+      yBlackEnd: 110,
+    },
+    labels: { red: "Palazzo Pants", black: "Kurti Sets" },
+    caption: "85% of Indore users styling Palazzo Pants this month.",
+  },
+  Celebrity: {
+    title: "Bollywood Look Adoption",
+    subtitle: "Deepika's Cannes Look vs Alia's Wedding season pick",
+    points: {
+      yStart: 35,
+      yRedDip: 75,
+      yRedPeak: 15,
+      yBlackPeak: 35,
+      yBlackEnd: 110,
+    },
+    labels: { red: "Deepika Cannes", black: "Alia Wedding" },
+    caption: "96% velocity spike on Deepika Cannes style replicas.",
+  },
+  Global: {
+    title: "Global Movement Speed",
+    subtitle: "Y2K Revival vs Quiet Luxury global velocity",
+    points: {
+      yStart: 60,
+      yRedDip: 85,
+      yRedPeak: 30,
+      yBlackPeak: 60,
+      yBlackEnd: 110,
+    },
+    labels: { red: "Y2K Revival", black: "Quiet Luxury" },
+    caption: "Y2K styles continue viral adoption cycles across global regions.",
+  },
+};
+
+const CATEGORIES = ["Near you", "Celebrity", "Global"] as const;
+
+interface TrendChartCardProps {
+  activeCategory: CategoryType;
+  setActiveCategory: (cat: CategoryType) => void;
+}
+
+export const TrendChartCard = React.memo(function TrendChartCard({
+  activeCategory,
+  setActiveCategory,
+}: TrendChartCardProps) {
+  const screenWidth = Dimensions.get("window").width;
+  const containerWidth = screenWidth - 40; // mx-5 is 20 padding on each side
+  const svgHeight = 155;
+  const paddingLeft = 24;
+  const paddingRight = 24;
+  const chartWidth = containerWidth - paddingLeft - paddingRight;
+
+  const xStart = paddingLeft;
+  const xEnd = containerWidth - paddingRight;
+  const yBaseline = 110;
+
+  const activeChart = CATEGORY_CHART_DATA[activeCategory];
+  const { yStart, yRedDip, yRedPeak, yBlackPeak, yBlackEnd } =
+    activeChart.points;
+
+  // Red curve coordinates (Starts at yStart, dips to yRedDip, rises to yRedPeak)
+  const dRed = `M ${xStart} ${yStart} C ${xStart + chartWidth / 3} ${yStart - 10}, ${xStart + chartWidth / 3} ${yRedDip + 15}, ${xStart + chartWidth / 2} ${yRedDip - 5} C ${xStart + (2 * chartWidth) / 3} ${yRedDip - 25}, ${xStart + (3 * chartWidth) / 4} ${yRedPeak}, ${xEnd} ${yRedPeak}`;
+  const dRedClosed = `${dRed} L ${xEnd} ${yBaseline} L ${xStart} ${yBaseline} Z`;
+
+  // Black curve coordinates (Starts at yStart, stays around yBlackPeak, declines to yBlackEnd)
+  const dBlack = `M ${xStart} ${yStart} C ${xStart + chartWidth / 2} ${yBlackPeak - 10}, ${xStart + chartWidth / 2} ${yBlackEnd}, ${xEnd} ${yBlackEnd}`;
+  const dBlackClosed = `${dBlack} L ${xEnd} ${yBaseline} L ${xStart} ${yBaseline} Z`;
+
+  return (
+    <View
+      style={{
+        backgroundColor: "#FFFFFF",
+        borderRadius: 24,
+        borderWidth: 1,
+        borderColor: "#E9EBF8",
+        padding: 16,
+        marginHorizontal: 20,
+        marginBottom: 20,
+        shadowColor: "#000000",
+        shadowOpacity: 0.02,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+        elevation: 1,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 14,
+          fontFamily: "TikTokSans16pt-Bold",
+          color: "#1D1A27",
+          marginBottom: 2,
+        }}
+      >
+        {activeChart.title}
+      </Text>
+      <Text
+        style={{
+          fontSize: 11,
+          fontFamily: "TikTokSans16pt-Medium",
+          color: "#9B9BAF",
+          marginBottom: 10,
+        }}
+        numberOfLines={1}
+      >
+        {activeChart.subtitle}
+      </Text>
+
+      <View
+        style={{
+          width: containerWidth - 32,
+          height: svgHeight,
+          marginLeft: -8,
+          // marginRight: 2,
+        }}
+      >
+        <Svg width={containerWidth - 32} height={svgHeight}>
+          <Defs>
+            <SvgLinearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#EF4444" stopOpacity={0.15} />
+              <Stop offset="100%" stopColor="#EF4444" stopOpacity={0.0} />
+            </SvgLinearGradient>
+            <SvgLinearGradient id="blackGrad" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#1D1A27" stopOpacity={0.1} />
+              <Stop offset="100%" stopColor="#1D1A27" stopOpacity={0.0} />
+            </SvgLinearGradient>
+          </Defs>
+
+          {/* Dotted horizontal helper lines */}
+          <Line
+            x1={xStart}
+            y1={40}
+            x2={xEnd}
+            y2={40}
+            stroke="#F0F0F2"
+            strokeWidth={1}
+            strokeDasharray="4,4"
+          />
+          <Line
+            x1={xStart}
+            y1={75}
+            x2={xEnd}
+            y2={75}
+            stroke="#F0F0F2"
+            strokeWidth={1}
+            strokeDasharray="4,4"
+          />
+
+          {/* Baseline axis */}
+          <Line
+            x1={xStart}
+            y1={yBaseline}
+            x2={xEnd}
+            y2={yBaseline}
+            stroke="#EBEBEB"
+            strokeWidth={1}
+          />
+
+          {/* Fills */}
+          <Path d={dBlackClosed} fill="url(#blackGrad)" />
+          <Path d={dRedClosed} fill="url(#redGrad)" />
+
+          {/* Lines */}
+          <Path
+            d={dBlack}
+            fill="none"
+            stroke="#1D1A27"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+          />
+          <Path
+            d={dRed}
+            fill="none"
+            stroke="#EF4444"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+          />
+
+          {/* Start and end points */}
+          <Circle
+            cx={xStart}
+            cy={yStart}
+            r={4.5}
+            fill="#FFFFFF"
+            stroke="#1D1A27"
+            strokeWidth={2}
+          />
+          <Circle
+            cx={xEnd}
+            cy={yBlackEnd}
+            r={4.5}
+            fill="#FFFFFF"
+            stroke="#1D1A27"
+            strokeWidth={2}
+          />
+
+          {/* X Axis labels */}
+          <SvgText
+            x={xStart}
+            y={yBaseline + 18}
+            textAnchor="start"
+            fill="#9B9BAF"
+            fontSize={10}
+            fontFamily="TikTokSans16pt-Bold"
+          >
+            Month 1
+          </SvgText>
+          <SvgText
+            x={xEnd}
+            y={yBaseline + 18}
+            textAnchor="end"
+            fill="#9B9BAF"
+            fontSize={10}
+            fontFamily="TikTokSans16pt-Bold"
+          >
+            Month 6
+          </SvgText>
+
+          {/* In-chart Curve Labels */}
+          <SvgText
+            x={xEnd - 10}
+            y={yRedPeak + 14}
+            textAnchor="end"
+            fill="#EF4444"
+            fontSize={9.5}
+            fontFamily="TikTokSans16pt-Bold"
+          >
+            {activeChart.labels.red}
+          </SvgText>
+          <SvgText
+            x={xEnd - 10}
+            y={yBlackEnd - 12}
+            textAnchor="end"
+            fill="#1D1A27"
+            fontSize={9.5}
+            fontFamily="TikTokSans16pt-Bold"
+          >
+            {activeChart.labels.black}
+          </SvgText>
+        </Svg>
+      </View>
+
+      {/* Horizontal Selector Bar inside Trend Chart Card */}
+      <View className="flex-row items-center justify-between bg-[#F4F5F9] rounded-[10px] p-1 mt-1 mb-3">
+        {CATEGORIES.map((category) => {
+          const isActive = activeCategory === category;
+          return (
+            <TouchableOpacity
+              key={category}
+              onPress={() => setActiveCategory(category)}
+              className="flex-1 items-center justify-center py-2"
+              style={
+                isActive
+                  ? {
+                      backgroundColor: "#FFFFFF",
+                      borderRadius: 10,
+                      shadowColor: "#000000",
+                      shadowOpacity: 0.15,
+                      shadowRadius: 3,
+                      shadowOffset: { width: 0, height: 1.5 },
+                      elevation: 2.5,
+                    }
+                  : {}
+              }
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: isActive
+                    ? "TikTokSans16pt-Bold"
+                    : "TikTokSans16pt-Medium",
+                  color: isActive ? "#1D1A27" : "#7E7C8C",
+                }}
+              >
+                {category === "Near you" ? "Near you" : category}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      {/* Descriptive caption */}
+      <Text
+        style={{
+          fontSize: 11,
+          fontFamily: "TikTokSans16pt-SemiBold",
+          color: "#000000",
+          textAlign: "center",
+          lineHeight: 17,
+          marginTop: 4,
+          paddingHorizontal: 8,
+        }}
+      >
+        {activeChart.caption}
+      </Text>
+    </View>
+  );
+});
+
 // ─── Main TrendFeed Component (used on Home screen) ──────────────────────────
+
+const CATEGORY_TRENDS_MAP: Record<CategoryType, TrendItem[]> = {
+  "Near you": LOCAL_TRENDS,
+  Celebrity: CELEBRITY_TRENDS,
+  Global: GLOBAL_TRENDS,
+};
+
+const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
+  "Near you": "Near You · Indore",
+  Celebrity: "Celebrity Looks · Bollywood",
+  Global: "Global Trends · Worldwide",
+};
+
+const getCategoryIcon = (category: CategoryType) => {
+  switch (category) {
+    case "Near you":
+      return <IconMapPin size={14} color="#6366F1" />;
+    case "Celebrity":
+      return <IconStar size={14} color="#EC4899" />;
+    case "Global":
+      return <IconFlame size={14} color="#EF4444" />;
+  }
+};
+
+const getCategoryIconBg = (category: CategoryType) => {
+  switch (category) {
+    case "Near you":
+      return "#EEF2FF";
+    case "Celebrity":
+      return "#FDF2F8";
+    case "Global":
+      return "#FEF2F2";
+  }
+};
 
 export const TrendFeed = React.memo(function TrendFeed() {
   const router = useRouter();
+  const [activeCategory, setActiveCategory] =
+    useState<CategoryType>("Near you");
 
   const handleSeeAll = useCallback(() => {
     router.push("/(root)/trend-feed" as never);
@@ -463,15 +882,21 @@ export const TrendFeed = React.memo(function TrendFeed() {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingHorizontal: 20,
-          marginBottom: 16,
+          paddingHorizontal: 24,
+          marginBottom: 12,
         }}
       >
         <View>
-          <Text style={{ fontSize: 18, fontFamily: "TikTokSans16pt-ExtraBold", color: "#1D1A27" }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontFamily: "TikTokSans16pt-Bold",
+              color: "#1D1A27",
+            }}
+          >
             Trend Feed
           </Text>
-          <Text
+          {/* <Text
             style={{
               fontSize: 11,
               color: "#9B9BAF",
@@ -480,66 +905,19 @@ export const TrendFeed = React.memo(function TrendFeed() {
             }}
           >
             Trending near you · Indore
-          </Text>
+          </Text> */}
         </View>
 
-        <Pressable
-          onPress={handleSeeAll}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 4,
-            backgroundColor: "#1D1A27",
-            borderRadius: 14,
-            paddingHorizontal: 14,
-            paddingVertical: 8,
-          }}
-        >
-          <IconChartLine size={12} color="#FFFFFF" />
-          <Text style={{ fontSize: 12, fontFamily: "TikTokSans16pt-SemiBold", color: "#FFFFFF" }}>
-            See all
-          </Text>
-        </Pressable>
+        <TouchableOpacity onPress={handleSeeAll}>
+          <ChevronRight size={20} color="#000000" strokeWidth={2} />
+        </TouchableOpacity>
       </View>
 
-      {/* ── Local section label ── */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8,
-          paddingHorizontal: 20,
-          marginBottom: 14,
-        }}
-      >
-        <View
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 15,
-            backgroundColor: "#EEF2FF",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <IconMapPin size={14} color="#6366F1" />
-        </View>
-        <Text style={{ fontSize: 13, fontFamily: "TikTokSans16pt-SemiBold", color: "#7E7C8C" }}>
-          Near You · Indore
-        </Text>
-      </View>
-
-      {/* ── Local trends only ── */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 4 }}
-        style={{ marginBottom: 20 }}
-      >
-        {LOCAL_TRENDS.map((trend) => (
-          <TrendCard key={trend.id} trend={trend} />
-        ))}
-      </ScrollView>
+      {/* Trend comparison graph card (Cal AI style with horizontal selector) */}
+      <TrendChartCard
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+      />
 
       {/* ── See all banner (celebrity + global teaser) ── */}
       <Pressable
@@ -549,12 +927,17 @@ export const TrendFeed = React.memo(function TrendFeed() {
           alignItems: "center",
           gap: 12,
           marginHorizontal: 20,
-          backgroundColor: "#F8F7FC",
-          borderRadius: 20,
+          backgroundColor: "#1D1A27",
+          borderRadius: 24,
           borderWidth: 1,
-          borderColor: "#E9EBF8",
+          borderColor: "#2E2B3A",
           paddingHorizontal: 16,
           paddingVertical: 14,
+          shadowColor: "#000000",
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
+          shadowOffset: { width: 0, height: 6 },
+          elevation: 3,
         }}
       >
         <View style={{ flexDirection: "row", gap: -8 }}>
@@ -565,9 +948,10 @@ export const TrendFeed = React.memo(function TrendFeed() {
                 width: 36,
                 height: 36,
                 borderRadius: 18,
-                backgroundColor: i === 0 ? "#FDF2F8" : "#FEF2F2",
+                backgroundColor:
+                  i === 0 ? "rgba(253,242,248,0.15)" : "rgba(254,242,242,0.15)",
                 borderWidth: 2,
-                borderColor: "#FFFFFF",
+                borderColor: "#1D1A27",
                 alignItems: "center",
                 justifyContent: "center",
                 marginLeft: i > 0 ? -10 : 0,
@@ -578,13 +962,19 @@ export const TrendFeed = React.memo(function TrendFeed() {
           ))}
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 13, fontFamily: "TikTokSans16pt-Bold", color: "#1D1A27" }}>
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: "TikTokSans16pt-Bold",
+              color: "#FFFFFF",
+            }}
+          >
             Celebrity &amp; Global Trends
           </Text>
           <Text
             style={{
               fontSize: 11,
-              color: "#9B9BAF",
+              color: "#A5A5C0",
               fontFamily: "TikTokSans16pt-Medium",
               marginTop: 2,
             }}
@@ -597,12 +987,12 @@ export const TrendFeed = React.memo(function TrendFeed() {
             width: 30,
             height: 30,
             borderRadius: 15,
-            backgroundColor: "#1D1A27",
+            backgroundColor: "#CD7C46",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <IconChartLine size={13} color="#FFFFFF" />
+          <IconArrowRight size={13} color="#FFFFFF" />
         </View>
       </Pressable>
     </View>

@@ -55,21 +55,39 @@ const DayCell = React.memo(function DayCell({
       onPress={handlePress}
     >
       <Text
-        className={`text-[12px] font-bold ${
-          isActive ? "text-[#171421]" : "text-[#868693]"
-        }`}
+        style={{
+          fontSize: 11,
+          fontFamily: "TikTokSans16pt-Medium",
+          color: isActive ? "#1D1A27" : "#868693",
+        }}
       >
         {dayLabel}
       </Text>
       <View
-        className={`mt-2 h-11 w-11 items-center justify-center rounded-full ${
-          isActive ? "bg-[#000000]" : "border border-[#E2E2EA] bg-[#F2F2F2]"
-        }`}
+        className="mt-2 h-10 w-10 items-center justify-center rounded-full"
+        style={
+          isActive
+            ? {
+                backgroundColor: "#1D1A27",
+                shadowColor: "#000000",
+                shadowOpacity: 0.1,
+                shadowRadius: 3,
+                shadowOffset: { width: 0, height: 1.5 },
+                elevation: 2,
+              }
+            : {
+                borderWidth: 1,
+                borderColor: "#E9EBF8",
+                backgroundColor: "#F8F9FC",
+              }
+        }
       >
         <Text
-          className={`text-sm font-bold ${
-            isActive ? "text-[#FFFFFF]" : "text-[#171421]"
-          }`}
+          style={{
+            fontSize: 13,
+            fontFamily: "TikTokSans16pt-Bold",
+            color: isActive ? "#FFFFFF" : "#1D1A27",
+          }}
         >
           {date.getDate()}
         </Text>

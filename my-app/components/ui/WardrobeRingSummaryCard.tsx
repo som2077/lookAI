@@ -64,24 +64,33 @@ export function WardrobeRingSummaryCard({
   const formattedPercentage = Math.round(clampProgress(wornPercentage) * 100);
 
   return (
-    <View className="mt-3 bg-[#ffffff] border border-[#E9EBF8] shadow rounded-3xl py-4 ml-1 ">
-      <View className="flex-row items-center justify-between gap-5  ml-1 mr-2">
+    <View
+      className="mt-3 bg-[#ffffff] border border-[#E9EBF8] rounded-[24px] py-4 px-3"
+      style={{
+        shadowColor: "#000",
+        shadowOpacity: 0.02,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+        elevation: 1,
+      }}
+    >
+      <View className="flex-row items-center justify-between gap-2">
         {/* Left Stats */}
-        <View className="flex-1 items-end gap-9 py-1">
+        <View className="flex-1 items-end gap-5 py-1">
           <View className="items-end">
-            <Text className="text-2xl  font-black text-[#F5B93A]">
-              {formattedPercentage}
+            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#E5904F" }}>
+              {formattedPercentage}%
             </Text>
-            <Text className="text-xs font-bold text-[#F5B93A]">
+            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#E5904F", marginTop: 2 }}>
               Worn clothes
             </Text>
           </View>
           <View className="items-end">
-            <Text className="text-2xl font-extrabold text-[#171421]">
+            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#1D1A27" }}>
               {totalWorn}
             </Text>
-            <Text className="text-xs font-semibold text-[#868693]">
-              Background
+            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#868693", marginTop: 2 }}>
+              Total Items
             </Text>
           </View>
         </View>
@@ -135,25 +144,27 @@ export function WardrobeRingSummaryCard({
               height: 80,
             }}
           >
-            <IconFlameFilled size={28} color="#000000" />
+            <IconFlameFilled size={26} color="#1D1A27" />
           </View>
         </View>
 
         {/* Right Stats */}
-        <View className="flex-1 items-start gap-9 py-1">
+        <View className="flex-1 items-start gap-5 py-1">
           <View>
-            <Text className="text-2xl font-black text-[#2A78FF]">
+            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#6B7AE8" }}>
               {wearCount}
             </Text>
-            <Text className="text-xs font-bold text-[#2A78FF]">
+            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#6B7AE8", marginTop: 2 }}>
               Total wears
             </Text>
           </View>
           <View>
-            <Text className="text-2xl font-black text-[#E54B4B]">
+            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#E26B6B" }}>
               {neverCount}
             </Text>
-            <Text className="text-xs font-bold text-[#E54B4B]">Never worn</Text>
+            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#E26B6B", marginTop: 2 }}>
+              Never worn
+            </Text>
           </View>
         </View>
       </View>
