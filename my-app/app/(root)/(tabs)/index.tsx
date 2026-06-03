@@ -31,6 +31,7 @@ const RING_SEGMENT_BASE: readonly Omit<RingProgressSegment, "progress">[] = [
   { id: "outer", color: "#F5B93A", radius: 78, strokeWidth: 8 },
   { id: "middle", color: "#E54B4B", radius: 68, strokeWidth: 8 },
   { id: "inner", color: "#2A78FF", radius: 58, strokeWidth: 8 },
+  { id: "innermost", color: "#000000", radius: 48, strokeWidth: 8 },
 ] as const;
 
 const clampRatio = (value: number): number => {
@@ -66,10 +67,12 @@ export default function HomeScreen() {
     const totalTracked = summary.wearCount + summary.neverCount;
     const wearShare = totalTracked > 0 ? summary.wearCount / totalTracked : 0;
     const neverShare = totalTracked > 0 ? summary.neverCount / totalTracked : 0;
+    const fourthShare = totalTracked > 0 ? (summary.wearCount * 0.5) / totalTracked : 0.45;
     return [
       { ...RING_SEGMENT_BASE[0], progress: clampRatio(summary.wornPercentage) },
       { ...RING_SEGMENT_BASE[1], progress: clampRatio(neverShare) },
       { ...RING_SEGMENT_BASE[2], progress: clampRatio(wearShare) },
+      { ...RING_SEGMENT_BASE[3], progress: clampRatio(fourthShare) },
     ];
   }, [summary]);
 

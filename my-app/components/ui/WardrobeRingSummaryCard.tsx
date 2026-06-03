@@ -141,8 +141,8 @@ export function WardrobeRingSummaryCard({
                 cx={27}
                 cy={27}
                 r={22}
-                stroke="#F1F1F4"
-                strokeWidth={2.5}
+                // stroke="#F1F1F4"
+                strokeWidth={4.5}
                 fill="transparent"
               />
               {/* Black progress arc representing streak progress */}
@@ -150,11 +150,13 @@ export function WardrobeRingSummaryCard({
                 cx={27}
                 cy={27}
                 r={22}
-                stroke="#000000"
-                strokeWidth={2.5}
+                // stroke="#000000"
+                strokeWidth={4.5}
                 strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 22} ${2 * Math.PI * 22}`}
-                strokeDashoffset={2 * Math.PI * 22 * (1 - (streak % 7 || 7) / 7)}
+                strokeDashoffset={
+                  2 * Math.PI * 22 * (1 - (streak % 7 || 7) / 7)
+                }
                 fill="transparent"
                 transform="rotate(-90 27 27)"
               />
