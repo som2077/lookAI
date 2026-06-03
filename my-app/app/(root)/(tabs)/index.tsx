@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Dimensions, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
@@ -18,7 +18,6 @@ import {
 import { TrendFeed } from "../../../components/ui/TrendFeed";
 import { WardrobeHighlights } from "../../../components/ui/WardrobeHighlights";
 import { WeatherOutfitCard } from "../../../components/ui/WeatherOutfitCard";
-import { AIPickOfTheDayCard } from "../../../components/ui/AIPickOfTheDayCard";
 import { LookAIBanner } from "../../../components/ui/LookAIBanner";
 import { WardrobeFilterTabs } from "../../../components/ui/WardrobeFilterTabs";
 
@@ -40,15 +39,26 @@ const clampRatio = (value: number): number => {
   return value;
 };
 
-const CARDS = ["wardrobe", "blank1", "blank2"] as const;
-type CardKey = (typeof CARDS)[number];
+type CardKey = "wardrobe" | "blank1";
+const CARDS = Array.from({ length: 100 }, (_, i) => (i % 2 === 0 ? "wardrobe" : "blank1")) as CardKey[];
 
 export default function HomeScreen() {
   const { user } = useUser();
   const { summary } = useWardrobeSummary(user?.id);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(50); // Start at index 50 ('wardrobe')
   const flatListRef = useRef<FlatList>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Initial scroll to index 50 ('wardrobe')
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      flatListRef.current?.scrollToIndex({
+        index: 50,
+        animated: false,
+      });
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   const ringSegments = useMemo<readonly RingProgressSegment[]>(() => {
     const totalTracked = summary.wearCount + summary.neverCount;
@@ -61,18 +71,17 @@ export default function HomeScreen() {
     ];
   }, [summary]);
 
-  const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: Array<{ index: number | null }> }) => {
-      if (viewableItems.length > 0 && viewableItems[0].index !== null) {
-        setActiveIndex(viewableItems[0].index);
-      }
-    },
-  ).current;
+  const handleMomentumScrollEnd = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / SCREEN_WIDTH);
+    setActiveIndex(index);
+  };
 
-  const viewabilityConfig = useRef({
-    viewAreaCoveragePercentThreshold: 60,
-    waitForInteraction: false,
-  }).current;
+  const getItemLayout = (_data: any, index: number) => ({
+    length: SCREEN_WIDTH,
+    offset: SCREEN_WIDTH * index,
+    index,
+  });
 
   const renderCard = ({ item }: { item: CardKey }) => (
     <View style={{ width: SCREEN_WIDTH, paddingHorizontal: H_PADDING }}>
@@ -87,13 +96,11 @@ export default function HomeScreen() {
           />
           <WardrobeFilterTabs />
         </>
-      ) : item === "blank1" ? (
+      ) : (
         <>
           <WeatherOutfitCard />
           <LookAIBanner />
         </>
-      ) : (
-        <AIPickOfTheDayCard />
       )}
     </View>
   );
@@ -111,6 +118,8 @@ export default function HomeScreen() {
     outputRange: [1, 0.6, 0],
     extrapolate: "clamp",
   });
+
+  const indicatorIndex = CARDS[activeIndex] === "wardrobe" ? 0 : 1;
 
   return (
     <SwipeTabWrapper tabIndex={0}>
@@ -143,14 +152,14 @@ export default function HomeScreen() {
               {/* FlatList full-width — pagingEnabled snaps correctly */}
               <FlatList
                 ref={flatListRef}
-                data={[...CARDS] as CardKey[]}
-                keyExtractor={(item) => item}
+                data={CARDS}
+                keyExtractor={(item, index) => `${item}-${index}`}
                 renderItem={renderCard}
                 horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
-                onViewableItemsChanged={onViewableItemsChanged}
-                viewabilityConfig={viewabilityConfig}
+                onMomentumScrollEnd={handleMomentumScrollEnd}
+                getItemLayout={getItemLayout}
                 style={{ flexGrow: 0 }}
                 scrollEnabled
               />
@@ -165,15 +174,15 @@ export default function HomeScreen() {
                   gap: 7,
                 }}
               >
-                {CARDS.map((_, i) => (
+                {[0, 1].map((i) => (
                   <View
                     key={i}
                     style={{
-                      width: i === activeIndex ? 8 : 7,
-                      height: i === activeIndex ? 8 : 7,
+                      width: i === indicatorIndex ? 8 : 7,
+                      height: i === indicatorIndex ? 8 : 7,
                       borderRadius: 5,
                       backgroundColor:
-                        i === activeIndex ? "#1C1C1E" : "#C7C7C7",
+                        i === indicatorIndex ? "#1C1C1E" : "#C7C7C7",
                     }}
                   />
                 ))}

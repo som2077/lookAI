@@ -303,7 +303,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  tagText: { fontSize: 11, fontFamily: "TikTokSans16pt-SemiBold", color: "#1C1C1E" },
+  tagText: {
+    fontSize: 11,
+    fontFamily: "TikTokSans16pt-SemiBold",
+    color: "#1C1C1E",
+  },
 
   // ── Bottom section
   bottomCard: {
@@ -326,7 +330,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 13,
   },
-  tryText: { fontSize: 13, fontFamily: "TikTokSans16pt-SemiBold", color: "#9CA3AF" },
+  tryText: {
+    fontSize: 13,
+    fontFamily: "TikTokSans16pt-SemiBold",
+    color: "#9CA3AF",
+  },
   wearBtn: {
     flexDirection: "row",
     alignItems: "center",
