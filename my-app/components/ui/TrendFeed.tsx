@@ -19,6 +19,7 @@ import {
 } from "@tabler/icons-react-native";
 import { ChevronRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, {
   Circle,
@@ -28,6 +29,7 @@ import Svg, {
   Stop,
   Line,
   Text as SvgText,
+  G,
 } from "react-native-svg";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -875,7 +877,7 @@ export const TrendFeed = React.memo(function TrendFeed() {
   }, [router]);
 
   return (
-    <View style={{ marginTop: 24, marginBottom: 80 }}>
+    <View style={{ marginTop: 24, marginBottom: 85 }}>
       {/* ── Header ── */}
       <View
         style={{
@@ -919,82 +921,59 @@ export const TrendFeed = React.memo(function TrendFeed() {
         setActiveCategory={setActiveCategory}
       />
 
-      {/* ── See all banner (celebrity + global teaser) ── */}
-      <Pressable
-        onPress={handleSeeAll}
+      {/* ── Empty State Outfit Tracking Card ── */}
+      <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 12,
-          marginHorizontal: 20,
-          backgroundColor: "#1D1A27",
+          marginHorizontal: 18,
+          // backgroundColor: "#FFFFFF",
+          // borderWidth: 1,
+          // borderColor: "#E5E7EB",
           borderRadius: 24,
-          borderWidth: 1,
-          borderColor: "#2E2B3A",
-          paddingHorizontal: 16,
-          paddingVertical: 14,
-          shadowColor: "#000000",
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
-          shadowOffset: { width: 0, height: 6 },
-          elevation: 3,
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+          // marginTop: 12,
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
         }}
       >
-        <View style={{ flexDirection: "row", gap: -8 }}>
-          {["⭐", "🌍"].map((emoji, i) => (
-            <View
-              key={i}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                backgroundColor:
-                  i === 0 ? "rgba(253,242,248,0.15)" : "rgba(254,242,242,0.15)",
-                borderWidth: 2,
-                borderColor: "#1D1A27",
-                alignItems: "center",
-                justifyContent: "center",
-                marginLeft: i > 0 ? -10 : 0,
-              }}
-            >
-              <Text style={{ fontSize: 16 }}>{emoji}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              fontSize: 13,
-              fontFamily: "TikTokSans16pt-Bold",
-              color: "#FFFFFF",
-            }}
-          >
-            Celebrity &amp; Global Trends
-          </Text>
-          <Text
-            style={{
-              fontSize: 11,
-              color: "#A5A5C0",
-              fontFamily: "TikTokSans16pt-Medium",
-              marginTop: 2,
-            }}
-          >
-            Tap to explore worldwide fashion
-          </Text>
-        </View>
-        <View
+        <Text
           style={{
-            width: 30,
-            height: 30,
-            borderRadius: 15,
-            backgroundColor: "#CD7C46",
-            alignItems: "center",
-            justifyContent: "center",
+            fontSize: 16.5,
+            fontFamily: "TikTokSans16pt-Bold",
+            color: "#1D1A27",
+            textAlign: "center",
+            marginBottom: 7,
           }}
         >
-          <IconArrowRight size={13} color="#FFFFFF" />
-        </View>
-      </Pressable>
+          Ready to style your wardrobe.
+        </Text>
+        <Text
+          style={{
+            fontSize: 13,
+            color: "#4C4B5E",
+            fontFamily: "TikTokSans16pt-Medium",
+            // textAlign: "center",
+            lineHeight: 17,
+          }}
+        >
+          Upload your clothes and discover {"\n"} new outfit combinations.
+        </Text>
+
+        {/* Curved hand-drawn style arrow pointing downwards (half inside, half outside) */}
+        <ExpoImage
+          source={require("../../assets/ScribbleArrow.svg")}
+          style={{
+            position: "absolute",
+            bottom: -19, // Half of height 40 is outside the card border
+            right: 40,
+            width: 80,
+            height: 40,
+            // transform: [{ scaleX: -1 }],
+          }}
+          contentFit="contain"
+        />
+      </View>
     </View>
   );
 });

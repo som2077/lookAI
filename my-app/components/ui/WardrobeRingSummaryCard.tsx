@@ -74,22 +74,48 @@ export function WardrobeRingSummaryCard({
         elevation: 1,
       }}
     >
-      <View className="flex-row items-center justify-between gap-2">
+      <View className="flex-row items-center justify-between gap-3">
         {/* Left Stats */}
         <View className="flex-1 items-end gap-5 py-1">
           <View className="items-end">
-            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#E5904F" }}>
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: "TikTokSans16pt-Bold",
+                color: "#E5904F",
+              }}
+            >
               {formattedPercentage}%
             </Text>
-            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#E5904F", marginTop: 2 }}>
+            <Text
+              style={{
+                fontSize: 10,
+                fontFamily: "TikTokSans16pt-Medium",
+                color: "#E5904F",
+                marginTop: 2,
+              }}
+            >
               Worn clothes
             </Text>
           </View>
           <View className="items-end">
-            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#1D1A27" }}>
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: "TikTokSans16pt-Bold",
+                color: "#1D1A27",
+              }}
+            >
               {totalWorn}
             </Text>
-            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#868693", marginTop: 2 }}>
+            <Text
+              style={{
+                fontSize: 10,
+                fontFamily: "TikTokSans16pt-Medium",
+                color: "#868693",
+                marginTop: 2,
+              }}
+            >
               Total Items
             </Text>
           </View>
@@ -144,25 +170,51 @@ export function WardrobeRingSummaryCard({
               height: 80,
             }}
           >
-            <IconFlameFilled size={26} color="#1D1A27" />
+            <IconFlameFilled size={20} color="#1D1A27" />
           </View>
         </View>
 
         {/* Right Stats */}
         <View className="flex-1 items-start gap-5 py-1">
           <View>
-            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#6B7AE8" }}>
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: "TikTokSans16pt-Bold",
+                color: "#6B7AE8",
+              }}
+            >
               {wearCount}
             </Text>
-            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#6B7AE8", marginTop: 2 }}>
+            <Text
+              style={{
+                fontSize: 10,
+                fontFamily: "TikTokSans16pt-Medium",
+                color: "#6B7AE8",
+                marginTop: 2,
+              }}
+            >
               Total wears
             </Text>
           </View>
           <View>
-            <Text style={{ fontSize: 22, fontFamily: "TikTokSans16pt-Bold", color: "#E26B6B" }}>
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: "TikTokSans16pt-Bold",
+                color: "#E26B6B",
+              }}
+            >
               {neverCount}
             </Text>
-            <Text style={{ fontSize: 10, fontFamily: "TikTokSans16pt-Medium", color: "#E26B6B", marginTop: 2 }}>
+            <Text
+              style={{
+                fontSize: 10,
+                fontFamily: "TikTokSans16pt-Medium",
+                color: "#E26B6B",
+                marginTop: 2,
+              }}
+            >
               Never worn
             </Text>
           </View>

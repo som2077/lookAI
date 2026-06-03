@@ -1,14 +1,19 @@
 import React from "react";
 import { Image as ExpoImage } from "expo-image";
 import { Pressable, Text, View } from "react-native";
-import { IconBell, IconX, IconShirt } from "@tabler/icons-react-native";
+import { IconBell, IconX } from "@tabler/icons-react-native";
 import { useOutfitAnalysisStore } from "@/backend/store/outfit-analysis-store";
 // import Svg, { Polygon, Defs, LinearGradient, Stop } from "react-native-svg";
 
 export const RecentlyUploadedHeading = React.memo(
   function RecentlyUploadedHeading() {
     return (
-      <Text className="text-[#1D1A27] text-xl font-bold mx-8 mt-4">
+      <Text
+        style={{
+          fontFamily: "TikTokSans16pt-Bold",
+        }}
+        className="text-[#1D1A27] text-[20px]  mx-8 mt-4"
+      >
         Recently Styled
       </Text>
     );
@@ -59,7 +64,7 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
   if (isAnalyzing || lastOutfits.length > 0) return null;
 
   return (
-    <View className="mx-6 mt-1 items-center justify-center bg-[#F8F7FC90] border border-[#E9EBF8] rounded-[24px] px-4 py-6">
+    <View className="mx-6 mt-1 items-center justify-center bg-[#F8F7FC] border border-[#E9EBF8] rounded-[24px] px-4 py-6">
       <View
         style={{
           flexDirection: "row",
