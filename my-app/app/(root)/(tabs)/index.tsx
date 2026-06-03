@@ -95,6 +95,7 @@ export default function HomeScreen() {
             wearCount={summary.wearCount}
             neverCount={summary.neverCount}
             ringSegments={ringSegments}
+            streak={1}
           />
           <WardrobeFilterTabs />
         </>

@@ -59,25 +59,25 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
   if (isAnalyzing || lastOutfits.length > 0) return null;
 
   return (
-    <View
-      className="mx-6 mt-1 mb-2 items-center justify-center bg-[#F8F7FC90] border border-[#E9EBF8] rounded-[16px] px-4 py-6"
-      style={{
-        // shadowColor: "#000000",
-        // shadowOpacity: 0.04,
-        // shadowRadius: 10,
-        // shadowOffset: { width: 0, height: 2 },
-        // elevation: 1,
-      }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", height: 80, width: 140, marginBottom: 4 }}>
+    <View className="mx-6 mt-1 items-center justify-center bg-[#F8F7FC90] border border-[#E9EBF8] rounded-[24px] px-4 py-6">
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          height: 80,
+          width: 140,
+          marginTop: -10,
+        }}
+      >
         {/* Left Circle: Guy Selfie */}
         <View
           style={{
-            width: 76,
-            height: 76,
+            width: 60,
+            height: 60,
             borderRadius: 38,
-            borderWidth: 2.2,
-            borderColor: "#A1A1AA",
+            borderWidth: 1,
+            borderColor: "#FFFFFF",
             overflow: "hidden",
             backgroundColor: "#F3F4F6",
           }}
@@ -93,11 +93,11 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
         {/* Right Circle: Girl Selfie (overlapping) */}
         <View
           style={{
-            width: 76,
-            height: 76,
+            width: 60,
+            height: 60,
             borderRadius: 38,
-            borderWidth: 2.2,
-            borderColor: "#A1A1AA",
+            borderWidth: 1,
+            borderColor: "#FFFFFF",
             overflow: "hidden",
             backgroundColor: "#F3F4F6",
             marginLeft: -24,
@@ -112,7 +112,7 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
         </View>
       </View>
       <Text
-        className="text-[#1D1A27] mt-4 text-center font-sans"
+        className="text-[#313131] mt-1 text-center font-TikTokSans16pt-Medium"
         style={{ fontSize: 14, lineHeight: 20 }}
       >
         Tap + add you first style look of the day

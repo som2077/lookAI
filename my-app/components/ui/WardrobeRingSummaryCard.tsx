@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 import { Svg, Circle } from "react-native-svg";
+import { IconFlameFilled } from "@tabler/icons-react-native";
 
 const TRACK_COLOR = "#F8F7FC" as const;
 
@@ -18,6 +19,7 @@ export interface WardrobeRingSummaryCardProps {
   readonly wearCount: number;
   readonly neverCount: number;
   readonly ringSegments: readonly RingProgressSegment[];
+  readonly streak?: number;
 }
 
 const clampProgress = (value: number) => {
@@ -33,6 +35,7 @@ export function WardrobeRingSummaryCard({
   wearCount,
   neverCount,
   ringSegments,
+  streak = 1,
 }: WardrobeRingSummaryCardProps) {
   const sanitizedSegments = useMemo(
     () =>
@@ -84,7 +87,7 @@ export function WardrobeRingSummaryCard({
         </View>
 
         {/* Center Ring */}
-        <View className="items-center">
+        <View className="items-center justify-center" style={{ position: "relative" }}>
           <Svg width={svgSize} height={svgSize}>
             {sanitizedSegments.map((segment) => {
               const circumference = 2 * Math.PI * segment.radius;
@@ -119,6 +122,60 @@ export function WardrobeRingSummaryCard({
               );
             })}
           </Svg>
+          {/* Absolutely centered fire icon + counter */}
+          <View
+            style={{
+              position: "absolute",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 80,
+              height: 80,
+            }}
+          >
+            {/* Circular badge container */}
+            <View
+              style={{
+                width: 58,
+                height: 58,
+                borderRadius: 29,
+                borderWidth: 2,
+                borderColor: "#F5B93A",
+                backgroundColor: "#FFFFFF",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+              }}
+            >
+              <IconFlameFilled size={26} color="#F5B93A" />
+              {/* Counter badge on the border of this circular container */}
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: -5,
+                  right: -5,
+                  backgroundColor: "#E54B4B",
+                  borderRadius: 10,
+                  paddingHorizontal: 5,
+                  paddingVertical: 1.5,
+                  borderWidth: 1.5,
+                  borderColor: "#FFFFFF",
+                  minWidth: 18,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#FFFFFF",
+                    fontSize: 9,
+                    fontFamily: "TikTokSans16pt-Bold",
+                  }}
+                >
+                  {streak}
+                </Text>
+              </View>
+            </View>
+          </View>
         </View>
 
         {/* Right Stats */}
