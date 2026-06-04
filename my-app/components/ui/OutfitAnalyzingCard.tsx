@@ -161,7 +161,7 @@ const AnalyzingCardSlide = React.memo(function AnalyzingCardSlide({
             cachePolicy="memory"
           />
           <View
-            className="absolute inset-0 items-center justify-center"
+            className="absolute inset-0 items-center justify-center mb-5"
             style={{ backgroundColor: "rgba(0,0,0,0.38)" }}
           >
             <Svg width={SVG_SIZE} height={SVG_SIZE}>

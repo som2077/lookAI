@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "Look AI",
+    "slug": "look-ai",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/kribb.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/getStartedLogo.png",
+    "scheme": "look-ai",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -13,9 +13,7 @@
     },
     "jsEngine": "hermes",
     "android": {
-      "permissions": [
-        "READ_MEDIA_IMAGES"
-      ],
+      "permissions": ["READ_MEDIA_IMAGES"],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

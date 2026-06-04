@@ -1,5 +1,11 @@
 import React, { useCallback, useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -17,45 +23,79 @@ import Animated, {
 import {
   IconArrowLeft,
   IconCamera,
+  IconChevronRight,
   IconPencil,
   IconPhoto,
   IconSparkles,
   IconX,
 } from "@tabler/icons-react-native";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface OptionCard {
+  id: string;
+  icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  subtitle: string;
+  badge: string;
+  badgeColor: string;
+  badgeBg: string;
+  recommended?: boolean;
+}
+
+const OPTIONS: OptionCard[] = [
+  {
+    id: "scan",
+    icon: IconSparkles,
+    iconColor: "#6366F1",
+    iconBg: "#EEF2FF",
+    title: "Scan with AI",
+    subtitle: "Take or pick a photo — AI detects category, color & style instantly.",
+    badge: "Recommended",
+    badgeColor: "#6366F1",
+    badgeBg: "#EEF2FF",
+    recommended: true,
+  },
+  {
+    id: "manual",
+    icon: IconPencil,
+    iconColor: "#0F766E",
+    iconBg: "#F0FDFA",
+    title: "Add manually",
+    subtitle: "Fill in the details yourself. Add a photo optionally — no AI needed.",
+    badge: "Manual",
+    badgeColor: "#0F766E",
+    badgeBg: "#F0FDFA",
+  },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function AddClothesIndex() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [sheetRendered, setSheetRendered] = useState(false);
 
-  const sheetY = useSharedValue(300);
+  const sheetY = useSharedValue(400);
   const sheetOpacity = useSharedValue(0);
 
   const openSheet = useCallback(() => {
     setSheetRendered(true);
-    sheetY.value = withTiming(0, {
-      duration: 300,
-      easing: Easing.out(Easing.cubic),
-    });
-    sheetOpacity.value = withTiming(1, { duration: 220 });
+    sheetY.value = withTiming(0, { duration: 320, easing: Easing.out(Easing.cubic) });
+    sheetOpacity.value = withTiming(1, { duration: 240 });
   }, [sheetY, sheetOpacity]);
 
   const closeSheet = useCallback(() => {
-    sheetY.value = withTiming(300, {
-      duration: 240,
-      easing: Easing.in(Easing.quad),
-    });
-    sheetOpacity.value = withTiming(0, { duration: 220 }, (done) => {
+    sheetY.value = withTiming(400, { duration: 260, easing: Easing.in(Easing.quad) });
+    sheetOpacity.value = withTiming(0, { duration: 240 }, (done) => {
       if (done) runOnJS(setSheetRendered)(false);
     });
   }, [sheetY, sheetOpacity]);
 
-  const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: sheetY.value }],
-  }));
-  const backdropStyle = useAnimatedStyle(() => ({
-    opacity: sheetOpacity.value,
-  }));
+  const sheetStyle = useAnimatedStyle(() => ({ transform: [{ translateY: sheetY.value }] }));
+  const backdropStyle = useAnimatedStyle(() => ({ opacity: sheetOpacity.value }));
 
   const handleBack = useCallback(() => {
     if (router.canGoBack()) router.back();
@@ -93,107 +133,91 @@ export default function AddClothesIndex() {
     } as never);
   }, [router]);
 
+  const handleOptionPress = useCallback(
+    (id: string) => {
+      if (id === "scan") openSheet();
+      else handleManual();
+    },
+    [openSheet, handleManual],
+  );
+
   return (
-    <View className="flex-1 bg-[#0c0c0c]">
-      <StatusBar style="light" />
-      <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-4 py-3">
-          <Pressable
-            onPress={handleBack}
-            className="h-9 w-9 items-center justify-center rounded-xl bg-[#141414] border border-[#1e1e1e]"
-          >
-            <IconArrowLeft size={16} color="#ffffff" />
+    <View style={s.root}>
+      <StatusBar style="dark" />
+      <SafeAreaView style={s.safe} edges={["top", "bottom"]}>
+
+        {/* ── Header ─────────────────────────────────────────────────── */}
+        <View style={s.header}>
+          <Pressable onPress={handleBack} style={s.backBtn} hitSlop={8}>
+            <IconArrowLeft size={18} color="#111827" strokeWidth={2.2} />
           </Pressable>
-          <Text className="text-white text-sm font-bold">Add clothes</Text>
-          <View className="w-9" />
+          <Text style={s.headerTitle}>Add Clothes</Text>
+          <View style={s.headerSpacer} />
         </View>
 
-        <View className="flex-1 px-5 pt-4">
-          <Text className="text-white text-2xl font-extrabold mb-1">
-            How would you like{"\n"}to add this item?
+        {/* ── Hero text ───────────────────────────────────────────────── */}
+        <View style={s.hero}>
+          <Text style={s.heroTitle}>How would you{"\n"}like to add it?</Text>
+          <Text style={s.heroSub}>
+            Choose a method below to start building your wardrobe.
           </Text>
-          <Text className="text-[#888] text-xs mb-7">
-            Scan with AI or fill it in yourself — your choice.
-          </Text>
+        </View>
 
-          {/* Option 1 — Scan */}
-          <Pressable
-            onPress={openSheet}
-            className="bg-[#141414] border border-[#1e1e1e] rounded-3xl p-5 mb-4 overflow-hidden"
-          >
-            <View className="flex-row items-center gap-4">
-              <View className="h-14 w-14 rounded-2xl bg-[#534AB7]/15 items-center justify-center">
-                <IconCamera size={26} color="#8b82ff" />
-              </View>
-              <View className="flex-1">
-                <View className="flex-row items-center gap-1.5 mb-0.5">
-                  <Text className="text-white text-base font-bold">
-                    Take a photo / Gallery
-                  </Text>
+        {/* ── Option cards ────────────────────────────────────────────── */}
+        <View style={s.cards}>
+          {OPTIONS.map((opt) => {
+            const Icon = opt.icon;
+            return (
+              <Pressable
+                key={opt.id}
+                onPress={() => handleOptionPress(opt.id)}
+                style={({ pressed }) => [s.card, pressed && s.cardPressed]}
+              >
+                {/* Recommended ribbon */}
+                {opt.recommended && (
+                  <View style={s.ribbon}>
+                    <IconSparkles size={9} color="#6366F1" strokeWidth={2} />
+                    <Text style={s.ribbonText}>Recommended</Text>
+                  </View>
+                )}
+
+                <View style={s.cardInner}>
+                  {/* Icon */}
+                  <View style={[s.cardIcon, { backgroundColor: opt.iconBg }]}>
+                    <Icon size={26} color={opt.iconColor} strokeWidth={1.8} />
+                  </View>
+
+                  {/* Text */}
+                  <View style={s.cardText}>
+                    <Text style={s.cardTitle}>{opt.title}</Text>
+                    <Text style={s.cardSub}>{opt.subtitle}</Text>
+
+                    {/* Badge */}
+                    <View style={[s.badge, { backgroundColor: opt.badgeBg }]}>
+                      <Text style={[s.badgeText, { color: opt.badgeColor }]}>
+                        {opt.badge}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Chevron */}
+                  <IconChevronRight size={18} color="#D1D5DB" strokeWidth={2} />
                 </View>
-                <Text className="text-[#888] text-[11px]">
-                  Capture or pick an image — AI will detect category, color
-                  &amp; style
-                </Text>
-              </View>
-            </View>
-
-            <View className="flex-row gap-2 mt-4">
-              <View className="flex-row items-center gap-1 bg-[#534AB7]/10 border border-[#534AB7]/25 rounded-full px-2.5 py-1">
-                <IconSparkles size={10} color="#8b82ff" />
-                <Text className="text-[#8b82ff] text-[10px] font-semibold">
-                  AI scan
-                </Text>
-              </View>
-              <View className="flex-row items-center gap-1 bg-[#1e1e1e] rounded-full px-2.5 py-1">
-                <IconCamera size={10} color="#888" />
-                <Text className="text-[#888] text-[10px]">Camera</Text>
-              </View>
-              <View className="flex-row items-center gap-1 bg-[#1e1e1e] rounded-full px-2.5 py-1">
-                <IconPhoto size={10} color="#888" />
-                <Text className="text-[#888] text-[10px]">Gallery</Text>
-              </View>
-            </View>
-          </Pressable>
-
-          {/* Option 2 — Manual */}
-          <Pressable
-            onPress={handleManual}
-            className="bg-[#141414] border border-[#1e1e1e] rounded-3xl p-5 overflow-hidden"
-          >
-            <View className="flex-row items-center gap-4">
-              <View className="h-14 w-14 rounded-2xl bg-[#c9a84c]/15 items-center justify-center">
-                <IconPencil size={26} color="#c9a84c" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-white text-base font-bold mb-0.5">
-                  Add manually
-                </Text>
-                <Text className="text-[#888] text-[11px]">
-                  Write details yourself, add a photo optionally — no AI scan
-                  needed
-                </Text>
-              </View>
-            </View>
-
-            <View className="flex-row gap-2 mt-4">
-              <View className="flex-row items-center gap-1 bg-[#c9a84c]/10 border border-[#c9a84c]/25 rounded-full px-2.5 py-1">
-                <IconPencil size={10} color="#c9a84c" />
-                <Text className="text-[#c9a84c] text-[10px] font-semibold">
-                  Self-fill
-                </Text>
-              </View>
-              <View className="flex-row items-center gap-1 bg-[#1e1e1e] rounded-full px-2.5 py-1">
-                <IconPhoto size={10} color="#888" />
-                <Text className="text-[#888] text-[10px]">Optional photo</Text>
-              </View>
-            </View>
-          </Pressable>
+              </Pressable>
+            );
+          })}
         </View>
+
+        {/* ── Footer note ─────────────────────────────────────────────── */}
+        <View style={s.footer}>
+          <Text style={s.footerText}>
+            Items added here will appear in your wardrobe.
+          </Text>
+        </View>
+
       </SafeAreaView>
 
-      {/* Bottom sheet — camera / gallery picker */}
+      {/* ── Bottom sheet — source picker ───────────────────────────── */}
       <Modal
         visible={sheetRendered}
         transparent
@@ -201,64 +225,62 @@ export default function AddClothesIndex() {
         onRequestClose={closeSheet}
         statusBarTranslucent
       >
-        <Animated.View className="flex-1 justify-end" style={backdropStyle}>
-          <Pressable
-            className="absolute inset-0 bg-black/60"
-            onPress={closeSheet}
-          />
+        <Animated.View style={[s.backdrop, backdropStyle]}>
+          <Pressable style={StyleSheet.absoluteFillObject} onPress={closeSheet} />
+
           <Animated.View
             style={[
+              s.sheet,
               sheetStyle,
               { paddingBottom: Math.max(28, insets.bottom + 12) },
             ]}
-            className="bg-[#141414] rounded-t-[32px] px-5 pt-5"
           >
-            <View className="flex-row items-center justify-between mb-5">
-              <Text className="text-white text-base font-bold">
-                Choose source
-              </Text>
-              <Pressable
-                onPress={closeSheet}
-                className="h-8 w-8 rounded-full bg-[#1e1e1e] items-center justify-center"
-              >
-                <IconX size={14} color="#aaa" />
+            {/* Drag handle */}
+            <View style={s.sheetHandle} />
+
+            {/* Sheet header */}
+            <View style={s.sheetHeader}>
+              <Text style={s.sheetTitle}>Choose source</Text>
+              <Pressable onPress={closeSheet} style={s.sheetClose} hitSlop={8}>
+                <IconX size={15} color="#6B7280" strokeWidth={2.5} />
               </Pressable>
             </View>
 
-            {/* Camera */}
+            <Text style={s.sheetSub}>
+              How do you want to provide the photo?
+            </Text>
+
+            {/* Camera option */}
             <Pressable
               onPress={handleCamera}
-              className="flex-row items-center gap-4 bg-[#1a1a1a] border border-[#1e1e1e] rounded-2xl p-4 mb-3"
+              style={({ pressed }) => [s.sheetRow, pressed && s.sheetRowPressed]}
             >
-              <View className="h-12 w-12 rounded-xl bg-[#534AB7]/15 items-center justify-center">
-                <IconCamera size={22} color="#8b82ff" />
+              <View style={[s.sheetRowIcon, { backgroundColor: "#EEF2FF" }]}>
+                <IconCamera size={22} color="#6366F1" strokeWidth={1.8} />
               </View>
-              <View className="flex-1">
-                <Text className="text-white text-sm font-bold">
-                  Take a photo
-                </Text>
-                <Text className="text-[#888] text-[11px] mt-0.5">
-                  Use camera — edit before scanning
-                </Text>
+              <View style={s.sheetRowText}>
+                <Text style={s.sheetRowTitle}>Take a photo</Text>
+                <Text style={s.sheetRowSub}>Open camera — edit before scanning</Text>
               </View>
+              <IconChevronRight size={16} color="#D1D5DB" strokeWidth={2} />
             </Pressable>
 
-            {/* Gallery */}
+            {/* Divider */}
+            <View style={s.divider} />
+
+            {/* Gallery option */}
             <Pressable
               onPress={handleGallery}
-              className="flex-row items-center gap-4 bg-[#1a1a1a] border border-[#1e1e1e] rounded-2xl p-4 mb-2"
+              style={({ pressed }) => [s.sheetRow, pressed && s.sheetRowPressed]}
             >
-              <View className="h-12 w-12 rounded-xl bg-[#1D9E75]/15 items-center justify-center">
-                <IconPhoto size={22} color="#1D9E75" />
+              <View style={[s.sheetRowIcon, { backgroundColor: "#F0FDFA" }]}>
+                <IconPhoto size={22} color="#0F766E" strokeWidth={1.8} />
               </View>
-              <View className="flex-1">
-                <Text className="text-white text-sm font-bold">
-                  Choose from gallery
-                </Text>
-                <Text className="text-[#888] text-[11px] mt-0.5">
-                  Pick &amp; crop an existing photo
-                </Text>
+              <View style={s.sheetRowText}>
+                <Text style={s.sheetRowTitle}>Choose from gallery</Text>
+                <Text style={s.sheetRowSub}>Pick & crop an existing photo</Text>
               </View>
+              <IconChevronRight size={16} color="#D1D5DB" strokeWidth={2} />
             </Pressable>
           </Animated.View>
         </Animated.View>
@@ -266,3 +288,230 @@ export default function AddClothesIndex() {
     </View>
   );
 }
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const s = StyleSheet.create({
+  root: { flex: 1, backgroundColor: "#FFFFFF" },
+  safe: { flex: 1 },
+
+  // Header
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#F3F4F6",
+  },
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: "#F9FAFB",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#E5E7EB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    color: "#111827",
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.1,
+  },
+  headerSpacer: { width: 38 },
+
+  // Hero
+  hero: {
+    paddingHorizontal: 22,
+    paddingTop: 30,
+    paddingBottom: 24,
+  },
+  heroTitle: {
+    color: "#111827",
+    fontSize: 28,
+    fontWeight: "800",
+    lineHeight: 36,
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  heroSub: {
+    color: "#6B7280",
+    fontSize: 14,
+    lineHeight: 20,
+  },
+
+  // Cards
+  cards: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: "#E5E7EB",
+    overflow: "hidden",
+    padding: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  cardPressed: {
+    backgroundColor: "#F9FAFB",
+  },
+  cardInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  cardIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardText: { flex: 1 },
+  cardTitle: {
+    color: "#111827",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  cardSub: {
+    color: "#6B7280",
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 10,
+  },
+  badge: {
+    alignSelf: "flex-start",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.2,
+  },
+
+  // Recommended ribbon
+  ribbon: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+    backgroundColor: "#EEF2FF",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginBottom: 12,
+  },
+  ribbonText: {
+    color: "#6366F1",
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+
+  // Footer
+  footer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingBottom: 8,
+  },
+  footerText: {
+    color: "#D1D5DB",
+    fontSize: 11,
+    textAlign: "center",
+  },
+
+  // Bottom sheet
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
+  },
+  sheet: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#E5E7EB",
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 4,
+  },
+  sheetTitle: {
+    color: "#111827",
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: -0.2,
+  },
+  sheetClose: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sheetSub: {
+    color: "#9CA3AF",
+    fontSize: 13,
+    marginBottom: 20,
+  },
+  sheetRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    paddingVertical: 14,
+    borderRadius: 16,
+    paddingHorizontal: 4,
+  },
+  sheetRowPressed: {
+    backgroundColor: "#F9FAFB",
+  },
+  sheetRowIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sheetRowText: { flex: 1 },
+  sheetRowTitle: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 2,
+  },
+  sheetRowSub: {
+    color: "#9CA3AF",
+    fontSize: 12,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: "#F3F4F6",
+    marginVertical: 2,
+    marginHorizontal: 4,
+  },
+});
