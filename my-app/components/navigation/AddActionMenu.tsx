@@ -82,24 +82,16 @@ export function AddActionMenu({
   useEffect(() => {
     if (visible) {
       setRendered(true);
-      const inConfig = {
-        duration: 220,
-        easing: Easing.out(Easing.quad),
-      };
+      const inConfig = { duration: 220, easing: Easing.out(Easing.quad) };
       fadeAnim.value = withTiming(1, inConfig);
       scaleAnim.value = withTiming(1, inConfig);
       translateY.value = withTiming(0, inConfig);
     } else if (rendered) {
-      const outConfig = {
-        duration: 200,
-        easing: Easing.in(Easing.quad),
-      };
+      const outConfig = { duration: 200, easing: Easing.in(Easing.quad) };
       scaleAnim.value = withTiming(0.98, outConfig);
       translateY.value = withTiming(20, outConfig);
       fadeAnim.value = withTiming(0, outConfig, (finished) => {
-        if (finished) {
-          runOnJS(setRendered)(false);
-        }
+        if (finished) runOnJS(setRendered)(false);
       });
     }
   }, [visible, rendered, fadeAnim, scaleAnim, translateY]);
@@ -112,9 +104,7 @@ export function AddActionMenu({
   const handleCardPress = useCallback(
     (route: string) => {
       onClose();
-      setTimeout(() => {
-        onNavigate(route);
-      }, 200);
+      setTimeout(() => onNavigate(route), 200);
     },
     [onClose, onNavigate],
   );
@@ -128,9 +118,11 @@ export function AddActionMenu({
       statusBarTranslucent
     >
       <Animated.View className="flex-1" style={backdropStyle}>
+        {/* ✅ Ek hi BlurView — poora screen cover, status bar + home indicator dono */}
         <BlurView intensity={140} tint="dark" className="absolute inset-0" />
+
         <Animated.View
-          className="flex-1 px-[16px] mb-[-8px] justify-end"
+          className="flex-1 px-[16px] justify-end"
           style={[
             contentStyle,
             { paddingBottom: Math.max(24, insets.bottom + 16) },
@@ -201,11 +193,7 @@ export function AddActionMenu({
           <Pressable
             onPress={onClose}
             className="self-end rounded-full bg-white items-center justify-center"
-            style={{
-              marginLeft: 12,
-              height: 60,
-              width: 60,
-            }}
+            style={{ marginLeft: 12, height: 60, width: 60 }}
           >
             <IconX size={24} color="#000000" strokeWidth={2} />
           </Pressable>

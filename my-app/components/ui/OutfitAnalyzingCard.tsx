@@ -59,15 +59,15 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
 }) {
   return (
     <View style={{ width: CARD_WIDTH }}>
-      <View className="flex-row rounded-[20px] border border-[#E9EBF8] bg-white overflow-hidden h-40 ">
+      <View className="flex-row rounded-[24px] border border-[#E9EBF8] bg-white overflow-hidden h-40 ">
         <View
           className="justify-center items-center"
-          style={{ width: 115, height: 160, backgroundColor: "#C8C7C6" }}
+          style={{ width: 120, height: 160, backgroundColor: "#FFFFFF" }}
         >
           <ExpoImage
             source={{ uri: outfit.imageUri }}
-            style={{ width: 115, height: 160 }}
-            contentFit="cover"
+            style={{ width: 120, height: 160 }}
+            contentFit="contain"
             cachePolicy="memory"
           />
         </View>
@@ -77,30 +77,30 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
             <View className="flex-row items-start justify-between mb-1">
               <Text
                 className="text-[#1D1A27] font-bold flex-1 mr-2"
-                style={{ fontSize: 15 }}
+                style={{ fontSize: 19 }}
                 numberOfLines={1}
               >
                 {MOCK_NAME}
               </Text>
-              <Text className="text-[#9B9BAF] text-[11px] mt-1 mr-2 font-sans">
+              <Text className="text-[#9B9BAF] text-[11px] mt-1 mr-3 font-sans">
                 {outfit.time}
               </Text>
             </View>
-            <Text className="text-[#9B9BAF] text-[11px] mb-3 mt-1 font-sans">
+            <Text className="text-[#9B9BAF] text-[12px] mb-3 mt-1 font-sans">
               {MOCK_SUBTITLE}
             </Text>
             <View className="flex-row flex-wrap gap-[6px]">
               {MOCK_TAGS.map((tag) => (
                 <View
                   key={tag}
-                  className="rounded-full px-3 py-[3px]"
+                  className="rounded-[6px] px-3 py-[3px]"
                   style={{
                     borderWidth: 1,
                     borderColor: "#E9EBF8",
-                    backgroundColor: "#F8F7FC",
+                    backgroundColor: "#000000",
                   }}
                 >
-                  <Text className="text-[#4A4A55] text-[11px] font-medium">
+                  <Text className="text-[#ffffff] text-[11px] font-medium">
                     {tag}
                   </Text>
                 </View>
@@ -108,17 +108,19 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
             </View>
           </View>
 
-          <View className="flex-row gap-1 px-2 pb-2 ml-1 mr-1 mb-1">
-            <Pressable className="flex-1 bg-[#1D1A27] rounded-full py-[13px] items-center">
-              <Text className="text-white font-bold text-[10px]">
+          <View className="flex-row gap-1  ml-1 mr-1">
+            <Pressable className="flex-1  rounded-[26px] py-[13px] items-center">
+              <Text className="text-[#000000] font-bold text-[16px]">
                 View Details
               </Text>
             </Pressable>
             <Pressable
-              className="flex-1 bg-[#1D1A27] rounded-full py-[13px] items-center"
+              className="flex-1  rounded-[26px] py-[13px] items-center"
               onPress={() => onRemove(outfitIndex)}
             >
-              <Text className="text-white font-bold text-[10px]">Wear it</Text>
+              <Text className="text-[#000000] font-bold text-[16px]">
+                Wear it
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -141,20 +143,20 @@ const AnalyzingCardSlide = React.memo(function AnalyzingCardSlide({
   return (
     <View style={{ width: CARD_WIDTH }}>
       <View
-        className="flex-row rounded-[20px] border border-[#E9EBF8] bg-white overflow-hidden h-40"
+        className="flex-row rounded-[24px] border border-[#E9EBF8] bg-white overflow-hidden h-40"
         style={{
           shadowColor: "#000000",
           shadowOpacity: 0.09,
           shadowRadius: 16,
           shadowOffset: { width: 0, height: 4 },
-          elevation: 5,
+          elevation: 1,
         }}
       >
-        <View style={{ width: 115, height: 160 }} className="overflow-hidden">
+        <View style={{ width: 120, height: 160 }} className="overflow-hidden">
           <ExpoImage
             source={{ uri: imageUri }}
-            style={{ width: 115, height: 160 }}
-            contentFit="cover"
+            style={{ width: 120, height: 160 }}
+            contentFit="contain"
             blurRadius={5}
             cachePolicy="memory"
           />

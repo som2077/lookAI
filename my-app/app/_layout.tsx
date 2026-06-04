@@ -21,6 +21,7 @@ import {
 } from "../components/ui/ErrorStateView";
 import { useFonts } from "expo-font";
 import { FONT_ASSETS } from "@/constants/fonts";
+import * as NavigationBar from "expo-navigation-bar";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -175,6 +176,12 @@ export default function RootLayout() {
       console.warn("Failed to load fonts:", fontError);
     }
   }, [fontError]);
+
+  // Force navigation bar always black regardless of light/dark mode
+  useEffect(() => {
+    NavigationBar.setBackgroundColorAsync("#000000");
+    NavigationBar.setButtonStyleAsync("light");
+  }, []);
 
   const checkConnectivity = useCallback(async () => {
     try {

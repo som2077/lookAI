@@ -1,32 +1,73 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
-import { CameraView, useCameraPermissions, type CameraType } from "expo-camera";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
+import * as NavigationBar from "expo-navigation-bar"; // ✅
 import { useOutfitAnalysisStore } from "@/backend/store/outfit-analysis-store";
 import {
-  IconArrowLeft,
-  IconInfoCircle,
+  IconBolt,
   IconPhoto,
-  IconRotate,
   IconUser,
+  IconX,
 } from "@tabler/icons-react-native";
 
-type AngleId = "full";
+const BRACKET_SIZE = 36;
+const BRACKET_THICKNESS = 3;
+const BRACKET_COLOR = "rgba(255,255,255,0.90)";
+const CORNER_RADIUS = 10;
 
-const ANGLES: { id: AngleId; label: string }[] = [
-  { id: "full", label: "Full body" },
-];
+function CornerBracket({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
+  const isTop = position.startsWith("t");
+  const isLeft = position.endsWith("l");
+
+  return (
+    <View
+      style={{
+        position: "absolute",
+        width: BRACKET_SIZE,
+        height: BRACKET_SIZE,
+        ...(isTop ? { top: 0 } : { bottom: 0 }),
+        ...(isLeft ? { left: 0 } : { right: 0 }),
+        // Two-sided border with rounded outer corner
+        borderTopWidth: isTop ? BRACKET_THICKNESS : 0,
+        borderBottomWidth: !isTop ? BRACKET_THICKNESS : 0,
+        borderLeftWidth: isLeft ? BRACKET_THICKNESS : 0,
+        borderRightWidth: !isLeft ? BRACKET_THICKNESS : 0,
+        borderTopLeftRadius: position === "tl" ? CORNER_RADIUS : 0,
+        borderTopRightRadius: position === "tr" ? CORNER_RADIUS : 0,
+        borderBottomLeftRadius: position === "bl" ? CORNER_RADIUS : 0,
+        borderBottomRightRadius: position === "br" ? CORNER_RADIUS : 0,
+        borderColor: BRACKET_COLOR,
+      }}
+    />
+  );
+}
 
 export default function CameraScreen() {
   const router = useRouter();
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
-  const [angle, setAngle] = useState<AngleId>("full");
-  const [facing, setFacing] = useState<CameraType>("back");
+  const [facing, setFacing] = useState<"back" | "front">("back");
   const [capturing, setCapturing] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
+  const insets = useSafeAreaInsets();
+
+  // ✅ Camera screen pe navigation bar black, wapas jaane pe restore
+  useEffect(() => {
+    NavigationBar.setBackgroundColorAsync("#000000");
+    NavigationBar.setButtonStyleAsync("light");
+
+    return () => {
+      // Screen se bahar jaane pe transparent restore karo
+      NavigationBar.setBackgroundColorAsync("transparent");
+    };
+  }, []);
 
   const goToAnalyzing = useCallback(
     (uri: string) => {
@@ -63,10 +104,6 @@ export default function CameraScreen() {
     }
   }, [goToAnalyzing]);
 
-  const toggleFacing = useCallback(() => {
-    setFacing((f) => (f === "back" ? "front" : "back"));
-  }, []);
-
   const handleBack = useCallback(() => {
     if (router.canGoBack()) router.back();
     else router.replace("/(root)/(tabs)" as never);
@@ -76,7 +113,6 @@ export default function CameraScreen() {
     router.push("/(root)/log-outfit/info" as never);
   }, [router]);
 
-  // Permission states
   if (!permission) {
     return (
       <View className="flex-1 bg-[#0c0c0c] items-center justify-center">
@@ -118,87 +154,65 @@ export default function CameraScreen() {
   return (
     <View className="flex-1 bg-[#0c0c0c]">
       <StatusBar style="light" />
-      {/* Live camera fills full screen */}
+
+      {/* Live camera — full screen */}
       <CameraView
+        key={facing}
         ref={cameraRef}
         style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
         facing={facing}
+        flash={flashOn ? "on" : "off"}
+        enableTorch={flashOn}
       />
-      {/* Dark vignette overlay */}
-      <View pointerEvents="none" className="absolute inset-0 bg-black/25" />
+
+      {/* Subtle vignette */}
+      <View pointerEvents="none" className="absolute inset-0 bg-black/20" />
 
       <SafeAreaView className="flex-1" edges={["top"]}>
         {/* Top bar */}
-        <View className="flex-row items-center justify-between px-4 py-3">
+        <View className="flex-row items-center justify-between px-9 pt-4 pb-3">
           <Pressable
             onPress={handleBack}
-            className="h-10 w-10 items-center justify-center rounded-xl bg-black/55 border border-white/10"
+            className="h-14 w-14 items-center justify-center rounded-full bg-white/20"
           >
-            <IconArrowLeft size={18} color="#ffffff" />
+            <IconX size={20} color="#ffffff" strokeWidth={2.2} />
           </Pressable>
-          <Text className="text-white text-base font-bold">Log outfit</Text>
+
           <Pressable
             onPress={handleInfo}
-            className="h-10 w-10 items-center justify-center rounded-xl bg-black/55 border border-white/10"
+            className="h-14 w-14 items-center justify-center rounded-full bg-white/20"
           >
-            <IconInfoCircle size={18} color="#ffffff" />
+            <Text className="text-white text-xl font-bold">?</Text>
           </Pressable>
         </View>
 
-        <Text className="text-center text-white/85 text-xs px-6 mb-4">
-          Show your full outfit — head to toe in good lighting
-        </Text>
-
         {/* Framing guide */}
-        <View className="flex-1 items-center justify-center px-6">
+        <View className="flex-1 items-center justify-center px-16">
           <View
-            className="border-2 border-dashed border-white/55 rounded-2xl items-center justify-center"
-            style={{ width: 220, height: 300 }}
+            style={{
+              width: "90%",
+              aspectRatio: 0.92,
+              position: "relative",
+              borderRadius: 20,
+            }}
           >
-            <IconUser
-              size={64}
-              color="rgba(255,255,255,0.6)"
-              strokeWidth={1.5}
-            />
-            <Text className="text-white/70 text-xs mt-3">
-              Stand full body in frame
-            </Text>
-          </View>
-
-          {/* Angle pills */}
-          <View className="flex-row gap-2 mt-8">
-            {ANGLES.map((a) => {
-              const active = a.id === angle;
-              return (
-                <Pressable
-                  key={a.id}
-                  onPress={() => setAngle(a.id)}
-                  className={`px-4 py-2 rounded-full border ${
-                    active
-                      ? "bg-[#2a2418] border-[#c9a84c]"
-                      : "bg-black/55 border-white/15"
-                  }`}
-                >
-                  <Text
-                    className={`text-xs font-semibold ${
-                      active ? "text-[#c9a84c]" : "text-white/85"
-                    }`}
-                  >
-                    {a.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            <CornerBracket position="tl" />
+            <CornerBracket position="tr" />
+            <CornerBracket position="bl" />
+            <CornerBracket position="br" />
           </View>
         </View>
 
-        {/* Bottom controls */}
-        <View className="flex-row items-center justify-between px-8 pb-6 pt-4 bg-black/55">
+        {/* Bottom bar */}
+        <View
+          className="flex-row items-center justify-between px-28  "
+          style={{ paddingTop: 18, paddingBottom: insets.bottom + 18 }}
+        >
           <Pressable
             onPress={handlePickGallery}
-            className="h-12 w-12 items-center justify-center rounded-xl bg-black/55 border border-white/15"
+            className="h-16 w-16 items-center rounded-full  justify-center bg-white/20"
           >
-            <IconPhoto size={20} color="#ffffff" />
+            <IconPhoto size={26} color="#FFFFFF" strokeWidth={1.8} />
           </Pressable>
 
           <Pressable
@@ -207,17 +221,21 @@ export default function CameraScreen() {
             className="h-[72px] w-[72px] rounded-full border-[3px] border-white items-center justify-center"
           >
             {capturing ? (
-              <ActivityIndicator color="#0c0c0c" />
+              <ActivityIndicator color="#111" />
             ) : (
-              <View className="h-14 w-14 rounded-full bg-white" />
+              <View className="h-[56px] w-[56px] rounded-full bg-white" />
             )}
           </Pressable>
 
           <Pressable
-            onPress={toggleFacing}
-            className="h-12 w-12 items-center justify-center rounded-xl bg-black/55 border border-white/15"
+            onPress={() => setFlashOn((f) => !f)}
+            className="h-16 w-16 items-center justify-center bg-white/20 rounded-full"
           >
-            <IconRotate size={20} color="#ffffff" />
+            <IconBolt
+              size={26}
+              color={flashOn ? "#c9a84c" : "#ffffff"}
+              strokeWidth={1.8}
+            />
           </Pressable>
         </View>
       </SafeAreaView>
