@@ -17,15 +17,21 @@ config.resolver.extraNodeModules = {
 config.transformer = {
   ...config.transformer,
   inlineRequires: true,
-  // Use hermes parser for faster JS compilation
-  hermesParser: true,
 };
 
-// ── Resolver: faster module resolution ────────────────────────────────────────
-config.resolver = {
-  ...config.resolver,
-  // Prefer ES module sources when available
-  unstable_enableSymlinks: false,
+// ── Resolver: fix Hermes crash on lucide-react-native Infinity icon ───────────
+// lucide-react-native exports `const Infinity = createLucideIcon(...)` which
+// Hermes parser rejects because `Infinity` is a reserved global property.
+// We intercept the request and serve a patched file that renames it.
+const INFINITY_ICON_RE = /lucide-react-native[/\\]dist[/\\]esm[/\\]icons[/\\]infinity\.mjs$/;
+const PATCHED_INFINITY = path.resolve(__dirname, "patches/lucide-infinity-patched.mjs");
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (INFINITY_ICON_RE.test(context.originModulePath) || INFINITY_ICON_RE.test(moduleName)) {
+    return { filePath: PATCHED_INFINITY, type: "sourceFile" };
+  }
+  return context.resolveRequest(context, moduleName, platform);
 };
 
-module.exports = withNativeWind(config, { input: "./global.css" });
+module.exports = withNativeWind(config, { input: "./global.css" });
+

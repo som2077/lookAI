@@ -14,16 +14,13 @@ import {
   LastOutfit,
   useOutfitAnalysisStore,
 } from "@/backend/store/outfit-analysis-store";
+import { useRouter } from "expo-router";
 
 const SVG_SIZE = 72;
 const STROKE_WIDTH = 4.5;
 const RADIUS = (SVG_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const CENTER = SVG_SIZE / 2;
-
-const MOCK_NAME = "Breezy office look";
-const MOCK_SUBTITLE = "Kurta · Palazzo · Flats";
-const MOCK_TAGS = ["Office", "Casual"];
 
 const CARD_H_MARGIN = 20;
 const CARD_WIDTH = Dimensions.get("window").width - CARD_H_MARGIN * 2;
@@ -52,14 +49,19 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
   outfit,
   outfitIndex,
   onRemove,
+  onViewDetails,
 }: {
   outfit: LastOutfit;
   outfitIndex: number;
   onRemove: (i: number) => void;
+  onViewDetails: (i: number) => void;
 }) {
   return (
-    <View style={{ width: CARD_WIDTH }}>
-      <View className="flex-row rounded-[24px] border border-[#E9EBF8] bg-[#F5F4F980] overflow-hidden h-40 ">
+    <Pressable
+      style={{ width: CARD_WIDTH }}
+      onPress={() => onViewDetails(outfitIndex)}
+    >
+      <View className="flex-row rounded-[24px] border border-[#E9EBF8] bg-[#F5F4F980] overflow-hidden h-40">
         <View
           className="justify-center items-center"
           style={{ width: 120, height: 160, backgroundColor: "#FFFFFF" }}
@@ -77,20 +79,36 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
             <View className="flex-row items-start justify-between mb-1">
               <Text
                 className="text-[#1D1A27] font-bold flex-1 mr-2"
-                style={{ fontSize: 19 }}
+                style={{ fontSize: 17, fontFamily: "TikTokSans16pt-Bold" }}
                 numberOfLines={1}
               >
-                {MOCK_NAME}
+                {outfit.name}
               </Text>
-              <Text className="text-[#9B9BAF] text-[11px] mt-1 mr-3 font-sans">
+              <Text
+                style={{
+                  color: "#9B9BAF",
+                  fontSize: 11,
+                  marginTop: 2,
+                  marginRight: 12,
+                  fontFamily: "TikTokSans16pt-Medium",
+                }}
+              >
                 {outfit.time}
               </Text>
             </View>
-            <Text className="text-[#9B9BAF] text-[12px] mb-3 mt-1 font-sans">
-              {MOCK_SUBTITLE}
+            <Text
+              style={{
+                color: "#9B9BAF",
+                fontSize: 12,
+                marginBottom: 8,
+                marginTop: 2,
+                fontFamily: "TikTokSans16pt-Regular",
+              }}
+            >
+              {outfit.subtitle}
             </Text>
             <View className="flex-row flex-wrap gap-[6px]">
-              {MOCK_TAGS.map((tag) => (
+              {outfit.tags.slice(0, 2).map((tag) => (
                 <View
                   key={tag}
                   className="rounded-[6px] px-3 py-[3px]"
@@ -100,7 +118,13 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
                     backgroundColor: "#000000",
                   }}
                 >
-                  <Text className="text-[#ffffff] text-[11px] font-medium">
+                  <Text
+                    style={{
+                      color: "#ffffff",
+                      fontSize: 11,
+                      fontFamily: "TikTokSans16pt-Medium",
+                    }}
+                  >
                     {tag}
                   </Text>
                 </View>
@@ -108,24 +132,39 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
             </View>
           </View>
 
-          <View className="flex-row gap-1  ml-1 mr-1">
-            <Pressable className="flex-1  rounded-[26px] py-[13px] items-center">
-              <Text className="text-[#000000] font-bold text-[16px]">
-                View Details
-              </Text>
-            </Pressable>
+          {/* View Details button */}
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 6,
+              marginHorizontal: 10,
+              marginBottom: 12,
+            }}
+          >
             <Pressable
-              className="flex-1  rounded-[26px] py-[13px] items-center"
-              onPress={() => onRemove(outfitIndex)}
+              onPress={() => onViewDetails(outfitIndex)}
+              style={{
+                flex: 1,
+                backgroundColor: "#1D1A27",
+                borderRadius: 14,
+                paddingVertical: 10,
+                alignItems: "center",
+              }}
             >
-              <Text className="text-[#000000] font-bold text-[16px]">
-                Wear it
+              <Text
+                style={{
+                  color: "#FFFFFF",
+                  fontSize: 13,
+                  fontFamily: "TikTokSans16pt-Bold",
+                }}
+              >
+                View Details
               </Text>
             </Pressable>
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 });
 
@@ -218,6 +257,7 @@ const AnalyzingCardSlide = React.memo(function AnalyzingCardSlide({
 // ─── Main unified card ───────────────────────────────────────────────────────
 
 export const OutfitAnalyzingCard = React.memo(function OutfitAnalyzingCard() {
+  const router = useRouter();
   const { isAnalyzing, isDone, imageUri, progress, lastOutfits, removeOutfit } =
     useOutfitAnalysisStore();
 
@@ -292,6 +332,13 @@ export const OutfitAnalyzingCard = React.memo(function OutfitAnalyzingCard() {
 
   const keyExtractor = useCallback((_: CardSlide, i: number) => String(i), []);
 
+  const handleViewDetails = useCallback(
+    (index: number) => {
+      router.push(`/(root)/outfit-log-detail?index=${index}` as never);
+    },
+    [router],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: CardSlide }) => {
       if (item.type === "analyzing") {
@@ -308,10 +355,11 @@ export const OutfitAnalyzingCard = React.memo(function OutfitAnalyzingCard() {
           outfit={item.outfit}
           outfitIndex={item.outfitIndex}
           onRemove={removeOutfit}
+          onViewDetails={handleViewDetails}
         />
       );
     },
-    [strokeDashoffset, removeOutfit],
+    [strokeDashoffset, removeOutfit, handleViewDetails],
   );
 
   if (slides.length === 0) return null;
