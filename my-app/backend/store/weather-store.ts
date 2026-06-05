@@ -8,14 +8,17 @@ export interface WeatherData {
   state: string;
   isLive: boolean;
   temperatureCelsius: number;
+  feelsLike: number;
   condition: string;
   humidityPercent: number;
   windKmh: number;
+  uvIndex: number;
   uvLevel: "Low" | "Moderate" | "High" | "Very High";
   comfortScore: number;
   bestFabric: string;
   bestColors: string;
-  weatherIcon: string; // OpenWeatherMap icon code e.g. "01d"
+  weatherIcon: string; // maps to tabler icon codes
+  isDay: boolean;
 }
 
 interface WeatherStore {
@@ -28,8 +31,22 @@ interface WeatherStore {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY ?? "";
 const CACHE_MS = 10 * 60 * 1000; // 10 minutes
+
+/** WMO weather code → readable condition + icon code */
+function wmoToCondition(code: number, isDay: boolean): { condition: string; icon: string } {
+  if (code === 0) return { condition: isDay ? "Clear Sky" : "Clear Night", icon: isDay ? "01d" : "01n" };
+  if (code <= 2) return { condition: "Partly Cloudy", icon: isDay ? "02d" : "02n" };
+  if (code === 3) return { condition: "Overcast", icon: "04d" };
+  if (code <= 49) return { condition: "Foggy", icon: "50d" };
+  if (code <= 55) return { condition: "Drizzle", icon: "09d" };
+  if (code <= 65) return { condition: "Rain", icon: "10d" };
+  if (code <= 75) return { condition: "Snow", icon: "13d" };
+  if (code <= 82) return { condition: "Rain Showers", icon: "09d" };
+  if (code <= 86) return { condition: "Snow Showers", icon: "13d" };
+  if (code <= 99) return { condition: "Thunderstorm", icon: "11d" };
+  return { condition: "Clear", icon: "01d" };
+}
 
 function uvIndexToLevel(uvi: number): WeatherData["uvLevel"] {
   if (uvi <= 2) return "Low";
@@ -39,12 +56,7 @@ function uvIndexToLevel(uvi: number): WeatherData["uvLevel"] {
 }
 
 /** 0–100 comfort score based on temp, humidity & wind */
-function calcComfortScore(
-  temp: number,
-  humidity: number,
-  wind: number,
-): number {
-  // Ideal: 22°C, 50% humidity, 10 km/h wind
+function calcComfortScore(temp: number, humidity: number, wind: number): number {
   const tempScore = Math.max(0, 100 - Math.abs(temp - 22) * 3);
   const humScore = Math.max(0, 100 - Math.abs(humidity - 50) * 1.2);
   const windScore = Math.max(0, 100 - Math.max(0, wind - 10) * 2);
@@ -69,151 +81,29 @@ function bestColorsForTemp(temp: number): string {
 // ─── State Abbreviations ──────────────────────────────────────────────────────
 
 const STATE_ABBR: Record<string, string> = {
-  // ── India – States
-  "Andhra Pradesh": "AP",
-  "Arunachal Pradesh": "AR",
-  Assam: "AS",
-  Bihar: "BR",
-  Chhattisgarh: "CG",
-  Goa: "GA",
-  Gujarat: "GJ",
-  Haryana: "HR",
-  "Himachal Pradesh": "HP",
-  Jharkhand: "JH",
-  Karnataka: "KA",
-  Kerala: "KL",
-  "Madhya Pradesh": "MP",
-  Maharashtra: "MH",
-  Manipur: "MN",
-  Meghalaya: "ML",
-  Mizoram: "MZ",
-  Nagaland: "NL",
-  Odisha: "OD",
-  Punjab: "PB",
-  Rajasthan: "RJ",
-  Sikkim: "SK",
-  "Tamil Nadu": "TN",
-  Telangana: "TG",
-  Tripura: "TR",
-  "Uttar Pradesh": "UP",
-  Uttarakhand: "UK",
-  "West Bengal": "WB",
-  // ── India – UTs
-  "Andaman and Nicobar Islands": "AN",
-  Chandigarh: "CH",
-  "Dadra and Nagar Haveli and Daman and Diu": "DN",
-  Delhi: "DL",
-  "Jammu and Kashmir": "JK",
-  Ladakh: "LA",
-  Lakshadweep: "LD",
-  Puducherry: "PY",
-  // ── USA
-  Alabama: "AL",
-  Alaska: "AK",
-  Arizona: "AZ",
-  California: "CA",
-  Colorado: "CO",
-  Connecticut: "CT",
-  Delaware: "DE",
-  Florida: "FL",
-  Georgia: "GA",
-  Hawaii: "HI",
-  Idaho: "ID",
-  Illinois: "IL",
-  Indiana: "IN",
-  Iowa: "IA",
-  Kansas: "KS",
-  Kentucky: "KY",
-  Louisiana: "LA",
-  Maine: "ME",
-  Maryland: "MD",
-  Massachusetts: "MA",
-  Michigan: "MI",
-  Minnesota: "MN",
-  Mississippi: "MS",
-  Missouri: "MO",
-  Montana: "MT",
-  Nebraska: "NE",
-  Nevada: "NV",
-  "New Hampshire": "NH",
-  "New Jersey": "NJ",
-  "New Mexico": "NM",
-  "New York": "NY",
-  "North Carolina": "NC",
-  "North Dakota": "ND",
-  Ohio: "OH",
-  Oklahoma: "OK",
-  Oregon: "OR",
-  Pennsylvania: "PA",
-  "Rhode Island": "RI",
-  "South Carolina": "SC",
-  "South Dakota": "SD",
-  Tennessee: "TN",
-  Texas: "TX",
-  Utah: "UT",
-  Vermont: "VT",
-  Virginia: "VA",
-  Washington: "WA",
-  "West Virginia": "WV",
-  Wisconsin: "WI",
-  Wyoming: "WY",
-  // ── UK
-  England: "ENG",
-  Scotland: "SCT",
-  Wales: "WLS",
-  "Northern Ireland": "NIR",
-  // ── Canada
-  Ontario: "ON",
-  Quebec: "QC",
-  "British Columbia": "BC",
-  Alberta: "AB",
-  Manitoba: "MB",
-  Saskatchewan: "SK",
-  "Nova Scotia": "NS",
-  "New Brunswick": "NB",
-  "Newfoundland and Labrador": "NL",
-  // ── Australia
-  "New South Wales": "NSW",
-  Victoria: "VIC",
-  Queensland: "QLD",
-  "Western Australia": "WA",
-  "South Australia": "SA",
-  Tasmania: "TAS",
-  // ── Countries (fallback)
-  India: "IN",
-  "United States": "US",
-  "United Kingdom": "UK",
-  Canada: "CA",
-  Australia: "AU",
-  Pakistan: "PK",
-  Bangladesh: "BD",
-  Nepal: "NP",
-  "Sri Lanka": "LK",
-  Germany: "DE",
-  France: "FR",
-  Italy: "IT",
-  Spain: "ES",
-  Japan: "JP",
-  China: "CN",
-  "South Korea": "KR",
-  Singapore: "SG",
-  UAE: "AE",
-  "Saudi Arabia": "SA",
+  "Andhra Pradesh": "AP", "Arunachal Pradesh": "AR", Assam: "AS", Bihar: "BR",
+  Chhattisgarh: "CG", Goa: "GA", Gujarat: "GJ", Haryana: "HR",
+  "Himachal Pradesh": "HP", Jharkhand: "JH", Karnataka: "KA", Kerala: "KL",
+  "Madhya Pradesh": "MP", Maharashtra: "MH", Manipur: "MN", Meghalaya: "ML",
+  Mizoram: "MZ", Nagaland: "NL", Odisha: "OD", Punjab: "PB",
+  Rajasthan: "RJ", Sikkim: "SK", "Tamil Nadu": "TN", Telangana: "TG",
+  Tripura: "TR", "Uttar Pradesh": "UP", Uttarakhand: "UK", "West Bengal": "WB",
+  Delhi: "DL", "Jammu and Kashmir": "JK", Ladakh: "LA", Puducherry: "PY",
+  Chandigarh: "CH", Lakshadweep: "LD",
+  California: "CA", Texas: "TX", "New York": "NY", Florida: "FL",
+  Illinois: "IL", Pennsylvania: "PA", Ohio: "OH", Georgia: "GA",
+  "North Carolina": "NC", Michigan: "MI", Washington: "WA",
+  England: "ENG", Scotland: "SCT", Wales: "WLS",
+  Ontario: "ON", Quebec: "QC", "British Columbia": "BC", Alberta: "AB",
+  India: "IN", "United States": "US", "United Kingdom": "UK",
+  Canada: "CA", Australia: "AU", Pakistan: "PK", Bangladesh: "BD",
+  Nepal: "NP", Germany: "DE", France: "FR", Japan: "JP", UAE: "AE",
 };
 
-/** Returns 2–3 char abbreviation for any state/country name */
 function abbreviateState(name: string): string {
   if (!name) return "";
   if (STATE_ABBR[name]) return STATE_ABBR[name];
-  const lower = name.toLowerCase();
-  const found = Object.keys(STATE_ABBR).find((k) => k.toLowerCase() === lower);
-  if (found) return STATE_ABBR[found];
-  // Fallback: initials of each word, max 3 chars
-  return name
-    .split(/\s+/)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("")
-    .slice(0, 3);
+  return name.split(/\s+/).map((w) => w[0]?.toUpperCase() ?? "").join("").slice(0, 3);
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -229,8 +119,7 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
     if (loading) return;
 
     // Return cached data if fresh
-    if (lastFetchedAt && Date.now() - lastFetchedAt < CACHE_MS && get().data)
-      return;
+    if (lastFetchedAt && Date.now() - lastFetchedAt < CACHE_MS && get().data) return;
 
     set({ loading: true, error: null });
 
@@ -248,44 +137,36 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
       });
       const { latitude, longitude } = loc.coords;
 
-      // 3. Reverse geocode for city name
-      const [place] = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude,
-      });
-      const city =
-        place?.city ?? place?.district ?? place?.subregion ?? "Unknown";
+      // 3. Reverse geocode for city/state
+      const [place] = await Location.reverseGeocodeAsync({ latitude, longitude });
+      const city = place?.city ?? place?.district ?? place?.subregion ?? "Unknown";
       const state = place?.region ?? place?.country ?? "";
 
-      // 4. Fetch current weather from OpenWeatherMap
-      const weatherUrl =
-        `https://api.openweathermap.org/data/2.5/weather` +
-        `?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
-      const weatherRes = await fetch(weatherUrl);
-      const weatherJson = await weatherRes.json();
+      // 4. Fetch from Open-Meteo (FREE — no API key needed!)
+      const url =
+        `https://api.open-meteo.com/v1/forecast` +
+        `?latitude=${latitude}&longitude=${longitude}` +
+        `&current=temperature_2m,relative_humidity_2m,apparent_temperature,` +
+        `weather_code,wind_speed_10m,uv_index,is_day` +
+        `&wind_speed_unit=kmh` +
+        `&timezone=auto`;
 
-      if (!weatherRes.ok)
-        throw new Error(weatherJson.message ?? "Weather fetch failed");
+      const res = await fetch(url);
+      const json = await res.json();
 
-      const temp = Math.round(weatherJson.main.temp);
-      const humidity = weatherJson.main.humidity;
-      const windKmh = Math.round((weatherJson.wind?.speed ?? 0) * 3.6);
-      const condition = weatherJson.weather?.[0]?.description ?? "Clear";
-      const icon = weatherJson.weather?.[0]?.icon ?? "01d";
+      if (!res.ok) throw new Error("Weather fetch failed");
 
-      // 5. Fetch UVI (One Call API 2.5 – free tier)
-      let uvLevel: WeatherData["uvLevel"] = "Low";
-      try {
-        const uvUrl =
-          `https://api.openweathermap.org/data/2.5/uvi` +
-          `?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`;
-        const uvRes = await fetch(uvUrl);
-        const uvJson = await uvRes.json();
-        uvLevel = uvIndexToLevel(uvJson.value ?? 0);
-      } catch (_) {
-        // UVI optional — don't fail the whole fetch
-      }
+      const current = json.current;
+      const temp = Math.round(current.temperature_2m);
+      const feelsLike = Math.round(current.apparent_temperature);
+      const humidity = Math.round(current.relative_humidity_2m);
+      const windKmh = Math.round(current.wind_speed_10m);
+      const uvIndex = Math.round(current.uv_index ?? 0);
+      const wmoCode = current.weather_code ?? 0;
+      const isDay = current.is_day === 1;
 
+      const { condition, icon } = wmoToCondition(wmoCode, isDay);
+      const uvLevel = uvIndexToLevel(uvIndex);
       const comfortScore = calcComfortScore(temp, humidity, windKmh);
 
       set({
@@ -294,14 +175,17 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
           state: abbreviateState(state),
           isLive: true,
           temperatureCelsius: temp,
-          condition: condition.charAt(0).toUpperCase() + condition.slice(1),
+          feelsLike,
+          condition,
           humidityPercent: humidity,
           windKmh,
+          uvIndex,
           uvLevel,
           comfortScore,
           bestFabric: bestFabricForTemp(temp),
           bestColors: bestColorsForTemp(temp),
           weatherIcon: icon,
+          isDay,
         },
         loading: false,
         lastFetchedAt: Date.now(),

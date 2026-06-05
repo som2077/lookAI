@@ -3,11 +3,11 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --max-workers 4",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web",
+    "android": "expo run:android --max-workers 4",
+    "ios": "expo run:ios --max-workers 4",
+    "web": "expo start --web --max-workers 4",
     "lint": "expo lint",
     "postinstall": "patch-package"
   },
