@@ -17,6 +17,15 @@ config.resolver.extraNodeModules = {
 config.transformer = {
   ...config.transformer,
   inlineRequires: true,
+  // Use hermes parser for faster JS compilation
+  hermesParser: true,
 };
 
-module.exports = withNativeWind(config, { input: "./global.css" });
+// ── Resolver: faster module resolution ────────────────────────────────────────
+config.resolver = {
+  ...config.resolver,
+  // Prefer ES module sources when available
+  unstable_enableSymlinks: false,
+};
+
+module.exports = withNativeWind(config, { input: "./global.css" });

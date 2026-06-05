@@ -214,8 +214,8 @@ export default function RootLayout() {
     // Initial check on mount
     checkConnectivity();
 
-    // Periodic check every 15 seconds
-    const interval = setInterval(checkConnectivity, 15000);
+    // Periodic check every 60 seconds (was 15s — too aggressive)
+    const interval = setInterval(checkConnectivity, 60000);
 
     return () => {
       clearInterval(interval);

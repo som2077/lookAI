@@ -15,12 +15,33 @@ type UseSupabaseQueryOptions = {
   enabled?: boolean;
 };
 
+// ── Simple in-memory cache with 30s TTL to avoid duplicate API calls ──────────
+const CACHE_TTL_MS = 30_000;
+interface CacheEntry<T> {
+  data: T[];
+  timestamp: number;
+}
+const queryCache = new Map<string, CacheEntry<Record<string, unknown>>>();
+
+function getCacheKey(table: string, select?: string): string {
+  return `${table}::${select ?? "*"}`;
+}
+
 export const useSupabaseQuery = <T extends Record<string, unknown>>(
   table: string,
   options?: UseSupabaseQueryOptions,
 ) => {
   const { supabase, isInitializing } = useSupabase();
-  const [data, setData] = useState<T[]>([]);
+  const cacheKey = getCacheKey(table, options?.select);
+
+  // Initialise from cache immediately to avoid flash of empty state
+  const [data, setData] = useState<T[]>(() => {
+    const cached = queryCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data as T[];
+    }
+    return [];
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<PostgrestError | Error | null>(null);
   const optionsRef = useRef(options);
@@ -30,6 +51,14 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
     const opts = optionsRef.current;
 
     if (opts?.enabled === false || isInitializing) {
+      return;
+    }
+
+    // Serve from cache if still fresh
+    const cached = queryCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      setData(cached.data as T[]);
+      setLoading(false);
       return;
     }
 
@@ -51,7 +80,10 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
         return;
       }
 
-      setData((rows ?? []) as unknown as T[]);
+      const freshData = (rows ?? []) as unknown as T[];
+      // Write to cache
+      queryCache.set(cacheKey, { data: freshData as Record<string, unknown>[], timestamp: Date.now() });
+      setData(freshData);
     } catch (unknownError) {
       const err =
         unknownError instanceof Error
@@ -68,7 +100,7 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
     } finally {
       setLoading(false);
     }
-  }, [isInitializing, supabase, table]);
+  }, [isInitializing, supabase, table, cacheKey]);
 
   useEffect(() => {
     void fetchData();

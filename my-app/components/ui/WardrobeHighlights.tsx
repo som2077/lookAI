@@ -228,16 +228,17 @@ const RANGE_DATA: Record<
   },
 };
 
+const SCREEN_WIDTH = Dimensions.get("window").width;
+
 export const WardrobeHighlights = React.memo(function WardrobeHighlights() {
   const router = useRouter();
-  const screenWidth = Dimensions.get("window").width;
   const [selectedRange, setSelectedRange] = useState<RangeType>("30 Days");
 
   // Get active dataset based on selection
   const activeData = RANGE_DATA[selectedRange];
 
   // Dimensions
-  const containerWidth = screenWidth - 48; // mx-6 is 24 padding on each side
+  const containerWidth = SCREEN_WIDTH - 48; // mx-6 is 24 padding on each side
   const svgHeight = 135;
   const paddingLeft = 32;
   const paddingRight = 36;

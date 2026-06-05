@@ -574,12 +574,13 @@ interface TrendChartCardProps {
   setActiveCategory: (cat: CategoryType) => void;
 }
 
+const SCREEN_WIDTH_TREND = Dimensions.get("window").width;
+
 export const TrendChartCard = React.memo(function TrendChartCard({
   activeCategory,
   setActiveCategory,
 }: TrendChartCardProps) {
-  const screenWidth = Dimensions.get("window").width;
-  const containerWidth = screenWidth - 40; // mx-5 is 20 padding on each side
+  const containerWidth = SCREEN_WIDTH_TREND - 40; // mx-5 is 20 padding on each side
   const svgHeight = 155;
   const paddingLeft = 24;
   const paddingRight = 24;

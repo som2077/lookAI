@@ -59,7 +59,7 @@ const CompletedCardSlide = React.memo(function CompletedCardSlide({
 }) {
   return (
     <View style={{ width: CARD_WIDTH }}>
-      <View className="flex-row rounded-[24px] border border-[#E9EBF8] bg-white overflow-hidden h-40 ">
+      <View className="flex-row rounded-[24px] border border-[#E9EBF8] bg-[#F5F4F980] overflow-hidden h-40 ">
         <View
           className="justify-center items-center"
           style={{ width: 120, height: 160, backgroundColor: "#FFFFFF" }}
@@ -143,7 +143,7 @@ const AnalyzingCardSlide = React.memo(function AnalyzingCardSlide({
   return (
     <View style={{ width: CARD_WIDTH }}>
       <View
-        className="flex-row rounded-[24px] border border-[#E9EBF8] bg-white overflow-hidden h-40"
+        className="flex-row rounded-[24px] border border-[#E9EBF8] bg-[##F5F4F9] overflow-hidden h-40"
         style={{
           shadowColor: "#000000",
           shadowOpacity: 0.09,
@@ -199,14 +199,14 @@ const AnalyzingCardSlide = React.memo(function AnalyzingCardSlide({
         <View className="flex-1 justify-center px-3 ml-1">
           <Text
             className="text-[#1D1A27] font-bold mb-2"
-            style={{ fontSize: 14 }}
+            style={{ fontSize: 16 }}
           >
             Analyzing cloth...
           </Text>
-          <View className="h-[9px] rounded-full bg-[#EBEBEB] w-4/5 mb-[7px]" />
-          <View className="h-[9px] rounded-full bg-[#EBEBEB] w-3/5 mb-[7px]" />
-          <View className="h-[9px] rounded-full bg-[#EBEBEB] w-2/5 mb-[10px]" />
-          <Text className="text-[#9B9BAF] font-sans" style={{ fontSize: 11 }}>
+          <View className="h-[9px] rounded-full bg-[#ffffff] w-4/5 mb-[7px]" />
+          <View className="h-[9px] rounded-full bg-[#ffffff] w-3/5 mb-[7px]" />
+          <View className="h-[9px] rounded-full bg-[#ffffff] w-2/5 mb-[10px]" />
+          <Text className="text-[#000000] font-sans" style={{ fontSize: 11 }}>
             {"We'll notify you when done!"}
           </Text>
         </View>

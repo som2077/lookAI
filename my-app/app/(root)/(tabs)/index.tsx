@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Animated, Dimensions, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
@@ -41,27 +41,15 @@ const clampRatio = (value: number): number => {
 };
 
 type CardKey = "wardrobe" | "blank1";
-const CARDS = Array.from({ length: 100 }, (_, i) =>
-  i % 2 === 0 ? "wardrobe" : "blank1",
-) as CardKey[];
+// Only 2 cards needed — was wastefully creating 100 items
+const CARDS: CardKey[] = ["wardrobe", "blank1"];
 
 export default function HomeScreen() {
   const { user } = useUser();
   const { summary } = useWardrobeSummary(user?.id);
-  const [activeIndex, setActiveIndex] = useState(50); // Start at index 50 ('wardrobe')
+  const [activeIndex, setActiveIndex] = useState(0); // Start at index 0 directly
   const flatListRef = useRef<FlatList>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
-
-  // Initial scroll to index 50 ('wardrobe')
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      flatListRef.current?.scrollToIndex({
-        index: 50,
-        animated: false,
-      });
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
 
   const ringSegments = useMemo<readonly RingProgressSegment[]>(() => {
     const totalTracked = summary.wearCount + summary.neverCount;
@@ -77,19 +65,19 @@ export default function HomeScreen() {
     ];
   }, [summary]);
 
-  const handleMomentumScrollEnd = (event: any) => {
+  const handleMomentumScrollEnd = useCallback((event: any) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / SCREEN_WIDTH);
     setActiveIndex(index);
-  };
+  }, []);
 
-  const getItemLayout = (_data: any, index: number) => ({
+  const getItemLayout = useCallback((_data: any, index: number) => ({
     length: SCREEN_WIDTH,
     offset: SCREEN_WIDTH * index,
     index,
-  });
+  }), []);
 
-  const renderCard = ({ item }: { item: CardKey }) => (
+  const renderCard = useCallback(({ item }: { item: CardKey }) => (
     <View style={{ width: SCREEN_WIDTH, paddingHorizontal: H_PADDING }}>
       {item === "wardrobe" ? (
         <>
@@ -110,7 +98,7 @@ export default function HomeScreen() {
         </>
       )}
     </View>
-  );
+  ), [summary, ringSegments]);
 
   // Header stays in place (translateY counteracts scroll), clamped to HEADER_HEIGHT
   const headerTranslateY = scrollY.interpolate({
@@ -126,7 +114,7 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
-  const indicatorIndex = CARDS[activeIndex] === "wardrobe" ? 0 : 1;
+  const indicatorIndex = activeIndex === 0 ? 0 : 1;
 
   return (
     <SwipeTabWrapper tabIndex={0}>
@@ -169,6 +157,10 @@ export default function HomeScreen() {
                 getItemLayout={getItemLayout}
                 style={{ flexGrow: 0 }}
                 scrollEnabled
+                initialNumToRender={1}
+                maxToRenderPerBatch={1}
+                windowSize={2}
+                removeClippedSubviews={true}
               />
 
               {/* Pagination dots */}

@@ -22,6 +22,7 @@ import {
   IconChevronRight,
   IconSparkles,
   IconList,
+  IconHeart,
 } from "@tabler/icons-react-native";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
@@ -63,13 +64,13 @@ const GRID_PADDING = 20;
 const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP * 2) / 3;
 
 const CATEGORIES: CategoryChip[] = [
-  { id: "all",       label: "All",       emoji: "✨" },
-  { id: "top",       label: "Tops",      emoji: "👕" },
-  { id: "bottoms",   label: "Bottoms",   emoji: "👖" },
-  { id: "footwear",  label: "Shoes",     emoji: "👟" },
-  { id: "outerwear", label: "Outer",     emoji: "🧥" },
-  { id: "dress",     label: "Dress",     emoji: "👗" },
-  { id: "ethnic",    label: "Ethnic",    emoji: "🎽" },
+  { id: "all", label: "All", emoji: "✨" },
+  { id: "top", label: "Tops", emoji: "👕" },
+  { id: "bottoms", label: "Bottoms", emoji: "👖" },
+  { id: "footwear", label: "Shoes", emoji: "👟" },
+  { id: "outerwear", label: "Outer", emoji: "🧥" },
+  { id: "dress", label: "Dress", emoji: "👗" },
+  { id: "ethnic", label: "Ethnic", emoji: "🎽" },
   { id: "accessory", label: "Accessory", emoji: "👜" },
 ];
 
@@ -85,42 +86,119 @@ const CATEGORY_ICONS: Record<CategoryId, React.ComponentType<any>> = {
 };
 
 const CATEGORY_COLORS: Record<CategoryId, string> = {
-  all:       "#6366F1",
-  top:       "#10B981",
-  bottoms:   "#3B82F6",
-  footwear:  "#F59E0B",
+  all: "#6366F1",
+  top: "#10B981",
+  bottoms: "#3B82F6",
+  footwear: "#F59E0B",
   outerwear: "#8B5CF6",
-  dress:     "#EC4899",
-  ethnic:    "#EF4444",
+  dress: "#EC4899",
+  ethnic: "#EF4444",
   accessory: "#6B7280",
 };
 
 const CATEGORY_BG: Record<CategoryId, string> = {
-  all:       "#EEF2FF",
-  top:       "#ECFDF5",
-  bottoms:   "#EFF6FF",
-  footwear:  "#FFFBEB",
+  all: "#EEF2FF",
+  top: "#ECFDF5",
+  bottoms: "#EFF6FF",
+  footwear: "#FFFBEB",
   outerwear: "#F5F3FF",
-  dress:     "#FDF2F8",
-  ethnic:    "#FFF1F2",
+  dress: "#FDF2F8",
+  ethnic: "#FFF1F2",
   accessory: "#F9FAFB",
 };
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 const BASE_MOCK_ITEMS: ClothingItem[] = [
-  { id: "1", name: "White Shirt",    category: "top",       color: "White", bgColor: "#F8F7FC", occasion: "Casual", wears: 8,  isNew: false },
-  { id: "2", name: "Black Jeans",    category: "bottoms",   color: "Black", bgColor: "#F8F7FC", occasion: "Casual", wears: 5,  isNew: false },
-  { id: "3", name: "Blue Kurta",     category: "top",       color: "Blue",  bgColor: "#F8F7FC", occasion: "Casual", wears: 0,  isNew: true  },
-  { id: "4", name: "Sneakers",       category: "footwear",  color: "White", bgColor: "#F8F7FC", occasion: "Casual", wears: 12, isNew: false },
-  { id: "5", name: "Grey Blazer",    category: "outerwear", color: "Grey",  bgColor: "#F8F7FC", occasion: "Formal", wears: 0,  isNew: true  },
-  { id: "6", name: "Beige Chinos",   category: "bottoms",   color: "Beige", bgColor: "#F8F7FC", occasion: "Casual", wears: 0,  isNew: true  },
+  {
+    id: "1",
+    name: "White Shirt",
+    category: "top",
+    color: "White",
+    bgColor: "#F8F7FC",
+    occasion: "Casual",
+    wears: 8,
+    isNew: false,
+  },
+  {
+    id: "2",
+    name: "Black Jeans",
+    category: "bottoms",
+    color: "Black",
+    bgColor: "#F8F7FC",
+    occasion: "Casual",
+    wears: 5,
+    isNew: false,
+  },
+  {
+    id: "3",
+    name: "Blue Kurta",
+    category: "top",
+    color: "Blue",
+    bgColor: "#F8F7FC",
+    occasion: "Casual",
+    wears: 0,
+    isNew: true,
+  },
+  {
+    id: "4",
+    name: "Sneakers",
+    category: "footwear",
+    color: "White",
+    bgColor: "#F8F7FC",
+    occasion: "Casual",
+    wears: 12,
+    isNew: false,
+  },
+  {
+    id: "5",
+    name: "Grey Blazer",
+    category: "outerwear",
+    color: "Grey",
+    bgColor: "#F8F7FC",
+    occasion: "Formal",
+    wears: 0,
+    isNew: true,
+  },
+  {
+    id: "6",
+    name: "Beige Chinos",
+    category: "bottoms",
+    color: "Beige",
+    bgColor: "#F8F7FC",
+    occasion: "Casual",
+    wears: 0,
+    isNew: true,
+  },
 ];
 
 const generateMockItems = (): ClothingItem[] => {
   const items = [...BASE_MOCK_ITEMS];
-  const categories: CategoryId[] = ["top", "bottoms", "footwear", "outerwear", "dress", "ethnic", "accessory"];
-  const names = ["Red T-Shirt", "Chino Pants", "Brown Boots", "Black Leather Jacket", "Summer Dress", "Sherwani", "Sunglasses", "Wool Scarf", "Silk Tie", "Running Shoes", "Jeans Jacket", "Cargo Shorts", "Hoodie", "Sweater"];
+  const categories: CategoryId[] = [
+    "top",
+    "bottoms",
+    "footwear",
+    "outerwear",
+    "dress",
+    "ethnic",
+    "accessory",
+  ];
+  const names = [
+    "Red T-Shirt",
+    "Chino Pants",
+    "Brown Boots",
+    "Black Leather Jacket",
+    "Summer Dress",
+    "Sherwani",
+    "Sunglasses",
+    "Wool Scarf",
+    "Silk Tie",
+    "Running Shoes",
+    "Jeans Jacket",
+    "Cargo Shorts",
+    "Hoodie",
+    "Sweater",
+  ];
   for (let i = 7; i <= 48; i++) {
     const category = categories[i % categories.length];
     const wears = i % 4 === 0 ? 0 : Math.floor((i * 3) % 15) + 1;
@@ -192,14 +270,20 @@ const CategoryFilter = React.memo(function CategoryFilter({
 
 // Premium 4-stat summary card
 const StatsCard = React.memo(function StatsCard({
-  total, worn, unworn, usage,
+  total,
+  worn,
+  unworn,
+  usage,
 }: {
-  total: number; worn: number; unworn: number; usage: number;
+  total: number;
+  worn: number;
+  unworn: number;
+  usage: number;
 }) {
   const stats = [
-    { value: total,     label: "Total",  color: "#6366F1", bg: "#EEF2FF" },
-    { value: worn,      label: "Worn",   color: "#10B981", bg: "#ECFDF5" },
-    { value: unworn,    label: "Unworn", color: "#EF4444", bg: "#FEF2F2" },
+    { value: total, label: "Total", color: "#6366F1", bg: "#EEF2FF" },
+    { value: worn, label: "Worn", color: "#10B981", bg: "#ECFDF5" },
+    { value: unworn, label: "Unworn", color: "#EF4444", bg: "#FEF2F2" },
     { value: `${usage}%`, label: "Usage", color: "#F59E0B", bg: "#FFFBEB" },
   ];
 
@@ -235,11 +319,15 @@ const StatsCard = React.memo(function StatsCard({
                   marginBottom: 8,
                 }}
               >
-                <Text style={{ fontSize: 15, fontWeight: "800", color: s.color }}>
+                <Text
+                  style={{ fontSize: 15, fontWeight: "800", color: s.color }}
+                >
                   {s.value}
                 </Text>
               </View>
-              <Text style={{ fontSize: 11, color: "#9B9BAF", fontWeight: "600" }}>
+              <Text
+                style={{ fontSize: 11, color: "#9B9BAF", fontWeight: "600" }}
+              >
                 {s.label}
               </Text>
             </View>
@@ -297,9 +385,17 @@ const ViewToggle = React.memo(function ViewToggle({
             }}
           >
             {mode === "grouped" ? (
-              <IconList size={17} color={isActive ? "#1D1A27" : "#9B9BAF"} strokeWidth={2} />
+              <IconList
+                size={17}
+                color={isActive ? "#1D1A27" : "#9B9BAF"}
+                strokeWidth={2}
+              />
             ) : (
-              <IconLayoutGrid size={17} color={isActive ? "#1D1A27" : "#9B9BAF"} strokeWidth={2} />
+              <IconLayoutGrid
+                size={17}
+                color={isActive ? "#1D1A27" : "#9B9BAF"}
+                strokeWidth={2}
+              />
             )}
           </Pressable>
         );
@@ -309,7 +405,11 @@ const ViewToggle = React.memo(function ViewToggle({
 });
 
 // 3-column grid clothing card
-const ClothingCard = React.memo(function ClothingCard({ item }: { item: ClothingItem }) {
+const ClothingCard = React.memo(function ClothingCard({
+  item,
+}: {
+  item: ClothingItem;
+}) {
   const Icon = CATEGORY_ICONS[item.category] || IconHanger;
   const iconColor = CATEGORY_COLORS[item.category] || "#9B9BAF";
   const iconBg = CATEGORY_BG[item.category] || "#F4F4F6";
@@ -383,11 +483,19 @@ const ClothingCard = React.memo(function ClothingCard({ item }: { item: Clothing
       <View style={{ padding: 10 }}>
         <Text
           numberOfLines={1}
-          style={{ fontSize: 11, fontWeight: "700", color: "#1D1A27", marginBottom: 2 }}
+          style={{
+            fontSize: 11,
+            fontWeight: "700",
+            color: "#1D1A27",
+            marginBottom: 2,
+          }}
         >
           {item.name}
         </Text>
-        <Text numberOfLines={1} style={{ fontSize: 9, color: "#B0AFBE", fontWeight: "500" }}>
+        <Text
+          numberOfLines={1}
+          style={{ fontSize: 9, color: "#B0AFBE", fontWeight: "500" }}
+        >
           {isWorn ? `${item.wears}× worn` : "Never worn"}
         </Text>
       </View>
@@ -396,7 +504,11 @@ const ClothingCard = React.memo(function ClothingCard({ item }: { item: Clothing
 });
 
 // Add cloth card for grid view
-const AddClothCard = React.memo(function AddClothCard({ onPress }: { onPress: () => void }) {
+const AddClothCard = React.memo(function AddClothCard({
+  onPress,
+}: {
+  onPress: () => void;
+}) {
   return (
     <Pressable
       onPress={onPress}
@@ -426,13 +538,19 @@ const AddClothCard = React.memo(function AddClothCard({ onPress }: { onPress: ()
       >
         <IconPlus size={18} color="#6366F1" strokeWidth={2.5} />
       </View>
-      <Text style={{ fontSize: 11, fontWeight: "600", color: "#9B9BAF" }}>Add item</Text>
+      <Text style={{ fontSize: 11, fontWeight: "600", color: "#9B9BAF" }}>
+        Add item
+      </Text>
     </Pressable>
   );
 });
 
 // Carousel card for grouped view
-const CarouselCard = React.memo(function CarouselCard({ item }: { item: ClothingItem }) {
+const CarouselCard = React.memo(function CarouselCard({
+  item,
+}: {
+  item: ClothingItem;
+}) {
   const Icon = CATEGORY_ICONS[item.category] || IconHanger;
   const iconColor = CATEGORY_COLORS[item.category] || "#9B9BAF";
   const iconBg = CATEGORY_BG[item.category] || "#F4F4F6";
@@ -503,11 +621,19 @@ const CarouselCard = React.memo(function CarouselCard({ item }: { item: Clothing
       <View style={{ padding: 10 }}>
         <Text
           numberOfLines={1}
-          style={{ fontSize: 11, fontWeight: "700", color: "#1D1A27", marginBottom: 2 }}
+          style={{
+            fontSize: 11,
+            fontWeight: "700",
+            color: "#1D1A27",
+            marginBottom: 2,
+          }}
         >
           {item.name}
         </Text>
-        <Text numberOfLines={1} style={{ fontSize: 9, color: "#B0AFBE", fontWeight: "500" }}>
+        <Text
+          numberOfLines={1}
+          style={{ fontSize: 9, color: "#B0AFBE", fontWeight: "500" }}
+        >
           {isWorn ? `${item.wears}× worn` : "Never worn"}
         </Text>
       </View>
@@ -516,7 +642,11 @@ const CarouselCard = React.memo(function CarouselCard({ item }: { item: Clothing
 });
 
 // Carousel add card
-const CarouselAddCard = React.memo(function CarouselAddCard({ onPress }: { onPress: () => void }) {
+const CarouselAddCard = React.memo(function CarouselAddCard({
+  onPress,
+}: {
+  onPress: () => void;
+}) {
   return (
     <Pressable
       onPress={onPress}
@@ -546,7 +676,9 @@ const CarouselAddCard = React.memo(function CarouselAddCard({ onPress }: { onPre
       >
         <IconPlus size={18} color="#6366F1" strokeWidth={2.5} />
       </View>
-      <Text style={{ fontSize: 11, fontWeight: "600", color: "#9B9BAF" }}>Add</Text>
+      <Text style={{ fontSize: 11, fontWeight: "600", color: "#9B9BAF" }}>
+        Add
+      </Text>
     </Pressable>
   );
 });
@@ -643,7 +775,9 @@ const AISuggestionBanner = React.memo(function AISuggestionBanner({
         <Text style={{ fontSize: 14, fontWeight: "700", color: "#FFFFFF" }}>
           {unworn} clothes never worn
         </Text>
-        <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
+        <Text
+          style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 3 }}
+        >
           Get AI outfit ideas for them →
         </Text>
       </View>
@@ -664,7 +798,11 @@ const AISuggestionBanner = React.memo(function AISuggestionBanner({
 });
 
 // Empty state
-const EmptyState = React.memo(function EmptyState({ onAdd }: { onAdd: () => void }) {
+const EmptyState = React.memo(function EmptyState({
+  onAdd,
+}: {
+  onAdd: () => void;
+}) {
   return (
     <View
       style={{
@@ -687,7 +825,14 @@ const EmptyState = React.memo(function EmptyState({ onAdd }: { onAdd: () => void
       >
         <IconHanger size={40} color="#6366F1" strokeWidth={1.5} />
       </View>
-      <Text style={{ fontSize: 18, fontWeight: "800", color: "#1D1A27", marginBottom: 8 }}>
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: "800",
+          color: "#1D1A27",
+          marginBottom: 8,
+        }}
+      >
         Your wardrobe is empty
       </Text>
       <Text
@@ -699,7 +844,8 @@ const EmptyState = React.memo(function EmptyState({ onAdd }: { onAdd: () => void
           marginBottom: 24,
         }}
       >
-        Start adding your clothes to track what you wear and get personalized AI outfit ideas.
+        Start adding your clothes to track what you wear and get personalized AI
+        outfit ideas.
       </Text>
       <Pressable
         onPress={onAdd}
@@ -738,7 +884,16 @@ export default function WardrobeScreen() {
 
   const displayItems = useMemo(() => {
     return [
-      { id: "upload", name: "Add cloth", category: "all" as CategoryId, wears: 0, isNew: false, color: "", bgColor: "", occasion: "" },
+      {
+        id: "upload",
+        name: "Add cloth",
+        category: "all" as CategoryId,
+        wears: 0,
+        isNew: false,
+        color: "",
+        bgColor: "",
+        occasion: "",
+      },
       ...filteredItems,
     ];
   }, [filteredItems]);
@@ -748,19 +903,28 @@ export default function WardrobeScreen() {
       return CATEGORIES.filter((cat) => cat.id === activeCategory);
     }
     return CATEGORIES.filter(
-      (cat) => cat.id !== "all" && MOCK_ITEMS.some((item) => item.category === cat.id),
+      (cat) =>
+        cat.id !== "all" && MOCK_ITEMS.some((item) => item.category === cat.id),
     );
   }, [activeCategory]);
 
   const total = MOCK_ITEMS.length;
-  const worn = summary.totalWorn || MOCK_ITEMS.filter((i) => i.wears > 0).length;
-  const unworn = summary.neverCount || MOCK_ITEMS.filter((i) => i.wears === 0).length;
+  const worn =
+    summary.totalWorn || MOCK_ITEMS.filter((i) => i.wears > 0).length;
+  const unworn =
+    summary.neverCount || MOCK_ITEMS.filter((i) => i.wears === 0).length;
   const usage = summary.wornPercentage
     ? Math.round(summary.wornPercentage * 100)
-    : total > 0 ? Math.round((worn / total) * 100) : 0;
+    : total > 0
+      ? Math.round((worn / total) * 100)
+      : 0;
 
   const handleAddClothes = useCallback(() => {
     router.push("/(root)/add-clothes" as never);
+  }, [router]);
+
+  const handleSaved = useCallback(() => {
+    router.push("/(root)/saved" as never);
   }, [router]);
 
   const handleCategorySelect = useCallback((id: CategoryId) => {
@@ -769,7 +933,8 @@ export default function WardrobeScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
-      if (item.id === "upload") return <AddClothCard onPress={handleAddClothes} />;
+      if (item.id === "upload")
+        return <AddClothCard onPress={handleAddClothes} />;
       return <ClothingCard item={item} />;
     },
     [handleAddClothes],
@@ -777,7 +942,9 @@ export default function WardrobeScreen() {
 
   const renderGroupedRow = useCallback(
     ({ item: category }: { item: CategoryChip }) => {
-      const categoryItems = MOCK_ITEMS.filter((item) => item.category === category.id);
+      const categoryItems = MOCK_ITEMS.filter(
+        (item) => item.category === category.id,
+      );
       return (
         <View style={{ marginBottom: 8 }}>
           <GroupHeader category={category} count={categoryItems.length} />
@@ -814,9 +981,18 @@ export default function WardrobeScreen() {
       >
         <View>
           <Text style={{ fontSize: 18, fontWeight: "700", color: "#1D1A27" }}>
-            {viewMode === "grouped" ? "All Categories" : `${filteredItems.length} Items`}
+            {viewMode === "grouped"
+              ? "All Categories"
+              : `${filteredItems.length} Items`}
           </Text>
-          <Text style={{ fontSize: 12, color: "#9B9BAF", fontWeight: "500", marginTop: 2 }}>
+          <Text
+            style={{
+              fontSize: 12,
+              color: "#9B9BAF",
+              fontWeight: "500",
+              marginTop: 2,
+            }}
+          >
             {viewMode === "grouped"
               ? `${total} items across ${groupableCategories.length} categories`
               : `Filtered: ${activeCategory === "all" ? "Everything" : CATEGORIES.find((c) => c.id === activeCategory)?.label}`}
@@ -832,7 +1008,6 @@ export default function WardrobeScreen() {
       <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <StatusBar style="dark" />
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-
           {/* ── Header ── */}
           <View
             style={{
@@ -847,18 +1022,6 @@ export default function WardrobeScreen() {
             <View>
               <Text
                 style={{
-                  fontSize: 11,
-                  fontWeight: "700",
-                  color: "#9B9BAF",
-                  textTransform: "uppercase",
-                  letterSpacing: 1.5,
-                  marginBottom: 4,
-                }}
-              >
-                My Closet
-              </Text>
-              <Text
-                style={{
                   fontSize: 30,
                   fontWeight: "800",
                   color: "#1D1A27",
@@ -868,22 +1031,48 @@ export default function WardrobeScreen() {
               </Text>
             </View>
 
-            <Pressable
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: "#F4F4F6",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+            {/* Search + Heart buttons */}
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
             >
-              <IconSearch size={20} color="#1D1A27" strokeWidth={2.5} />
-            </Pressable>
+              <Pressable
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: "#F4F4F6",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <IconSearch size={20} color="#1D1A27" strokeWidth={2.5} />
+              </Pressable>
+              <Pressable
+                onPress={handleSaved}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: "#FFF1F2",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <IconHeart
+                  size={20}
+                  color="#E11D48"
+                  strokeWidth={2}
+                  fill="#E11D48"
+                />
+              </Pressable>
+            </View>
           </View>
 
           {/* ── Category Filter ── */}
-          <CategoryFilter active={activeCategory} onSelect={handleCategorySelect} />
+          <CategoryFilter
+            active={activeCategory}
+            onSelect={handleCategorySelect}
+          />
 
           {/* ── Content ── */}
           {viewMode === "grid" ? (
@@ -907,6 +1096,10 @@ export default function WardrobeScreen() {
                   <AISuggestionBanner unworn={unworn} />
                 ) : null
               }
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={12}
+              windowSize={5}
+              initialNumToRender={9}
             />
           ) : (
             <FlatList
@@ -919,9 +1112,12 @@ export default function WardrobeScreen() {
               ListHeaderComponent={listHeader}
               ListEmptyComponent={<EmptyState onAdd={handleAddClothes} />}
               ListFooterComponent={<AISuggestionBanner unworn={unworn} />}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={4}
+              windowSize={5}
+              initialNumToRender={3}
             />
           )}
-
         </SafeAreaView>
       </View>
     </SwipeTabWrapper>

@@ -1,48 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Text, View, StyleSheet } from "react-native";
+import {
+  Animated,
+  Easing,
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import {
   IconDroplet,
   IconWind,
   IconSun,
+  IconMoon,
+  IconCloud,
+  IconCloudRain,
+  IconCloudSnow,
+  IconCloudStorm,
   IconMapPin,
+  IconRefresh,
+  IconAlertCircle,
 } from "@tabler/icons-react-native";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface WeatherData {
-  city: string;
-  state: string;
-  isLive: boolean;
-  temperatureCelsius: number;
-  condition: string;
-  humidityPercent: number;
-  windKmh: number;
-  uvLevel: "Low" | "Moderate" | "High" | "Very High";
-  comfortScore: number;
-  bestFabric: string;
-  bestColors: string;
-}
-
-interface WeatherOutfitCardProps {
-  data?: WeatherData;
-}
-
-// ─── Default data ─────────────────────────────────────────────────────────────
-
-const DEFAULT_DATA: WeatherData = {
-  city: "Indore",
-  state: "MP",
-  isLive: true,
-  temperatureCelsius: 32,
-  condition: "Sunny & Clear",
-  humidityPercent: 40,
-  windKmh: 12,
-  uvLevel: "High",
-  comfortScore: 68,
-  bestFabric: "Linen · Cotton",
-  bestColors: "Light & White",
-};
+import { useWeatherStore } from "@/backend/store/weather-store";
 
 // ─── Comfort Ring ─────────────────────────────────────────────────────────────
 
@@ -106,7 +85,6 @@ function AnimatedArc({
 
   return (
     <Svg width={RING_SIZE} height={RING_SIZE} style={StyleSheet.absoluteFill}>
-      {/* Light lavender track */}
       <Circle
         cx={center}
         cy={center}
@@ -115,7 +93,6 @@ function AnimatedArc({
         strokeWidth={stroke}
         fill="transparent"
       />
-      {/* Dark animated progress arc */}
       <Circle
         cx={center}
         cy={center}
@@ -132,29 +109,79 @@ function AnimatedArc({
   );
 }
 
+// ─── Weather Icon ─────────────────────────────────────────────────────────────
+
+function WeatherIcon({
+  iconCode,
+  spinAnim,
+}: {
+  iconCode: string;
+  spinAnim: Animated.Value;
+}) {
+  const spin = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
+
+  const isNight = iconCode.endsWith("n");
+  const code = iconCode.slice(0, 2);
+
+  // Map OWM icon codes to tabler icons
+  if (code === "01") {
+    // Clear
+    return isNight ? (
+      <IconMoon size={54} color="#7C8FAB" strokeWidth={1.5} />
+    ) : (
+      <Animated.View style={{ transform: [{ rotate: spin }] }}>
+        <IconSun size={54} color="#F5A623" strokeWidth={1.5} />
+      </Animated.View>
+    );
+  }
+  if (code === "02" || code === "03" || code === "04") {
+    return <IconCloud size={54} color="#94A3B8" strokeWidth={1.5} />;
+  }
+  if (code === "09" || code === "10") {
+    return <IconCloudRain size={54} color="#60A5FA" strokeWidth={1.5} />;
+  }
+  if (code === "11") {
+    return <IconCloudStorm size={54} color="#818CF8" strokeWidth={1.5} />;
+  }
+  if (code === "13") {
+    return <IconCloudSnow size={54} color="#BAE6FD" strokeWidth={1.5} />;
+  }
+  // Default — sunny
+  return (
+    <Animated.View style={{ transform: [{ rotate: spin }] }}>
+      <IconSun size={54} color="#F5A623" strokeWidth={1.5} />
+    </Animated.View>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export const WeatherOutfitCard = React.memo(function WeatherOutfitCard({
-  data = DEFAULT_DATA,
-}: WeatherOutfitCardProps) {
+export const WeatherOutfitCard = React.memo(function WeatherOutfitCard() {
+  const { data, loading, error, fetchWeather } = useWeatherStore();
+
   const spinAnim = useRef(new Animated.Value(0)).current;
   const blinkAnim = useRef(new Animated.Value(1)).current;
 
+  // Spin animation for sun icon
   useEffect(() => {
-    const rotateAnimation = Animated.loop(
+    const anim = Animated.loop(
       Animated.timing(spinAnim, {
         toValue: 1,
-        duration: 12000, // 12 seconds for a slow, smooth rotation
+        duration: 12000,
         easing: Easing.linear,
         useNativeDriver: true,
       }),
     );
-    rotateAnimation.start();
-    return () => rotateAnimation.stop();
+    anim.start();
+    return () => anim.stop();
   }, [spinAnim]);
 
+  // Blink animation for live dot
   useEffect(() => {
-    const blinkAnimation = Animated.loop(
+    const anim = Animated.loop(
       Animated.sequence([
         Animated.timing(blinkAnim, {
           toValue: 0.2,
@@ -168,23 +195,56 @@ export const WeatherOutfitCard = React.memo(function WeatherOutfitCard({
         }),
       ]),
     );
-    blinkAnimation.start();
-    return () => blinkAnimation.stop();
+    anim.start();
+    return () => anim.stop();
   }, [blinkAnim]);
 
-  const spin = spinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
+  // Fetch on mount
+  useEffect(() => {
+    fetchWeather();
+  }, []);
+
+  // ── Loading skeleton ────────────────────────────────────────────────────────
+  if (loading && !data) {
+    return (
+      <View style={styles.outerWrapper}>
+        <View style={styles.rowContainer}>
+          <View style={[styles.iconCard, styles.skeleton]} />
+          <View style={[styles.card, styles.skeleton]} />
+        </View>
+      </View>
+    );
+  }
+
+  // ── Error / permission denied ───────────────────────────────────────────────
+  if ((error || !data) && !loading) {
+    const isDenied = error === "location_denied";
+    return (
+      <View style={styles.outerWrapper}>
+        <View style={[styles.errorCard]}>
+          <IconAlertCircle size={20} color="#9CA3AF" strokeWidth={1.8} />
+          <Text style={styles.errorText}>
+            {isDenied
+              ? "Location access denied. Enable it in Settings."
+              : "Could not load weather. Check your API key."}
+          </Text>
+          <Pressable onPress={fetchWeather} style={styles.retryBtn}>
+            <IconRefresh size={13} color="#6366F1" strokeWidth={2} />
+            <Text style={styles.retryText}>Retry</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
+  if (!data) return null;
 
   return (
     <View style={styles.outerWrapper}>
       <View style={styles.rowContainer}>
-        {/* ── Left: Weather condition icon card */}
+        {/* ── Left: Weather icon card */}
         <View style={styles.iconCard}>
-          <Animated.View style={{ transform: [{ rotate: spin }] }}>
-            <IconSun size={54} color="#F5A623" strokeWidth={1.5} />
-          </Animated.View>
+          <WeatherIcon iconCode={data.weatherIcon} spinAnim={spinAnim} />
         </View>
 
         {/* ── Right: Info card */}
@@ -193,7 +253,7 @@ export const WeatherOutfitCard = React.memo(function WeatherOutfitCard({
           <View style={styles.topRow}>
             <View style={styles.locationPill}>
               <IconMapPin size={11} color="#1C1C1E" strokeWidth={2} />
-              <Text style={styles.locationText}>
+              <Text style={styles.locationText} numberOfLines={1}>
                 {data.city}, {data.state}
               </Text>
               {data.isLive && (
@@ -208,20 +268,17 @@ export const WeatherOutfitCard = React.memo(function WeatherOutfitCard({
             <ComfortRing score={data.comfortScore} />
           </View>
 
-          {/* Row 2: Temperature (no °C, just °) */}
+          {/* Row 2: Temperature */}
           <Text style={styles.tempText}>{data.temperatureCelsius}°</Text>
 
-          {/* Row 3: Condition */}
-          {/* <Text style={styles.conditionText}>{data.condition}</Text> */}
-
-          {/* Row 4: Humidity + Wind chips only */}
+          {/* Row 3: Humidity + Wind */}
           <View style={styles.chipsRow}>
             <WeatherChip
-              icon={<IconDroplet size={13} color="#2A78FF" strokeWidth={2} />}
+              icon={<IconDroplet size={12} color="#2A78FF" strokeWidth={2} />}
               label={`Humidity ${data.humidityPercent}%`}
             />
             <WeatherChip
-              icon={<IconWind size={13} color="#7C6AFA" strokeWidth={2} />}
+              icon={<IconWind size={12} color="#7C6AFA" strokeWidth={2} />}
               label={`Wind ${data.windKmh}km/h`}
             />
           </View>
@@ -251,29 +308,21 @@ function WeatherChip({
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  outerWrapper: {
-    marginTop: 10,
-  },
+  outerWrapper: { marginTop: 10 },
 
-  // Side-by-side layout
-  rowContainer: {
-    flexDirection: "row",
-    gap: 6,
-  },
+  rowContainer: { flexDirection: "row", gap: 6 },
 
-  // Left: Sun icon card (stretches to match right card height)
   iconCard: {
     width: 125,
-    // height: 120,
     backgroundColor: "#FFFFFF",
     borderColor: "#E5E7F0",
     borderWidth: 1,
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
+    minHeight: 130,
   },
 
-  // Right: Weather info card
   card: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -285,7 +334,42 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
   },
 
-  // Location row
+  // Skeleton
+  skeleton: {
+    backgroundColor: "#F3F4F6",
+    borderColor: "#F3F4F6",
+    minHeight: 130,
+  },
+
+  // Error
+  errorCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#FAFAFA",
+    borderColor: "#E5E7EB",
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 14,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 12,
+    color: "#6B7280",
+    lineHeight: 17,
+  },
+  retryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#EEF2FF",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  retryText: { fontSize: 11, color: "#6366F1", fontWeight: "700" },
+
+  // Location
   topRow: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -296,18 +380,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     paddingLeft: 2,
+    flex: 1,
+    paddingRight: 8,
   },
   locationText: {
     fontSize: 12,
     fontFamily: "TikTokSans16pt-SemiBold",
     color: "#1C1C1E",
     letterSpacing: 0.2,
+    flexShrink: 1,
   },
   liveDot: {
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: "#FF000F", // ← red
+    backgroundColor: "#FF000F",
     marginLeft: 2,
   },
   liveText: {
@@ -323,10 +410,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  ringTextBox: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  ringTextBox: { alignItems: "center", justifyContent: "center" },
   ringScore: {
     fontSize: 15,
     fontFamily: "TikTokSans16pt-ExtraBold",
@@ -351,32 +435,14 @@ const styles = StyleSheet.create({
     marginTop: -45,
   },
 
-  // Condition text
-  // conditionText: {
-  //   fontSize: 14,
-  //   fontWeight: "100",
-  //   color: "#1C1C1E",
-  //   marginTop: 7,
-  //   marginBottom: 10,
-  // },
-
-  // Chips with visible background + border
-  chipsRow: {
-    flexDirection: "row",
-    // gap: 4,
-    flexWrap: "wrap",
-  },
+  // Chips
+  chipsRow: { flexDirection: "row", flexWrap: "wrap" },
   chip: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    // backgroundColor: "#F0F2FA",
-    // borderRadius: 30,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    // marginTop: 3,
-    // borderWidth: 1,
-    // borderColor: "#E5E7F0",
   },
   chipText: {
     fontSize: 12,

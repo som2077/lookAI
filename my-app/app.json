@@ -34,6 +34,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Look AI to access your location to show local weather.",
+          "locationWhenInUsePermission": "Allow Look AI to access your location to show local weather.",
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      [
         "expo-camera",
         {
           "cameraPermission": "Allow Look AI to access your camera to log outfits."
