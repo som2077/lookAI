@@ -75,8 +75,20 @@ const TAG_SETS = [
   ["Formal", "Power", "Pro"],
   ["Daily", "Minimal", "Easy"],
 ];
-const OCCASIONS = ["Work", "Casual Day Out", "Weekend", "Evening Out", "Formal", "Everyday"];
-const WEATHERS = ["☀️ Sunny · 32°C", "🌤 Partly Cloudy · 28°C", "🌧 Rainy · 24°C", "❄️ Cool · 18°C"];
+const OCCASIONS = [
+  "Work",
+  "Casual Day Out",
+  "Weekend",
+  "Evening Out",
+  "Formal",
+  "Everyday",
+];
+const WEATHERS = [
+  "☀️ Sunny · 32°C",
+  "🌤 Partly Cloudy · 28°C",
+  "🌧 Rainy · 24°C",
+  "❄️ Cool · 18°C",
+];
 const SCORES = [92, 88, 95, 78, 85, 90];
 const ITEMS = [3, 4, 3, 5, 4, 3];
 

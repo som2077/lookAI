@@ -24,7 +24,7 @@ import {
   IconBell,
   IconRefresh,
 } from "@tabler/icons-react-native";
-import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
+import { SwipeTabWrapper } from "../../components/navigation/SwipeTabWrapper";
 
 // ─── Constants & Types ────────────────────────────────────────────────────────
 

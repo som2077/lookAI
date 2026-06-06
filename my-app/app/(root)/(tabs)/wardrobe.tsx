@@ -394,7 +394,7 @@ const MOCK_ITEMS = generateMockItems();
 // ─── Sub-Components ──────────────────────────────────────────────────────────
 
 // Category filter chips — smooth FlatList paging
-const CHIP_PAGE_HEIGHT = 170;
+const CHIP_PAGE_HEIGHT = 160;
 
 const CategoryFilter = React.memo(function CategoryFilter({
   active,
@@ -403,121 +403,59 @@ const CategoryFilter = React.memo(function CategoryFilter({
   active: CategoryId;
   onSelect: (id: CategoryId) => void;
 }) {
-  const [currentPage, setCurrentPage] = useState(0);
-  const flatListRef = useRef<any>(null);
-  const itemsPerPage = 9;
+  // Split categories into 3 rows for a true "Brick Masonry" tight-packing layout
+  const rows: CategoryChip[][] = [[], [], []];
+  CATEGORIES.forEach((cat, index) => {
+    rows[index % 3].push(cat);
+  });
 
-  const chunkedCategories = useMemo(() => {
-    const chunks: CategoryChip[][] = [];
-    for (let i = 0; i < CATEGORIES.length; i += itemsPerPage) {
-      chunks.push(CATEGORIES.slice(i, i + itemsPerPage));
-    }
-    return chunks;
-  }, []);
-
-  const pages = chunkedCategories.length;
-
-  const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
-    if (viewableItems.length > 0) {
-      setCurrentPage(viewableItems[0].index ?? 0);
-    }
-  }).current;
-
-  const viewabilityConfig = useRef({
-    viewAreaCoveragePercentThreshold: 51,
-  }).current;
-
-  const goToPage = useCallback((idx: number) => {
-    flatListRef.current?.scrollToIndex({ index: idx, animated: true });
-    setCurrentPage(idx);
-  }, []);
-
-  const renderPage = useCallback(
-    ({ item: chunk }: { item: CategoryChip[] }) => (
-      <View
+  const renderChip = (cat: CategoryChip) => {
+    const isActive = cat.id === active;
+    return (
+      <Pressable
+        key={cat.id}
+        onPress={() => onSelect(cat.id)}
         style={{
-          width: SCREEN_WIDTH,
-          height: CHIP_PAGE_HEIGHT,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          alignContent: "flex-start",
-          justifyContent: "center",
-          gap: 7,
+          backgroundColor: isActive ? "#1D1A27" : "#EEF0F5",
+          borderRadius: 25,
           paddingHorizontal: 20,
-          paddingVertical: 2,
+          paddingVertical: 10,
         }}
       >
-        {chunk.map((cat) => {
-          const isActive = cat.id === active;
-          return (
-            <Pressable
-              key={cat.id}
-              onPress={() => onSelect(cat.id)}
-              style={{
-                backgroundColor: isActive ? "#1D1A27" : "#EEF0F5",
-                borderRadius: 25,
-                paddingHorizontal: 25,
-                paddingVertical: 13,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 13,
-                  fontWeight: isActive ? "600" : "500",
-                  color: isActive ? "#FFFFFF" : "#1D1A27",
-                }}
-              >
-                {cat.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    ),
-    [active, onSelect],
-  );
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: isActive ? "600" : "500",
+            color: isActive ? "#FFFFFF" : "#1D1A27",
+          }}
+        >
+          {cat.label}
+        </Text>
+      </Pressable>
+    );
+  };
 
   return (
-    <View style={{ alignItems: "center", marginBottom: 16 }}>
-      <FlatList
-        ref={flatListRef}
-        data={chunkedCategories}
-        keyExtractor={(_, i) => `page-${i}`}
-        renderItem={renderPage}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        bounces={false}
-        decelerationRate="fast"
-        getItemLayout={(_, index) => ({
-          length: SCREEN_WIDTH,
-          offset: SCREEN_WIDTH * index,
-          index,
-        })}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        style={{ width: SCREEN_WIDTH, height: CHIP_PAGE_HEIGHT }}
-      />
-
-      {/* Pagination dots */}
-      <View style={{ flexDirection: "row", gap: 6, marginTop: 12 }}>
-        {Array.from({ length: pages }).map((_, idx) => (
-          <Pressable key={idx} onPress={() => goToPage(idx)}>
-            <View
-              style={{
-                width: idx === currentPage ? 16 : 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor:
-                  idx === currentPage ? "#1D1A27" : "transparent",
-                borderWidth: idx === currentPage ? 0 : 1,
-                borderColor: "#B0AFBE",
-              }}
-            />
-          </Pressable>
-        ))}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        flexDirection: "column",
+        gap: 5,
+        paddingHorizontal: 20,
+      }}
+      style={{ marginBottom: 16 }}
+    >
+      <View style={{ flexDirection: "row", gap: 5 }}>
+        {rows[0].map(renderChip)}
       </View>
-    </View>
+      <View style={{ flexDirection: "row", gap: 5 }}>
+        {rows[1].map(renderChip)}
+      </View>
+      <View style={{ flexDirection: "row", gap: 5 }}>
+        {rows[2].map(renderChip)}
+      </View>
+    </ScrollView>
   );
 });
 
@@ -770,77 +708,25 @@ const CarouselCard = React.memo(function CarouselCard({
 }: {
   item: ClothingItem;
 }) {
-  const iconBg = CATEGORY_BG[item.category] || "#F4F4F6";
+  const router = useRouter();
+  const bg = CATEGORY_BG[item.category] || "#F4F4F6";
   const isWorn = item.wears > 0;
 
   return (
     <Pressable
+      onPress={() => router.push(`/(root)/cloth-details/${item.id}` as never)}
       style={{
-        width: 116,
-        marginRight: 10,
-        backgroundColor: "#FFFFFF",
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: "#F0EEF8",
+        width: 180,
+        height: 220,
+        marginRight: 12,
+        backgroundColor: bg,
+        borderRadius: 24,
         overflow: "hidden",
-        shadowColor: "#000",
-        shadowOpacity: 0.03,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 1,
+        position: "relative",
       }}
     >
-      <View
-        style={{
-          height: 110,
-          backgroundColor: iconBg,
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-        }}
-      >
-        <View
-          style={{
-            position: "absolute",
-            top: 8,
-            left: 8,
-            backgroundColor: isWorn ? "#ECFDF5" : "#FEF2F2",
-            borderRadius: 8,
-            paddingHorizontal: 6,
-            paddingVertical: 3,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 8,
-              fontWeight: "700",
-              color: isWorn ? "#10B981" : "#EF4444",
-            }}
-          >
-            {isWorn ? "WORN" : "NEW"}
-          </Text>
-        </View>
-      </View>
-
-      <View style={{ padding: 10 }}>
-        <Text
-          numberOfLines={1}
-          style={{
-            fontSize: 11,
-            fontWeight: "700",
-            color: "#1D1A27",
-            marginBottom: 2,
-          }}
-        >
-          {item.name}
-        </Text>
-        <Text
-          numberOfLines={1}
-          style={{ fontSize: 9, color: "#B0AFBE", fontWeight: "500" }}
-        >
-          {isWorn ? `${item.wears}× worn` : "Never worn"}
-        </Text>
-      </View>
+      {/* Placeholder — swap with <Image source={{uri: item.imageUrl}} style={{flex:1}} /> when real photos available */}
+      <View style={{ flex: 1, backgroundColor: bg }} />
     </Pressable>
   );
 });
@@ -1182,8 +1068,8 @@ export default function WardrobeScreen() {
               alignItems: "center",
               justifyContent: "space-between",
               paddingHorizontal: 20,
-              paddingTop: 12,
-              paddingBottom: 16,
+              // paddingTop: 10,
+              paddingBottom: 15,
             }}
           >
             <View>

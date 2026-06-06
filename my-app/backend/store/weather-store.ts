@@ -34,9 +34,17 @@ interface WeatherStore {
 const CACHE_MS = 10 * 60 * 1000; // 10 minutes
 
 /** WMO weather code → readable condition + icon code */
-function wmoToCondition(code: number, isDay: boolean): { condition: string; icon: string } {
-  if (code === 0) return { condition: isDay ? "Clear Sky" : "Clear Night", icon: isDay ? "01d" : "01n" };
-  if (code <= 2) return { condition: "Partly Cloudy", icon: isDay ? "02d" : "02n" };
+function wmoToCondition(
+  code: number,
+  isDay: boolean,
+): { condition: string; icon: string } {
+  if (code === 0)
+    return {
+      condition: isDay ? "Clear Sky" : "Clear Night",
+      icon: isDay ? "01d" : "01n",
+    };
+  if (code <= 2)
+    return { condition: "Partly Cloudy", icon: isDay ? "02d" : "02n" };
   if (code === 3) return { condition: "Overcast", icon: "04d" };
   if (code <= 49) return { condition: "Foggy", icon: "50d" };
   if (code <= 55) return { condition: "Drizzle", icon: "09d" };
@@ -56,7 +64,11 @@ function uvIndexToLevel(uvi: number): WeatherData["uvLevel"] {
 }
 
 /** 0–100 comfort score based on temp, humidity & wind */
-function calcComfortScore(temp: number, humidity: number, wind: number): number {
+function calcComfortScore(
+  temp: number,
+  humidity: number,
+  wind: number,
+): number {
   const tempScore = Math.max(0, 100 - Math.abs(temp - 22) * 3);
   const humScore = Math.max(0, 100 - Math.abs(humidity - 50) * 1.2);
   const windScore = Math.max(0, 100 - Math.max(0, wind - 10) * 2);
@@ -81,29 +93,80 @@ function bestColorsForTemp(temp: number): string {
 // ─── State Abbreviations ──────────────────────────────────────────────────────
 
 const STATE_ABBR: Record<string, string> = {
-  "Andhra Pradesh": "AP", "Arunachal Pradesh": "AR", Assam: "AS", Bihar: "BR",
-  Chhattisgarh: "CG", Goa: "GA", Gujarat: "GJ", Haryana: "HR",
-  "Himachal Pradesh": "HP", Jharkhand: "JH", Karnataka: "KA", Kerala: "KL",
-  "Madhya Pradesh": "MP", Maharashtra: "MH", Manipur: "MN", Meghalaya: "ML",
-  Mizoram: "MZ", Nagaland: "NL", Odisha: "OD", Punjab: "PB",
-  Rajasthan: "RJ", Sikkim: "SK", "Tamil Nadu": "TN", Telangana: "TG",
-  Tripura: "TR", "Uttar Pradesh": "UP", Uttarakhand: "UK", "West Bengal": "WB",
-  Delhi: "DL", "Jammu and Kashmir": "JK", Ladakh: "LA", Puducherry: "PY",
-  Chandigarh: "CH", Lakshadweep: "LD",
-  California: "CA", Texas: "TX", "New York": "NY", Florida: "FL",
-  Illinois: "IL", Pennsylvania: "PA", Ohio: "OH", Georgia: "GA",
-  "North Carolina": "NC", Michigan: "MI", Washington: "WA",
-  England: "ENG", Scotland: "SCT", Wales: "WLS",
-  Ontario: "ON", Quebec: "QC", "British Columbia": "BC", Alberta: "AB",
-  India: "IN", "United States": "US", "United Kingdom": "UK",
-  Canada: "CA", Australia: "AU", Pakistan: "PK", Bangladesh: "BD",
-  Nepal: "NP", Germany: "DE", France: "FR", Japan: "JP", UAE: "AE",
+  "Andhra Pradesh": "AP",
+  "Arunachal Pradesh": "AR",
+  Assam: "AS",
+  Bihar: "BR",
+  Chhattisgarh: "CG",
+  Goa: "GA",
+  Gujarat: "GJ",
+  Haryana: "HR",
+  "Himachal Pradesh": "HP",
+  Jharkhand: "JH",
+  Karnataka: "KA",
+  Kerala: "KL",
+  "Madhya Pradesh": "MP",
+  Maharashtra: "MH",
+  Manipur: "MN",
+  Meghalaya: "ML",
+  Mizoram: "MZ",
+  Nagaland: "NL",
+  Odisha: "OD",
+  Punjab: "PB",
+  Rajasthan: "RJ",
+  Sikkim: "SK",
+  "Tamil Nadu": "TN",
+  Telangana: "TG",
+  Tripura: "TR",
+  "Uttar Pradesh": "UP",
+  Uttarakhand: "UK",
+  "West Bengal": "WB",
+  Delhi: "DL",
+  "Jammu and Kashmir": "JK",
+  Ladakh: "LA",
+  Puducherry: "PY",
+  Chandigarh: "CH",
+  Lakshadweep: "LD",
+  California: "CA",
+  Texas: "TX",
+  "New York": "NY",
+  Florida: "FL",
+  Illinois: "IL",
+  Pennsylvania: "PA",
+  Ohio: "OH",
+  Georgia: "GA",
+  "North Carolina": "NC",
+  Michigan: "MI",
+  Washington: "WA",
+  England: "ENG",
+  Scotland: "SCT",
+  Wales: "WLS",
+  Ontario: "ON",
+  Quebec: "QC",
+  "British Columbia": "BC",
+  Alberta: "AB",
+  India: "IN",
+  "United States": "US",
+  "United Kingdom": "UK",
+  Canada: "CA",
+  Australia: "AU",
+  Pakistan: "PK",
+  Bangladesh: "BD",
+  Nepal: "NP",
+  Germany: "DE",
+  France: "FR",
+  Japan: "JP",
+  UAE: "AE",
 };
 
 function abbreviateState(name: string): string {
   if (!name) return "";
   if (STATE_ABBR[name]) return STATE_ABBR[name];
-  return name.split(/\s+/).map((w) => w[0]?.toUpperCase() ?? "").join("").slice(0, 3);
+  return name
+    .split(/\s+/)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("")
+    .slice(0, 3);
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -119,7 +182,8 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
     if (loading) return;
 
     // Return cached data if fresh
-    if (lastFetchedAt && Date.now() - lastFetchedAt < CACHE_MS && get().data) return;
+    if (lastFetchedAt && Date.now() - lastFetchedAt < CACHE_MS && get().data)
+      return;
 
     set({ loading: true, error: null });
 
@@ -138,8 +202,12 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
       const { latitude, longitude } = loc.coords;
 
       // 3. Reverse geocode for city/state
-      const [place] = await Location.reverseGeocodeAsync({ latitude, longitude });
-      const city = place?.city ?? place?.district ?? place?.subregion ?? "Unknown";
+      const [place] = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+      const city =
+        place?.city ?? place?.district ?? place?.subregion ?? "Unknown";
       const state = place?.region ?? place?.country ?? "";
 
       // 4. Fetch from Open-Meteo (FREE — no API key needed!)

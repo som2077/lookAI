@@ -156,17 +156,17 @@ export function CustomTabBar({
               backgroundColor: "#FFFFFF",
               borderWidth: 1,
               borderColor: "#E5E5EA",
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-              paddingHorizontal: 7,
-              paddingVertical: 8,
-              height: 60,
+              shadowColor: "#E5E5EA",
+              // shadowOffset: {
+              //   width: 0,
+              //   height: 12,
+              // },
+              // shadowOpacity: 0.25,
+              // shadowRadius: 3.84,
+              elevation: 2,
+              paddingHorizontal: 8,
+              paddingVertical: 7,
+              height: 65,
             }}
           >
             {state.routes.map((route, index) => {
@@ -183,7 +183,7 @@ export function CustomTabBar({
                 }
               };
 
-              const label = options?.title ?? route.name;              // Profile tab — avatar icon
+              const label = options?.title ?? route.name; // Profile tab — avatar icon
               if (route.name === "profile") {
                 return (
                   <AnimatedTabButton
