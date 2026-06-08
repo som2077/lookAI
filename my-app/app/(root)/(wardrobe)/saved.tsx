@@ -15,6 +15,7 @@ import {
   IconHeart,
   IconPlus,
   IconSparkles,
+  IconChevronLeft,
 } from "@tabler/icons-react-native";
 import { Image as ExpoImage } from "expo-image";
 
@@ -375,7 +376,20 @@ export default function SavedScreen() {
             paddingBottom: 16,
           }}
         >
-          <View>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            <Pressable
+              onPress={() => router.back()}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: "#F4F4F6",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconChevronLeft size={24} color="#1D1A27" strokeWidth={2.5} />
+            </Pressable>
             <Text
               style={{
                 fontSize: 32,

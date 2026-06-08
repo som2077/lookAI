@@ -3,17 +3,12 @@ import { Image as ExpoImage } from "expo-image";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import {
-  IconCalendarWeekFilled,
   IconFlameFilled,
 } from "@tabler/icons-react-native";
 
 export const HomeHeader = React.memo(function HomeHeader() {
   const router = useRouter();
   const [streak] = useState<number>(1);
-  const onCalendarPress = useCallback(
-    () => router.push("/(root)/calendar" as never),
-    [router],
-  );
 
   return (
     <View className="flex-row items-center justify-between ">
@@ -36,14 +31,6 @@ export const HomeHeader = React.memo(function HomeHeader() {
           <Text className="ml-1 text-sm font-semibold text-[#171421]">
             {streak} <Text className="text-sm">day</Text>
           </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={onCalendarPress}
-          className="items-center justify-center rounded-full border border-[#E2E2EA] bg-[#F8F7FC] p-[9.2px]"
-          activeOpacity={0.7}
-        >
-          <IconCalendarWeekFilled size={21} color="#171421" />
         </TouchableOpacity>
       </View>
     </View>

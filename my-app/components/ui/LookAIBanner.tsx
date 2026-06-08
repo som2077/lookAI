@@ -7,7 +7,7 @@ export const LookAIBanner = React.memo(function LookAIBanner() {
 
   return (
     <Pressable
-      onPress={() => router.push("/(root)/look-ai")}
+      onPress={() => router.push("/(root)/look-ai" as never)}
       style={{
         marginTop: 7,
         backgroundColor: "#FFFFFF",

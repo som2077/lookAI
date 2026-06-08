@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import {
   IconArrowLeft,
@@ -132,7 +133,7 @@ export default function CalendarScreen() {
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selected, setSelected] = useState<Date>(today);
-  const [monthPickerVisible, setMonthPickerVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const days = useMemo(
     () => buildCalendarDays(viewYear, viewMonth),
@@ -145,10 +146,15 @@ export default function CalendarScreen() {
     setViewMonth(date.getMonth());
   }, []);
 
-  const handleMonthSelect = useCallback((monthIdx: number) => {
-    setViewMonth(monthIdx);
-    setMonthPickerVisible(false);
-  }, []);
+  const onDateChange = useCallback(
+    (event: any, selectedDate?: Date) => {
+      setShowDatePicker(false);
+      if (selectedDate) {
+        handleDaySelect(selectedDate);
+      }
+    },
+    [handleDaySelect],
+  );
 
   const selectedLog = useMemo(() => {
     return LOGGED_OUTFITS_DATA[selected.toDateString()];
@@ -160,500 +166,416 @@ export default function CalendarScreen() {
         style={{ flex: 1, backgroundColor: "#FFFFFF" }}
         edges={["top"]}
       >
-      <StatusBar style="dark" />
+        <StatusBar style="dark" />
 
-      {/* Nav Header */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 20,
-          paddingTop: 12,
-          paddingBottom: 8,
-          justifyContent: "space-between",
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 12,
-            backgroundColor: "#FFFFFF",
-            borderWidth: 1,
-            borderColor: "#E2E2EA",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 32 }}
         >
-          <IconArrowLeft size={18} color="#171421" />
-        </TouchableOpacity>
-
-        <Text style={{ fontSize: 16, fontWeight: "800", color: "#171421" }}>
-          Outfit Calendar
-        </Text>
-
-        <View style={{ width: 38 }} />
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 32 }}
-      >
-        {/* Month Dropdown Selector & Plus Button Row */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingHorizontal: 20,
-            marginTop: 14,
-            marginBottom: 16,
-          }}
-        >
-          {/* Dropdown Pill Button */}
-          <TouchableOpacity
-            onPress={() => setMonthPickerVisible(true)}
-            activeOpacity={0.8}
+          {/* Month Dropdown Selector & Plus Button Row */}
+          <View
             style={{
               flexDirection: "row",
+              justifyContent: "space-between",
               alignItems: "center",
-              backgroundColor: "#FFFFFF",
-              borderWidth: 1,
-              borderColor: "#E2E2EA",
-              borderRadius: 20,
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              gap: 8,
-              shadowColor: "#000",
-              shadowOpacity: 0.015,
-              shadowRadius: 3,
-              shadowOffset: { width: 0, height: 1 },
+              paddingHorizontal: 20,
+              marginTop: 14,
+              marginBottom: 16,
             }}
           >
-            <IconCalendar size={15} color="#4C36F5" />
-            <Text style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27" }}>
-              {MONTH_NAMES[viewMonth]}, {viewYear}
-            </Text>
-            <IconChevronDown size={14} color="#9B9BAF" />
-          </TouchableOpacity>
-
-          {/* Plus Add Button */}
-          <TouchableOpacity
-            onPress={() => router.push("/(root)/log-outfit/camera" as never)}
-            activeOpacity={0.8}
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: 19,
-              backgroundColor: "#EAE8FF",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <IconPlus size={18} color="#4C36F5" strokeWidth={2.5} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Days of Week Headers */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 20,
-            marginBottom: CELL_GAP,
-          }}
-        >
-          {DAY_LABELS.map((label, idx) => (
-            <View
-              key={idx}
+            {/* Dropdown Pill Button */}
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              activeOpacity={0.8}
               style={{
-                width: CELL_WIDTH,
-                height: CELL_WIDTH,
-                borderRadius: 12,
-                backgroundColor: "#000000",
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "#FFFFFF",
+                borderWidth: 1,
+                borderColor: "#E2E2EA",
+                borderRadius: 25,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                gap: 8,
+                shadowColor: "#000",
+                shadowOpacity: 0.015,
+                shadowRadius: 3,
+                shadowOffset: { width: 0, height: 1 },
+              }}
+            >
+              <IconCalendar size={20} color="#000000" />
+              <Text
+                style={{ fontSize: 13, fontWeight: "700", color: "#1D1A27" }}
+              >
+                {MONTH_NAMES[viewMonth]}, {viewYear}
+              </Text>
+              <IconChevronDown size={20} color="#000000" />
+            </TouchableOpacity>
+
+            {/* Plus Add Button */}
+            <TouchableOpacity
+              onPress={() => router.push("/(root)/log-outfit/camera" as never)}
+              activeOpacity={0.8}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "#1D1A27",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Text
-                style={{ fontSize: 12, fontWeight: "700", color: "#9B9BAF" }}
-              >
-                {label}
-              </Text>
-            </View>
-          ))}
-        </View>
+              <IconPlus size={18} color="#FFFFFF" strokeWidth={2.5} />
+            </TouchableOpacity>
+          </View>
 
-        {/* Calendar days cells grid */}
-        <View style={{ paddingHorizontal: 20 }}>
-          {Array.from({ length: days.length / 7 }, (_, weekIdx) => (
-            <View
-              key={weekIdx}
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: CELL_GAP,
-              }}
-            >
-              {days.slice(weekIdx * 7, weekIdx * 7 + 7).map((date) => {
-                const isSelected = isSameDay(date, selected);
-                const isToday = isSameDay(date, today);
-                const isCurrentMonth = date.getMonth() === viewMonth;
-                const hasOutfit = !!LOGGED_OUTFITS_DATA[date.toDateString()];
-
-                return (
-                  <TouchableOpacity
-                    key={date.toISOString()}
-                    onPress={() => handleDaySelect(date)}
-                    activeOpacity={0.8}
-                    style={{
-                      width: CELL_WIDTH,
-                      height: CELL_WIDTH,
-                      borderRadius: 12,
-                      borderWidth: isSelected ? 0 : 1,
-                      borderColor: isToday ? "#171421" : "#E2E2EA",
-                      backgroundColor: isSelected ? "#4C36F5" : "#FFFFFF",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      opacity: isCurrentMonth ? 1 : 0.35,
-                      position: "relative",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontWeight: "700",
-                        color: isSelected ? "#FFFFFF" : "#171421",
-                      }}
-                    >
-                      {date.getDate()}
-                    </Text>
-                    {hasOutfit && (
-                      <View
-                        style={{
-                          position: "absolute",
-                          bottom: 5,
-                          width: 4,
-                          height: 4,
-                          borderRadius: 2,
-                          backgroundColor: isSelected ? "#FFFFFF" : "#4C36F5",
-                        }}
-                      />
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          ))}
-        </View>
-
-        {/* Timeline Log Section */}
-        <View style={{ paddingHorizontal: 20, marginTop: 24 }}>
-          {selectedLog ? (
-            <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-              {/* Left Column Time indicator */}
-              <Text
+          {/* Days of Week Headers */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 20,
+              marginBottom: CELL_GAP,
+            }}
+          >
+            {DAY_LABELS.map((label, idx) => (
+              <View
+                key={idx}
                 style={{
-                  fontSize: 18,
-                  fontWeight: "800",
-                  color: "#171421",
-                  width: 60,
-                  marginRight: 10,
-                  marginTop: 6,
+                  width: CELL_WIDTH,
+                  height: CELL_WIDTH,
+                  borderRadius: 12,
+                  backgroundColor: "#000000",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {selectedLog.wornTime.split(" ")[0]}
                 <Text
-                  style={{ fontSize: 10, fontWeight: "600", color: "#9B9BAF" }}
+                  style={{ fontSize: 12, fontWeight: "700", color: "#9B9BAF" }}
                 >
-                  {" "}
-                  {selectedLog.wornTime.split(" ")[1]}
+                  {label}
                 </Text>
-              </Text>
+              </View>
+            ))}
+          </View>
 
-              {/* Right Cards Stack */}
-              <View style={{ flex: 1, gap: 12 }}>
-                {/* 1. Main log card description */}
+          {/* Calendar days cells grid */}
+          <View style={{ paddingHorizontal: 20 }}>
+            {Array.from({ length: days.length / 7 }, (_, weekIdx) => (
+              <View
+                key={weekIdx}
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: CELL_GAP,
+                }}
+              >
+                {days.slice(weekIdx * 7, weekIdx * 7 + 7).map((date) => {
+                  const isSelected = isSameDay(date, selected);
+                  const isToday = isSameDay(date, today);
+                  const isCurrentMonth = date.getMonth() === viewMonth;
+                  const hasOutfit = !!LOGGED_OUTFITS_DATA[date.toDateString()];
+
+                  if (!isCurrentMonth) {
+                    return (
+                      <View
+                        key={date.toISOString()}
+                        style={{ width: CELL_WIDTH, height: CELL_WIDTH }}
+                      />
+                    );
+                  }
+
+                  return (
+                    <TouchableOpacity
+                      key={date.toISOString()}
+                      onPress={() => handleDaySelect(date)}
+                      activeOpacity={0.8}
+                      style={{
+                        width: CELL_WIDTH,
+                        height: CELL_WIDTH,
+                        borderRadius: 12,
+                        borderWidth: isSelected ? 0 : 1,
+                        borderColor: isToday ? "#171421" : "#E2E2EA",
+                        backgroundColor: isSelected ? "#4C36F5" : "#FFFFFF",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        opacity: isCurrentMonth ? 1 : 0.35,
+                        position: "relative",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontWeight: "700",
+                          color: isSelected ? "#FFFFFF" : "#171421",
+                        }}
+                      >
+                        {date.getDate()}
+                      </Text>
+                      {hasOutfit && (
+                        <View
+                          style={{
+                            position: "absolute",
+                            bottom: 5,
+                            width: 4,
+                            height: 4,
+                            borderRadius: 2,
+                            backgroundColor: isSelected ? "#FFFFFF" : "#4C36F5",
+                          }}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ))}
+          </View>
+
+          {/* Timeline Log Section */}
+          <View style={{ paddingHorizontal: 20, marginTop: 24 }}>
+            {selectedLog ? (
+              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+                {/* Left Column Time indicator */}
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "800",
+                    color: "#171421",
+                    width: 60,
+                    marginRight: 10,
+                    marginTop: 6,
+                  }}
+                >
+                  {selectedLog.wornTime.split(" ")[0]}
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: "600",
+                      color: "#9B9BAF",
+                    }}
+                  >
+                    {" "}
+                    {selectedLog.wornTime.split(" ")[1]}
+                  </Text>
+                </Text>
+
+                {/* Right Cards Stack */}
+                <View style={{ flex: 1, gap: 12 }}>
+                  {/* 1. Main log card description */}
+                  <View
+                    style={{
+                      backgroundColor: "#FFFFFF",
+                      borderRadius: 22,
+                      borderWidth: 1,
+                      borderColor: "#E2E2EA",
+                      padding: 16,
+                      shadowColor: "#000",
+                      shadowOpacity: 0.01,
+                      shadowRadius: 3,
+                      shadowOffset: { width: 0, height: 1 },
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "800",
+                          color: "#1D1A27",
+                        }}
+                      >
+                        {selectedLog.title}
+                      </Text>
+                      <TouchableOpacity style={{ padding: 4 }}>
+                        <IconDots size={16} color="#9B9BAF" />
+                      </TouchableOpacity>
+                    </View>
+
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        color: "#5A5A6A",
+                        marginTop: 4,
+                        fontWeight: "500",
+                      }}
+                    >
+                      {selectedLog.itemsWorn}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        color: "#9B9BAF",
+                        marginTop: 8,
+                        lineHeight: 15,
+                        fontWeight: "500",
+                      }}
+                    >
+                      {selectedLog.description}
+                    </Text>
+                  </View>
+
+                  {/* 2. Grid-like stats card */}
+                  <LinearGradient
+                    colors={["#EAE8FF", "#F4F3FF"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      borderRadius: 22,
+                      padding: 16,
+                      borderWidth: 1,
+                      borderColor: "#EAE8FF",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      {/* Item count */}
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            color: "#9B9BAF",
+                            fontWeight: "600",
+                          }}
+                        >
+                          Items Worn
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 24,
+                            fontWeight: "800",
+                            color: "#4C36F5",
+                            marginTop: 2,
+                          }}
+                        >
+                          {selectedLog.itemCount}
+                        </Text>
+                      </View>
+
+                      {/* Usage score */}
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            color: "#9B9BAF",
+                            fontWeight: "600",
+                          }}
+                        >
+                          Usage Score
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 24,
+                            fontWeight: "800",
+                            color: "#4C36F5",
+                            marginTop: 2,
+                          }}
+                        >
+                          {selectedLog.score}%
+                        </Text>
+                      </View>
+
+                      {/* Small avatar thumbnail bubble */}
+                      <View
+                        style={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: 19,
+                          backgroundColor: "#FFFFFF",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderWidth: 1,
+                          borderColor: "#E2E2EA",
+                        }}
+                      >
+                        <IconShirt size={18} color="#4C36F5" />
+                      </View>
+                    </View>
+                  </LinearGradient>
+                </View>
+              </View>
+            ) : (
+              /* Empty logs timeline state */
+              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "800",
+                    color: "#171421",
+                    width: 60,
+                    marginRight: 10,
+                    marginTop: 6,
+                  }}
+                >
+                  09:00
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: "600",
+                      color: "#9B9BAF",
+                    }}
+                  >
+                    {" "}
+                    AM
+                  </Text>
+                </Text>
+
                 <View
                   style={{
+                    flex: 1,
                     backgroundColor: "#FFFFFF",
                     borderRadius: 22,
                     borderWidth: 1,
                     borderColor: "#E2E2EA",
-                    padding: 16,
-                    shadowColor: "#000",
-                    shadowOpacity: 0.01,
-                    shadowRadius: 3,
-                    shadowOffset: { width: 0, height: 1 },
+                    padding: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: 120,
                   }}
                 >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        fontWeight: "800",
-                        color: "#1D1A27",
-                      }}
-                    >
-                      {selectedLog.title}
-                    </Text>
-                    <TouchableOpacity style={{ padding: 4 }}>
-                      <IconDots size={16} color="#9B9BAF" />
-                    </TouchableOpacity>
-                  </View>
-
                   <Text
                     style={{
-                      fontSize: 11,
-                      color: "#5A5A6A",
-                      marginTop: 4,
-                      fontWeight: "500",
+                      fontSize: 13,
+                      fontWeight: "700",
+                      color: "#1D1A27",
+                      marginBottom: 4,
                     }}
                   >
-                    {selectedLog.itemsWorn}
+                    No outfit logged
                   </Text>
-
                   <Text
                     style={{
                       fontSize: 11,
                       color: "#9B9BAF",
-                      marginTop: 8,
-                      lineHeight: 15,
+                      textAlign: "center",
                       fontWeight: "500",
                     }}
                   >
-                    {selectedLog.description}
+                    Tap the &#39;+&#39; icon above to log what you wore today.
                   </Text>
                 </View>
-
-                {/* 2. Grid-like stats card */}
-                <LinearGradient
-                  colors={["#EAE8FF", "#F4F3FF"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={{
-                    borderRadius: 22,
-                    padding: 16,
-                    borderWidth: 1,
-                    borderColor: "#EAE8FF",
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    {/* Item count */}
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          color: "#9B9BAF",
-                          fontWeight: "600",
-                        }}
-                      >
-                        Items Worn
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 24,
-                          fontWeight: "800",
-                          color: "#4C36F5",
-                          marginTop: 2,
-                        }}
-                      >
-                        {selectedLog.itemCount}
-                      </Text>
-                    </View>
-
-                    {/* Usage score */}
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          color: "#9B9BAF",
-                          fontWeight: "600",
-                        }}
-                      >
-                        Usage Score
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 24,
-                          fontWeight: "800",
-                          color: "#4C36F5",
-                          marginTop: 2,
-                        }}
-                      >
-                        {selectedLog.score}%
-                      </Text>
-                    </View>
-
-                    {/* Small avatar thumbnail bubble */}
-                    <View
-                      style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: 19,
-                        backgroundColor: "#FFFFFF",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderWidth: 1,
-                        borderColor: "#E2E2EA",
-                      }}
-                    >
-                      <IconShirt size={18} color="#4C36F5" />
-                    </View>
-                  </View>
-                </LinearGradient>
               </View>
-            </View>
-          ) : (
-            /* Empty logs timeline state */
-            <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "800",
-                  color: "#171421",
-                  width: 60,
-                  marginRight: 10,
-                  marginTop: 6,
-                }}
-              >
-                09:00
-                <Text
-                  style={{ fontSize: 10, fontWeight: "600", color: "#9B9BAF" }}
-                >
-                  {" "}
-                  AM
-                </Text>
-              </Text>
-
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 22,
-                  borderWidth: 1,
-                  borderColor: "#E2E2EA",
-                  padding: 20,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: 120,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontWeight: "700",
-                    color: "#1D1A27",
-                    marginBottom: 4,
-                  }}
-                >
-                  No outfit logged
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 11,
-                    color: "#9B9BAF",
-                    textAlign: "center",
-                    fontWeight: "500",
-                  }}
-                >
-                  Tap the &#39;+&#39; icon above to log what you wore today.
-                </Text>
-              </View>
-            </View>
-          )}
-        </View>
-      </ScrollView>
-
-      {/* Month Selector Modal */}
-      <Modal
-        visible={monthPickerVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMonthPickerVisible(false)}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => setMonthPickerVisible(false)}
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.4)",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "#FFFFFF",
-              borderRadius: 24,
-              padding: 20,
-              width: SCREEN_WIDTH - 60,
-              shadowColor: "#000",
-              shadowOpacity: 0.1,
-              shadowRadius: 10,
-              shadowOffset: { width: 0, height: 4 },
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "800",
-                color: "#1D1A27",
-                marginBottom: 14,
-                textAlign: "center",
-              }}
-            >
-              Select Month
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-              }}
-            >
-              {MONTH_NAMES.map((m, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  onPress={() => handleMonthSelect(idx)}
-                  style={{
-                    width: "30%",
-                    paddingVertical: 10,
-                    marginVertical: 4,
-                    borderRadius: 10,
-                    backgroundColor: idx === viewMonth ? "#4C36F5" : "#F1F1F5",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: "700",
-                      color: idx === viewMonth ? "#FFFFFF" : "#1D1A27",
-                    }}
-                  >
-                    {m.substring(0, 3)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            )}
           </View>
-        </TouchableOpacity>
-      </Modal>
+        </ScrollView>
+        {showDatePicker && (
+          <DateTimePicker
+            value={selected}
+            mode="date"
+            display="calendar"
+            onChange={onDateChange}
+          />
+        )}
       </SafeAreaView>
     </SwipeTabWrapper>
   );
