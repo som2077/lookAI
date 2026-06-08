@@ -12,6 +12,7 @@ import {
   IconSparkles,
   IconTrendingUp,
   IconBookmark,
+  IconCalendar,
   type IconProps,
 } from "@tabler/icons-react-native";
 import { AddActionMenu } from "./AddActionMenu";
@@ -21,7 +22,7 @@ type TabConfig = Record<string, TabIconComponent>;
 
 const TAB_CONFIG: TabConfig = {
   index: IconSmartHome,
-  saved: IconBookmark,
+  calendar: IconCalendar,
   wardrobe: IconMesh,
 };
 

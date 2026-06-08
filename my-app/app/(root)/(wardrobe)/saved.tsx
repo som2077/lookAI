@@ -17,7 +17,6 @@ import {
   IconSparkles,
 } from "@tabler/icons-react-native";
 import { Image as ExpoImage } from "expo-image";
-import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -362,213 +361,107 @@ export default function SavedScreen() {
   const keyExtractor = useCallback((item: SavedOutfit) => item.id, []);
 
   return (
-    <SwipeTabWrapper tabIndex={2}>
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-        <StatusBar style="dark" />
-        <SafeAreaView className="flex-1" edges={["top"]}>
-          {/* Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingHorizontal: 24,
-              paddingTop: 16,
-              paddingBottom: 16,
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontSize: 32,
-                  fontWeight: "800",
-                  color: "#1D1A27",
-                }}
-              >
-                Saved
-              </Text>
-            </View>
-
-            <Pressable
+    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <StatusBar style="dark" />
+      <SafeAreaView className="flex-1" edges={["top"]}>
+        {/* Header */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 24,
+            paddingTop: 16,
+            paddingBottom: 16,
+          }}
+        >
+          <View>
+            <Text
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: "#F4F4F6",
-                alignItems: "center",
-                justifyContent: "center",
+                fontSize: 32,
+                fontWeight: "800",
+                color: "#1D1A27",
               }}
             >
-              <IconSearch size={20} color="#1D1A27" strokeWidth={2.5} />
-            </Pressable>
+              Saved
+            </Text>
           </View>
 
-          {/* Grid Layout list */}
-          <FlatList
-            data={filteredOutfits}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            numColumns={2}
-            columnWrapperStyle={{
-              justifyContent: "space-between",
-              paddingHorizontal: 24,
+          <Pressable
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              backgroundColor: "#F4F4F6",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            contentContainerStyle={{ paddingBottom: 120 }}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={
-              <View style={{ marginTop: 4 }}>
-                {/* Occasion/Type Filter Chips */}
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ paddingHorizontal: 24, gap: 8 }}
-                  style={{ marginBottom: 24, maxHeight: 42 }}
-                >
-                  {FILTER_CHIPS.map((chip) => {
-                    const isActive = chip === activeChip;
-                    return (
-                      <Pressable
-                        key={chip}
-                        onPress={() => setActiveChip(chip)}
-                        style={{
-                          backgroundColor: isActive ? "#1D1A27" : "#F4F4F6",
-                          borderWidth: isActive ? 0 : 1,
-                          borderColor: "#EAEAEF",
-                          borderRadius: 20,
-                          paddingHorizontal: 20,
-                          paddingVertical: 10,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 13,
-                            fontWeight: "600",
-                            color: isActive ? "#FFFFFF" : "#7E7C8C",
-                          }}
-                        >
-                          {chip}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
+          >
+            <IconSearch size={20} color="#1D1A27" strokeWidth={2.5} />
+          </Pressable>
+        </View>
 
-                {/* Collections Section */}
-                <View style={{ marginBottom: 28 }}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      paddingHorizontal: 24,
-                      marginBottom: 14,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "700",
-                        color: "#1D1A27",
-                      }}
-                    >
-                      Collections
-                    </Text>
+        {/* Grid Layout list */}
+        <FlatList
+          data={filteredOutfits}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          numColumns={2}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+            paddingHorizontal: 24,
+          }}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View style={{ marginTop: 4 }}>
+              {/* Occasion/Type Filter Chips */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24, gap: 8 }}
+                style={{ marginBottom: 24, maxHeight: 42 }}
+              >
+                {FILTER_CHIPS.map((chip) => {
+                  const isActive = chip === activeChip;
+                  return (
                     <Pressable
+                      key={chip}
+                      onPress={() => setActiveChip(chip)}
                       style={{
-                        flexDirection: "row",
+                        backgroundColor: isActive ? "#1D1A27" : "#F4F4F6",
+                        borderWidth: isActive ? 0 : 1,
+                        borderColor: "#EAEAEF",
+                        borderRadius: 20,
+                        paddingHorizontal: 20,
+                        paddingVertical: 10,
                         alignItems: "center",
-                        gap: 4,
+                        justifyContent: "center",
                       }}
                     >
-                      <IconPlus size={14} color="#7E7C8C" strokeWidth={2.5} />
                       <Text
                         style={{
-                          fontSize: 14,
+                          fontSize: 13,
                           fontWeight: "600",
-                          color: "#7E7C8C",
+                          color: isActive ? "#FFFFFF" : "#7E7C8C",
                         }}
                       >
-                        New
+                        {chip}
                       </Text>
                     </Pressable>
-                  </View>
+                  );
+                })}
+              </ScrollView>
 
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
-                  >
-                    {INITIAL_COLLECTIONS.map((col) => (
-                      <Pressable
-                        key={col.id}
-                        style={{
-                          width: 140,
-                          height: 90,
-                          borderRadius: 16,
-                          overflow: "hidden",
-                          position: "relative",
-                          backgroundColor: "#E2E2EA",
-                        }}
-                      >
-                        <ExpoImage
-                          source={{ uri: col.image }}
-                          style={{ width: "100%", height: "100%" }}
-                          contentFit="cover"
-                        />
-                        {/* Semi-transparent dark overlay */}
-                        <View
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: "rgba(0, 0, 0, 0.4)",
-                          }}
-                        />
-                        <View
-                          style={{
-                            position: "absolute",
-                            bottom: 12,
-                            left: 12,
-                            right: 12,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: "#FFFFFF",
-                              fontSize: 14,
-                              fontWeight: "700",
-                            }}
-                          >
-                            {col.name}
-                          </Text>
-                          <Text
-                            style={{
-                              color: "rgba(255, 255, 255, 0.8)",
-                              fontSize: 10,
-                              fontWeight: "500",
-                              marginTop: 2,
-                            }}
-                          >
-                            {col.count} outfits
-                          </Text>
-                        </View>
-                      </Pressable>
-                    ))}
-                  </ScrollView>
-                </View>
-
-                {/* Saved Outfits Header */}
+              {/* Collections Section */}
+              <View style={{ marginBottom: 28 }}>
                 <View
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
                     paddingHorizontal: 24,
-                    marginBottom: 16,
+                    marginBottom: 14,
                   }}
                 >
                   <Text
@@ -578,25 +471,129 @@ export default function SavedScreen() {
                       color: "#1D1A27",
                     }}
                   >
-                    Saved Outfits
+                    Collections
                   </Text>
-                  <Text
+                  <Pressable
                     style={{
-                      fontSize: 13,
-                      color: "#9B9BAF",
-                      fontWeight: "500",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
                     }}
                   >
-                    {filteredOutfits.length}{" "}
-                    {filteredOutfits.length === 1 ? "look" : "looks"}
-                  </Text>
+                    <IconPlus size={14} color="#7E7C8C" strokeWidth={2.5} />
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "600",
+                        color: "#7E7C8C",
+                      }}
+                    >
+                      New
+                    </Text>
+                  </Pressable>
                 </View>
+
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+                >
+                  {INITIAL_COLLECTIONS.map((col) => (
+                    <Pressable
+                      key={col.id}
+                      style={{
+                        width: 140,
+                        height: 90,
+                        borderRadius: 16,
+                        overflow: "hidden",
+                        position: "relative",
+                        backgroundColor: "#E2E2EA",
+                      }}
+                    >
+                      <ExpoImage
+                        source={{ uri: col.image }}
+                        style={{ width: "100%", height: "100%" }}
+                        contentFit="cover"
+                      />
+                      {/* Semi-transparent dark overlay */}
+                      <View
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: "rgba(0, 0, 0, 0.4)",
+                        }}
+                      />
+                      <View
+                        style={{
+                          position: "absolute",
+                          bottom: 12,
+                          left: 12,
+                          right: 12,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#FFFFFF",
+                            fontSize: 14,
+                            fontWeight: "700",
+                          }}
+                        >
+                          {col.name}
+                        </Text>
+                        <Text
+                          style={{
+                            color: "rgba(255, 255, 255, 0.8)",
+                            fontSize: 10,
+                            fontWeight: "500",
+                            marginTop: 2,
+                          }}
+                        >
+                          {col.count} outfits
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ))}
+                </ScrollView>
               </View>
-            }
-            ListEmptyComponent={<EmptyState onExplore={handleExplore} />}
-          />
-        </SafeAreaView>
-      </View>
-    </SwipeTabWrapper>
+
+              {/* Saved Outfits Header */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingHorizontal: 24,
+                  marginBottom: 16,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "700",
+                    color: "#1D1A27",
+                  }}
+                >
+                  Saved Outfits
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: "#9B9BAF",
+                    fontWeight: "500",
+                  }}
+                >
+                  {filteredOutfits.length}{" "}
+                  {filteredOutfits.length === 1 ? "look" : "looks"}
+                </Text>
+              </View>
+            </View>
+          }
+          ListEmptyComponent={<EmptyState onExplore={handleExplore} />}
+        />
+      </SafeAreaView>
+    </View>
   );
 }

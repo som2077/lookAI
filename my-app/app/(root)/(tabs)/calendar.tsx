@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
+import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import {
   IconArrowLeft,
   IconCalendar,
@@ -154,10 +155,11 @@ export default function CalendarScreen() {
   }, [selected]);
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: "#FFFFFF" }}
-      edges={["top"]}
-    >
+    <SwipeTabWrapper tabIndex={2}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: "#FFFFFF" }}
+        edges={["top"]}
+      >
       <StatusBar style="dark" />
 
       {/* Nav Header */}
@@ -652,6 +654,7 @@ export default function CalendarScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
-    </SafeAreaView>
+      </SafeAreaView>
+    </SwipeTabWrapper>
   );
 }

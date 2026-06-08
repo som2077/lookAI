@@ -23,7 +23,7 @@ import {
   CELEBRITY_TRENDS,
   GLOBAL_TRENDS,
   type TrendItem,
-} from "../../components/ui/TrendFeed";
+} from "../../../components/ui/TrendFeed";
 
 // ─── Trend Row Item (vertical list card) ─────────────────────────────────────
 

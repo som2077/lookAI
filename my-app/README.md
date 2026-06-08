@@ -34,25 +34,32 @@ my-app/
 │   ├── (auth)/                 # Auth route screens
 │   │   ├── sign-in.tsx         # Email / Google SSO sign-in options
 │   │   └── email.tsx           # OTP validation verification with 30s resend timer
+│   ├── UNNECESSARY/            # Unused prototypes and demo files
+│   │   ├── posts.tsx
+│   │   └── swipe-demo.tsx
 │   └── (root)/                 # Authenticated workspace screens
 │       ├── _layout.tsx         # Authenticated environment wrapper
-│       ├── calendar.tsx        # Outfit wear logs calendar interface
-│       ├── streak.tsx          # Logging streak tracking details
-│       ├── saved.tsx           # Saved outfits screen with overlapping fanned decks
-│       ├── look-ai.tsx         # AI Look generator screen
-│       ├── trend-feed.tsx      # Fashion trends full-screen feed
-│       ├── outfit-log-detail.tsx # Individual outfit log detail view
-│       ├── wardrobe-highlights.tsx # Wardrobe highlights expanded view
+│       ├── (ai-features)/      # AI & Outfit recommendation flows
+│       │   ├── look-ai.tsx
+│       │   ├── outfit.tsx
+│       │   └── outfit-log-detail.tsx
+│       ├── (analytics)/        # Gamification & tracking stats
+│       │   ├── score.tsx
+│       │   └── streak.tsx
+│       ├── (social)/           # Social interaction & feeds
+│       │   └── trend-feed.tsx
+│       ├── (subscription)/     # In-app purchases & billing
+│       │   ├── subscription.tsx
+│       │   └── manage-subscription.tsx
+│       ├── (wardrobe)/         # Wardrobe discovery & highlights
+│       │   ├── saved.tsx
+│       │   └── wardrobe-highlights.tsx
 │       ├── (tabs)/             # Main Tab Bar screen views
 │       │   ├── _layout.tsx     # Tab setup & navigation index mapping
 │       │   ├── index.tsx       # Home: Highlights, trend feeds, and stats overview
 │       │   ├── wardrobe.tsx    # Wardrobe: Pinterest masonry grid + grouped carousels
-│       │   ├── outfit.tsx      # Outfit: AI Outfit Suggester
-│       │   ├── saved.tsx       # Saved: Bookmarked outfits screen
-│       │   ├── score.tsx       # Score: Style Score metrics & achievements dashboard
-│       │   ├── profile.tsx     # Profile: Bio summary, body stats, and settings
-│       │   ├── subscription.tsx         # Paywall pricing screen
-│       │   └── manage-subscription.tsx  # Billing history & cancel options
+│       │   ├── calendar.tsx    # Calendar: Outfit wear logs & scheduling
+│       │   └── profile.tsx     # Profile: Bio summary, body stats, and settings
 │       ├── onboarding/         # Onboarding questionnaire wizard
 │       │   ├── index.tsx       # Onboarding entry page
 │       │   ├── step{1-6}.tsx   # Wizard steps (Age, Height, Gender, Body, Styles)

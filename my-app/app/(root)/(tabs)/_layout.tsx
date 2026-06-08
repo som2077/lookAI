@@ -15,7 +15,7 @@ export default function TabLayout() {
     >
       <MaterialTopTabs.Screen name="index" options={{ title: "Home" }} />
       <MaterialTopTabs.Screen name="wardrobe" options={{ title: "Wardrobe" }} />
-      <MaterialTopTabs.Screen name="saved" options={{ title: "Saved" }} />
+      <MaterialTopTabs.Screen name="calendar" options={{ title: "Calendar" }} />
       <MaterialTopTabs.Screen name="profile" options={{ title: "Profile" }} />
     </MaterialTopTabs>
   );

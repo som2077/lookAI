@@ -1404,7 +1404,6 @@ export default function WardrobeScreen() {
                   </View>
                 </View>
               )}
-
             </ScrollView>
           ) : (
             <FlatList

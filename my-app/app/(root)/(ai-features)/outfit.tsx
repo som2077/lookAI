@@ -24,7 +24,7 @@ import {
   IconBell,
   IconRefresh,
 } from "@tabler/icons-react-native";
-import { SwipeTabWrapper } from "../../components/navigation/SwipeTabWrapper";
+
 
 // ─── Constants & Types ────────────────────────────────────────────────────────
 
@@ -406,8 +406,7 @@ export default function OutfitScreen() {
   const isWorn = !!wornIds[selectedId];
 
   return (
-    <SwipeTabWrapper tabIndex={2}>
-      <View style={{ flex: 1, backgroundColor: "#F8F7FC" }}>
+    <View style={{ flex: 1, backgroundColor: "#F8F7FC" }}>
         <StatusBar style="dark" />
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           
@@ -820,6 +819,5 @@ export default function OutfitScreen() {
           )}
         </SafeAreaView>
       </View>
-    </SwipeTabWrapper>
   );
 }
