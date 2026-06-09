@@ -13,6 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
+import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
 import {
   IconArrowLeft,
   IconCalendar,
@@ -162,10 +163,11 @@ export default function CalendarScreen() {
 
   return (
     <SwipeTabWrapper tabIndex={2}>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: "#FFFFFF" }}
-        edges={["top"]}
-      >
+      <AppGradientBackground>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          edges={["top"]}
+        >
         <StatusBar style="dark" />
 
         <ScrollView
@@ -576,7 +578,8 @@ export default function CalendarScreen() {
             onChange={onDateChange}
           />
         )}
-      </SafeAreaView>
+        </SafeAreaView>
+      </AppGradientBackground>
     </SwipeTabWrapper>
   );
 }

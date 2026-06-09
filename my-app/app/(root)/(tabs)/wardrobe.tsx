@@ -30,6 +30,7 @@ import {
 } from "@tabler/icons-react-native";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
+import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1158,7 +1159,7 @@ export default function WardrobeScreen() {
 
   return (
     <SwipeTabWrapper tabIndex={1}>
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <AppGradientBackground>
         <StatusBar style="dark" />
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* ── Header ── */}
@@ -1422,7 +1423,7 @@ export default function WardrobeScreen() {
             />
           )}
         </SafeAreaView>
-      </View>
+      </AppGradientBackground>
     </SwipeTabWrapper>
   );
 }
