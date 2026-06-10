@@ -267,6 +267,9 @@ export default function ProfileScreen() {
                     Advanced outfit analysis.
                   </Text>
                   <Pressable
+                    onPress={() =>
+                      router.push("/(root)/subscription" as never)
+                    }
                     style={{
                       backgroundColor: "white",
                       paddingVertical: 6,

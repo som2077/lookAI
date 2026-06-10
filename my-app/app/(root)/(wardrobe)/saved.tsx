@@ -21,6 +21,8 @@ import { Image as ExpoImage } from "expo-image";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+type SavedItemType = "outfit" | "clothes" | "inspo";
+
 interface SavedOutfit {
   id: string;
   name: string;
@@ -29,6 +31,7 @@ interface SavedOutfit {
   image: string;
   match: number;
   tags: string[];
+  saveType: SavedItemType;
   bgColor?: string;
   items?: {
     id: string;
@@ -87,6 +90,7 @@ const INITIAL_OUTFITS: SavedOutfit[] = [
       "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=500&auto=format&fit=crop&q=60",
     match: 96,
     tags: ["Work", "Formal"],
+    saveType: "outfit",
   },
   {
     id: "outfit-2",
@@ -97,6 +101,7 @@ const INITIAL_OUTFITS: SavedOutfit[] = [
       "https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=500&auto=format&fit=crop&q=60",
     match: 91,
     tags: ["Casual", "Denim"],
+    saveType: "outfit",
   },
   {
     id: "outfit-3",
@@ -107,6 +112,7 @@ const INITIAL_OUTFITS: SavedOutfit[] = [
       "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=500&auto=format&fit=crop&q=60",
     match: 88,
     tags: ["Party", "Bold"],
+    saveType: "inspo",
   },
   {
     id: "outfit-4",
@@ -117,6 +123,29 @@ const INITIAL_OUTFITS: SavedOutfit[] = [
       "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=500&auto=format&fit=crop&q=60",
     match: 93,
     tags: ["Casual", "Light"],
+    saveType: "outfit",
+  },
+  {
+    id: "cloth-1",
+    name: "White Linen Shirt",
+    occasion: "Casual",
+    wears: 6,
+    image:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&auto=format&fit=crop&q=60",
+    match: 89,
+    tags: ["Essential", "Summer"],
+    saveType: "clothes",
+  },
+  {
+    id: "inspo-1",
+    name: "Street Style Mood",
+    occasion: "Casual",
+    wears: 0,
+    image:
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&auto=format&fit=crop&q=60",
+    match: 94,
+    tags: ["Inspo", "Trendy"],
+    saveType: "inspo",
   },
 ];
 
@@ -340,8 +369,14 @@ export default function SavedScreen() {
   const [outfits, setOutfits] = useState<SavedOutfit[]>(INITIAL_OUTFITS);
 
   const filteredOutfits = useMemo(() => {
-    if (activeChip === "All" || activeChip === "Outfits") return outfits;
-    return [];
+    if (activeChip === "All") return outfits;
+    if (activeChip === "Outfits")
+      return outfits.filter((o) => o.saveType === "outfit");
+    if (activeChip === "Clothes")
+      return outfits.filter((o) => o.saveType === "clothes");
+    if (activeChip === "Inspo")
+      return outfits.filter((o) => o.saveType === "inspo");
+    return outfits;
   }, [activeChip, outfits]);
 
   const handleUnsave = useCallback((id: string) => {
@@ -349,7 +384,7 @@ export default function SavedScreen() {
   }, []);
 
   const handleExplore = useCallback(() => {
-    router.push("/(root)/(tabs)/outfit" as never);
+    router.push("/(root)/outfit" as never);
   }, [router]);
 
   const renderItem = useCallback(

@@ -45,8 +45,7 @@ export default function SubscriptionScreen() {
   useEffect(() => {
     if (!userId) return;
     (async () => {
-      const token = await getToken();
-      if (token) await initBilling(userId, token);
+      await initBilling(userId, () => getToken());
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -96,7 +95,7 @@ export default function SubscriptionScreen() {
         {isPremium && (
           <TouchableOpacity
             onPress={() =>
-              router.push("/(root)/(tabs)/manage-subscription" as never)
+              router.push("/(root)/manage-subscription" as never)
             }
             activeOpacity={0.75}
             className="flex-row items-center bg-[#A78BFA]/15 px-4 py-3 rounded-xl mb-5"

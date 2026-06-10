@@ -41,6 +41,7 @@ export const useWardrobeSummary = (
       select:
         "user_id, period, period_label, worn_percentage, total_worn, wear_count, never_count",
       enabled: hasUserId,
+      cacheKeySuffix: hasUserId ? `${userId}:${period}` : undefined,
       apply: (query) => {
         if (!userId) {
           return query;

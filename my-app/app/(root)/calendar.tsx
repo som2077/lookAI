@@ -12,8 +12,7 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
-import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
+import { AppGradientBackground } from "../../components/ui/AppGradientBackground";
 import {
   IconArrowLeft,
   IconCalendar,
@@ -162,13 +161,49 @@ export default function CalendarScreen() {
   }, [selected]);
 
   return (
-    <SwipeTabWrapper tabIndex={2}>
+    <View style={{ flex: 1 }}>
       <AppGradientBackground>
         <SafeAreaView
           style={{ flex: 1 }}
           edges={["top"]}
         >
         <StatusBar style="dark" />
+
+        {/* Custom Header for Back Navigation */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: "#FFFFFF",
+              alignItems: "center",
+              justifyContent: "center",
+              borderWidth: 1,
+              borderColor: "#E2E2EA",
+            }}
+          >
+            <IconArrowLeft size={20} color="#171421" />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "700",
+              color: "#171421",
+              marginLeft: 16,
+            }}
+          >
+            Calendar
+          </Text>
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -580,6 +615,6 @@ export default function CalendarScreen() {
         )}
         </SafeAreaView>
       </AppGradientBackground>
-    </SwipeTabWrapper>
+    </View>
   );
 }

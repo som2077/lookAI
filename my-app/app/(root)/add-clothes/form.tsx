@@ -11,6 +11,7 @@ import {
   IconPhoto,
   IconSparkles,
 } from "@tabler/icons-react-native";
+import { useUserWardrobeStore } from "@/backend/store/user-wardrobe-store";
 
 type CategoryId =
   | "top"
@@ -84,7 +85,17 @@ export default function AddClothesFormScreen() {
     if (router.canGoBack()) router.back();
   }, [router]);
 
+  const addItem = useUserWardrobeStore((state) => state.addItem);
+
   const handleConfirm = useCallback(() => {
+    addItem({
+      name: name || "Untitled item",
+      category,
+      color: color || undefined,
+      photoUri: localPhotoUri,
+      occasion: occasion || undefined,
+    });
+
     router.replace({
       pathname: "/(root)/add-clothes/success",
       params: {
@@ -93,7 +104,7 @@ export default function AddClothesFormScreen() {
         category,
       },
     } as never);
-  }, [router, name, category, localPhotoUri]);
+  }, [router, name, category, color, occasion, localPhotoUri, addItem]);
 
   return (
     <View className="flex-1 bg-[#0c0c0c]">

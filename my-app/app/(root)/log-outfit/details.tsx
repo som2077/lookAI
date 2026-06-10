@@ -14,6 +14,7 @@ import {
   IconStar,
   IconStarFilled,
 } from "@tabler/icons-react-native";
+import { useUserWardrobeStore } from "@/backend/store/user-wardrobe-store";
 
 type Occasion = "Casual" | "Office" | "Party" | "Wedding" | "Date";
 
@@ -26,9 +27,12 @@ export default function DetailsScreen() {
   const [note, setNote] = useState<string>("");
   const [addToWardrobe, setAddToWardrobe] = useState<boolean>(true);
 
+  const addOutfitLog = useUserWardrobeStore((state) => state.addOutfitLog);
+
   const handleSave = useCallback(() => {
+    addOutfitLog({ occasion, rating, note, addToWardrobe });
     router.replace("/(root)/log-outfit/success" as never);
-  }, [router]);
+  }, [router, occasion, rating, note, addToWardrobe, addOutfitLog]);
 
   const handleBack = useCallback(() => {
     if (router.canGoBack()) router.back();

@@ -75,7 +75,7 @@ export default function FullLengthPicsScreen() {
         const { error } = await supabase.storage
           .from(BUCKET)
           .upload(fileName, formData, {
-            contentType: "multipart/form-data",
+            contentType,
             upsert: false,
           });
 

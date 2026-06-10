@@ -13,6 +13,8 @@ type UseSupabaseQueryOptions = {
   select?: string;
   apply?: (query: QueryBuilder) => QueryBuilder;
   enabled?: boolean;
+  /** Distinguishes filtered queries in the cache (e.g. userId + period). */
+  cacheKeySuffix?: string;
 };
 
 // ── Simple in-memory cache with 30s TTL to avoid duplicate API calls ──────────
@@ -23,8 +25,13 @@ interface CacheEntry<T> {
 }
 const queryCache = new Map<string, CacheEntry<Record<string, unknown>>>();
 
-function getCacheKey(table: string, select?: string): string {
-  return `${table}::${select ?? "*"}`;
+function getCacheKey(
+  table: string,
+  select?: string,
+  suffix?: string,
+): string {
+  const base = `${table}::${select ?? "*"}`;
+  return suffix ? `${base}::${suffix}` : base;
 }
 
 export const useSupabaseQuery = <T extends Record<string, unknown>>(
@@ -32,30 +39,40 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
   options?: UseSupabaseQueryOptions,
 ) => {
   const { supabase, isInitializing } = useSupabase();
-  const cacheKey = getCacheKey(table, options?.select);
+  const enabled = options?.enabled !== false;
+  const cacheKey = getCacheKey(
+    table,
+    options?.select,
+    options?.cacheKeySuffix,
+  );
 
   // Initialise from cache immediately to avoid flash of empty state
   const [data, setData] = useState<T[]>(() => {
+    if (!enabled) return [];
     const cached = queryCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
       return cached.data as T[];
     }
     return [];
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !enabled ? false : true);
   const [error, setError] = useState<PostgrestError | Error | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
   const fetchData = useCallback(async () => {
     const opts = optionsRef.current;
+    const isEnabled = opts?.enabled !== false;
 
-    if (opts?.enabled === false || isInitializing) {
+    if (!isEnabled || isInitializing) {
+      setLoading(false);
       return;
     }
 
+    const key = getCacheKey(table, opts?.select, opts?.cacheKeySuffix);
+
     // Serve from cache if still fresh
-    const cached = queryCache.get(cacheKey);
+    const cached = queryCache.get(key);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
       setData(cached.data as T[]);
       setLoading(false);
@@ -81,8 +98,10 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
       }
 
       const freshData = (rows ?? []) as unknown as T[];
-      // Write to cache
-      queryCache.set(cacheKey, { data: freshData as Record<string, unknown>[], timestamp: Date.now() });
+      queryCache.set(key, {
+        data: freshData as Record<string, unknown>[],
+        timestamp: Date.now(),
+      });
       setData(freshData);
     } catch (unknownError) {
       const err =
@@ -91,8 +110,10 @@ export const useSupabaseQuery = <T extends Record<string, unknown>>(
           : new Error("Failed to fetch Supabase data.");
       setError(err);
 
-      // Trigger global offline or server down flags on fetch failure
-      if (err.message.includes("Network request failed") || err.message.includes("fetch")) {
+      if (
+        err.message.includes("Network request failed") ||
+        err.message.includes("fetch")
+      ) {
         useErrorStore.getState().setOffline(true);
       } else {
         useErrorStore.getState().setServerError(true);

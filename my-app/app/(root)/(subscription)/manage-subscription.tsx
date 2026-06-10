@@ -80,7 +80,7 @@ export default function ManageSubscriptionScreen() {
   }, []);
 
   const handleUpgrade = useCallback(() => {
-    router.push("/(root)/(tabs)/subscription" as never);
+    router.push("/(root)/subscription" as never);
   }, [router]);
 
   return (

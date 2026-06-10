@@ -24,7 +24,7 @@ export default function SuccessScreen() {
   }, [router]);
 
   const viewDiary = useCallback(() => {
-    router.replace("/(root)/(tabs)/posts" as never);
+    router.replace("/(root)/calendar" as never);
   }, [router]);
 
   return (

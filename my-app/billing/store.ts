@@ -17,8 +17,10 @@ import { PLAN_MAP } from "./constants";
 
 // ─── Store actions interface ─────────────────────────────────────────────────
 
+type GetClerkToken = () => Promise<string | null>;
+
 interface BillingActions {
-  initBilling: (userId: string, clerkToken: string) => Promise<void>;
+  initBilling: (userId: string, getToken: GetClerkToken) => Promise<void>;
   purchasePlan: (
     productId: SubscriptionPlanId,
     userId: string,
@@ -34,6 +36,10 @@ type BillingStore = BillingState & BillingActions;
 
 // ─── Guard: prevent duplicate initBilling calls for the same user ─────────────
 let _initializedForUser: string | null = null;
+let _getClerkToken: GetClerkToken = async () => null;
+
+const ANDROID_ONLY_MSG =
+  "Google Play subscriptions are currently available on Android only.";
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 
@@ -46,8 +52,14 @@ export const useBillingStore = create<BillingStore>((set, get) => ({
   billingReady: false,
 
   // ── Init: connect to GPB + register listeners + load entitlement ──────────
-  initBilling: async (userId, clerkToken) => {
-    if (Platform.OS !== "android") return;
+  initBilling: async (userId, getToken) => {
+    _getClerkToken = getToken;
+
+    if (Platform.OS !== "android") {
+      set({ billingReady: false, isLoading: false });
+      return;
+    }
+
     if (_initializedForUser === userId && get().billingReady) return;
     _initializedForUser = userId;
 
@@ -71,6 +83,15 @@ export const useBillingStore = create<BillingStore>((set, get) => ({
           set({ isPurchasing: true });
 
           try {
+            const clerkToken = await _getClerkToken();
+            if (!clerkToken) {
+              set({
+                error: "Authentication expired. Please sign in again.",
+                isPurchasing: false,
+              });
+              return;
+            }
+
             const result = await verifyPurchase(
               {
                 userId,
@@ -113,8 +134,10 @@ export const useBillingStore = create<BillingStore>((set, get) => ({
 
       set({ billingReady: true });
 
-      // Sync entitlement from DB
-      await get().refreshEntitlement(userId, clerkToken);
+      const clerkToken = await _getClerkToken();
+      if (clerkToken) {
+        await get().refreshEntitlement(userId, clerkToken);
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Billing init failed";
       set({ error: msg, billingReady: false });
@@ -125,6 +148,11 @@ export const useBillingStore = create<BillingStore>((set, get) => ({
 
   // ── Purchase a subscription plan ─────────────────────────────────────────
   purchasePlan: async (productId, _userId, _clerkToken) => {
+    if (Platform.OS !== "android") {
+      Alert.alert("Not Available", ANDROID_ONLY_MSG);
+      return;
+    }
+
     if (!get().billingReady) {
       Alert.alert("Store not ready", "Please wait a moment and try again.");
       return;
@@ -150,6 +178,11 @@ export const useBillingStore = create<BillingStore>((set, get) => ({
 
   // ── Restore purchases ────────────────────────────────────────────────────
   restorePurchases: async (userId, clerkToken) => {
+    if (Platform.OS !== "android") {
+      Alert.alert("Not Available", ANDROID_ONLY_MSG);
+      return;
+    }
+
     if (!get().billingReady) return;
 
     set({ isRestoring: true, error: null });

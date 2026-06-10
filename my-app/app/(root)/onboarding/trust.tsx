@@ -1,27 +1,21 @@
-// import { SafeAreaView } from "react-native-safe-area-context";
-import { useAuth } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
 import { Image, Text, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
-import { useSupabase } from "@/backend/hooks/useSupabase";
 
 export default function TrustScreen() {
-  const { userId } = useAuth();
-  const { supabase } = useSupabase();
-  const { completeOnboarding, isSaving } = useOnboardingState();
+  const router = useRouter();
+  const { error } = useOnboardingState();
 
-  const handleContinue = async () => {
-    if (!userId) return;
-    await completeOnboarding(userId, supabase);
+  const handleContinue = () => {
+    router.push("/(root)/onboarding/setup-account" as never);
   };
 
   return (
-    // <SafeAreaView className="flex-1 bg-white">
     <View className="flex-1 px-6 pb-6 pt-2">
       <OnboardingHeader step={8} />
 
-      {/* Top image */}
       <View className="mt-8 items-center">
         <Image
           source={require("@/assets/images/trust1.png")}
@@ -30,7 +24,6 @@ export default function TrustScreen() {
         />
       </View>
 
-      {/* Title */}
       <Text className="mt-3 text-center text-5xl py-4 font-bold text-[#1D1A27]">
         Thanks you for{"\n"}trusting us
       </Text>
@@ -38,7 +31,6 @@ export default function TrustScreen() {
         Now let&apos;s personalize Look AI for you...
       </Text>
 
-      {/* Privacy badge */}
       <View className="mt-10 items-center">
         <Image
           source={require("@/assets/images/trust2.png")}
@@ -47,11 +39,13 @@ export default function TrustScreen() {
         />
       </View>
 
-      {/* Continue button */}
+      {!!error && (
+        <Text className="mt-4 text-center text-sm text-red-500">{error}</Text>
+      )}
+
       <View className="mt-auto w-full">
-        <ContinueButton onPress={handleContinue} disabled={isSaving} />
+        <ContinueButton onPress={handleContinue} />
       </View>
     </View>
-    // </SafeAreaView>
   );
 }

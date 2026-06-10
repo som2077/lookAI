@@ -30,6 +30,8 @@ import {
 } from "@tabler/icons-react-native";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
+import { MOCK_WARDROBE_ITEMS } from "@/constants/mock-wardrobe-items";
+import { useUserWardrobeStore } from "@/backend/store/user-wardrobe-store";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -281,116 +283,7 @@ const CATEGORY_BG: Partial<Record<CategoryId, string>> = {
   recommended: "#EEF2FF",
 };
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const BASE_MOCK_ITEMS: ClothingItem[] = [
-  {
-    id: "1",
-    name: "White Shirt",
-    category: "top",
-    color: "White",
-    bgColor: "#F8F7FC",
-    occasion: "Casual",
-    wears: 8,
-    isNew: false,
-  },
-  {
-    id: "2",
-    name: "Black Jeans",
-    category: "bottoms",
-    color: "Black",
-    bgColor: "#F8F7FC",
-    occasion: "Casual",
-    wears: 5,
-    isNew: false,
-  },
-  {
-    id: "3",
-    name: "Blue Kurta",
-    category: "top",
-    color: "Blue",
-    bgColor: "#F8F7FC",
-    occasion: "Casual",
-    wears: 0,
-    isNew: true,
-  },
-  {
-    id: "4",
-    name: "Sneakers",
-    category: "footwear",
-    color: "White",
-    bgColor: "#F8F7FC",
-    occasion: "Casual",
-    wears: 12,
-    isNew: false,
-  },
-  {
-    id: "5",
-    name: "Grey Blazer",
-    category: "outerwear",
-    color: "Grey",
-    bgColor: "#F8F7FC",
-    occasion: "Formal",
-    wears: 0,
-    isNew: true,
-  },
-  {
-    id: "6",
-    name: "Beige Chinos",
-    category: "bottoms",
-    color: "Beige",
-    bgColor: "#F8F7FC",
-    occasion: "Casual",
-    wears: 0,
-    isNew: true,
-  },
-];
-
-const generateMockItems = (): ClothingItem[] => {
-  const items = [...BASE_MOCK_ITEMS];
-  const categories: CategoryId[] = [
-    "top",
-    "bottoms",
-    "footwear",
-    "outerwear",
-    "dress",
-    "ethnic",
-    "accessory",
-  ];
-  const names = [
-    "Red T-Shirt",
-    "Chino Pants",
-    "Brown Boots",
-    "Black Leather Jacket",
-    "Summer Dress",
-    "Sherwani",
-    "Sunglasses",
-    "Wool Scarf",
-    "Silk Tie",
-    "Running Shoes",
-    "Jeans Jacket",
-    "Cargo Shorts",
-    "Hoodie",
-    "Sweater",
-  ];
-  for (let i = 7; i <= 48; i++) {
-    const category = categories[i % categories.length];
-    const wears = i % 4 === 0 ? 0 : Math.floor((i * 3) % 15) + 1;
-    items.push({
-      id: String(i),
-      name: `${names[i % names.length]} #${i}`,
-      category,
-      color: "Various",
-      bgColor: "#F8F7FC",
-      occasion: i % 2 === 0 ? "Casual" : "Formal",
-      wears,
-      isNew: wears === 0 && i % 3 === 0,
-    });
-  }
-  return items;
-};
-
-const MOCK_ITEMS = generateMockItems();
+const MOCK_ITEMS = MOCK_WARDROBE_ITEMS as ClothingItem[];
 
 // ─── Sub-Components ──────────────────────────────────────────────────────────
 
@@ -1008,7 +901,24 @@ export default function WardrobeScreen() {
   const router = useRouter();
   const { user } = useUser();
   const { summary } = useWardrobeSummary(user?.id);
+  const userItems = useUserWardrobeStore((state) => state.items);
   const [showAddMenu, setShowAddMenu] = useState(false);
+
+  const allItems = useMemo(() => {
+    const saved = userItems.map(
+      (item): ClothingItem => ({
+        id: item.id,
+        name: item.name,
+        category: item.category as CategoryId,
+        color: item.color ?? "—",
+        bgColor: "#F8F7FC",
+        occasion: item.occasion ?? "Casual",
+        wears: 0,
+        isNew: true,
+      }),
+    );
+    return [...saved, ...MOCK_ITEMS];
+  }, [userItems]);
 
   const ADD_MENU_OPTIONS = [
     {
@@ -1063,9 +973,9 @@ export default function WardrobeScreen() {
   const [viewMode, setViewMode] = useState<"grouped" | "grid">("grouped");
 
   const filteredItems = useMemo(() => {
-    if (activeCategory === "all") return MOCK_ITEMS;
-    return MOCK_ITEMS.filter((item) => item.category === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === "all") return allItems;
+    return allItems.filter((item) => item.category === activeCategory);
+  }, [activeCategory, allItems]);
 
   const displayItems = useMemo(() => filteredItems, [filteredItems]);
 
@@ -1075,15 +985,15 @@ export default function WardrobeScreen() {
     }
     return CATEGORIES.filter(
       (cat) =>
-        cat.id !== "all" && MOCK_ITEMS.some((item) => item.category === cat.id),
+        cat.id !== "all" && allItems.some((item) => item.category === cat.id),
     );
   }, [activeCategory]);
 
-  const total = MOCK_ITEMS.length;
+  const total = allItems.length;
   const worn =
-    summary.totalWorn || MOCK_ITEMS.filter((i) => i.wears > 0).length;
+    summary.totalWorn || allItems.filter((i) => i.wears > 0).length;
   const unworn =
-    summary.neverCount || MOCK_ITEMS.filter((i) => i.wears === 0).length;
+    summary.neverCount || allItems.filter((i) => i.wears === 0).length;
   const usage = summary.wornPercentage
     ? Math.round(summary.wornPercentage * 100)
     : total > 0
@@ -1104,7 +1014,7 @@ export default function WardrobeScreen() {
 
   const renderGroupedRow = useCallback(
     ({ item: category }: { item: CategoryChip }) => {
-      const categoryItems = MOCK_ITEMS.filter(
+      const categoryItems = allItems.filter(
         (item) => item.category === category.id,
       );
       return (
@@ -1124,7 +1034,7 @@ export default function WardrobeScreen() {
         </View>
       );
     },
-    [activeCategory],
+    [activeCategory, allItems],
   );
 
   const listHeader = (

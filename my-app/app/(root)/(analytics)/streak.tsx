@@ -10,6 +10,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
+  CURRENT_STREAK_DAYS,
+  LONGEST_STREAK_DAYS,
+} from "@/constants/streak";
+import {
   IconFlameFilled,
   IconArrowLeft,
   IconTrophy,
@@ -43,8 +47,8 @@ const MILESTONES: { days: number; label: string; emoji: string }[] = [
 
 export default function StreakScreen() {
   const router = useRouter();
-  const currentStreak = 5;
-  const longestStreak = 12;
+  const currentStreak = CURRENT_STREAK_DAYS;
+  const longestStreak = LONGEST_STREAK_DAYS;
   const totalOutfits = 47;
   const daysActive = 30;
 

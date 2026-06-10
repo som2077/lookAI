@@ -8,24 +8,40 @@ import {
   IconShare,
 } from "@tabler/icons-react-native";
 import { StatusBar } from "expo-status-bar";
+import { getMockWardrobeItemById } from "@/constants/mock-wardrobe-items";
+import { useUserWardrobeStore } from "@/backend/store/user-wardrobe-store";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+const CATEGORY_LABELS: Record<string, string> = {
+  top: "Top",
+  bottoms: "Bottoms",
+  footwear: "Footwear",
+  outerwear: "Outerwear",
+  dress: "Dress",
+  ethnic: "Ethnic",
+  accessory: "Accessory",
+};
 
 export default function ClothDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const userItem = useUserWardrobeStore((state) =>
+    state.items.find((item) => item.id === id),
+  );
+  const mockItem = getMockWardrobeItemById(id);
 
-  // In a real app, you would fetch the item details using the ID from Supabase.
-  // For now, we mock the data based on the ID.
-  const isWorn = true;
-  const wearCount = 5;
-  const categoryName = "Outerwear";
-  const itemName = "Classic Beige Trench";
-  const itemColor = "Beige";
-  const itemOccasion = "Casual";
-
-  // Placeholder background color
-  const bg = "#F4F4F6";
+  const itemName = userItem?.name ?? mockItem?.name ?? "Unknown item";
+  const wearCount = mockItem?.wears ?? 0;
+  const isWorn = wearCount > 0;
+  const categoryName =
+    CATEGORY_LABELS[userItem?.category ?? mockItem?.category ?? ""] ??
+    userItem?.category ??
+    mockItem?.category ??
+    "Item";
+  const itemColor = userItem?.color ?? mockItem?.color ?? "—";
+  const itemOccasion = userItem?.occasion ?? mockItem?.occasion ?? "Casual";
+  const bg = mockItem?.bgColor ?? "#F4F4F6";
 
   return (
     <View style={styles.container}>

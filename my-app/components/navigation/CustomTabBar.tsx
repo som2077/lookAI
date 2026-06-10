@@ -1,4 +1,4 @@
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import type { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { Image as ExpoImage } from "expo-image";
 import { Pressable, View, Animated, Text } from "react-native";
 import { useRouter, type Href } from "expo-router";
@@ -8,11 +8,7 @@ import {
   IconSmartHome,
   IconPlus,
   IconMesh,
-  IconHanger,
-  IconSparkles,
-  IconTrendingUp,
-  IconBookmark,
-  IconCalendar,
+  IconCompass,
   type IconProps,
 } from "@tabler/icons-react-native";
 import { AddActionMenu } from "./AddActionMenu";
@@ -22,8 +18,8 @@ type TabConfig = Record<string, TabIconComponent>;
 
 const TAB_CONFIG: TabConfig = {
   index: IconSmartHome,
-  calendar: IconCalendar,
   wardrobe: IconMesh,
+  explore: IconCompass,
 };
 
 const AnimatedTabButton = React.memo(function AnimatedTabButton({
@@ -109,7 +105,7 @@ export function CustomTabBar({
   state,
   descriptors,
   navigation,
-}: BottomTabBarProps) {
+}: MaterialTopTabBarProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [menuVisible, setMenuVisible] = useState(false);

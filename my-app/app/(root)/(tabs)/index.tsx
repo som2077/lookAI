@@ -21,6 +21,7 @@ import { WeatherOutfitCard } from "../../../components/ui/WeatherOutfitCard";
 import { LookAIBanner } from "../../../components/ui/LookAIBanner";
 import { WardrobeFilterTabs } from "../../../components/ui/WardrobeFilterTabs";
 import { WardrobeMessageBar } from "../../../components/ui/WardrobeMessageBar";
+import { CURRENT_STREAK_DAYS } from "@/constants/streak";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const H_PADDING = 20;
@@ -88,7 +89,7 @@ export default function HomeScreen() {
             wearCount={summary.wearCount}
             neverCount={summary.neverCount}
             ringSegments={ringSegments}
-            streak={1}
+            streak={CURRENT_STREAK_DAYS}
           />
           <WardrobeFilterTabs />
           <WardrobeMessageBar />

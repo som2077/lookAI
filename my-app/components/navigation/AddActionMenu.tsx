@@ -49,7 +49,7 @@ const ACTION_CARDS: ActionCard[] = [
     title: "AI outfit",
     subtitle: "Generate my mood",
     icon: IconSparkles,
-    route: "/(root)/(tabs)/outfit",
+    route: "/(root)/outfit",
     color: "#A78BFA",
   },
   {
@@ -57,7 +57,7 @@ const ACTION_CARDS: ActionCard[] = [
     title: "Style score",
     subtitle: "Face + outfit match",
     icon: IconTrendingUp,
-    route: "/(root)/(tabs)/score",
+    route: "/(root)/score",
     color: "#FBBF24",
   },
 ];
