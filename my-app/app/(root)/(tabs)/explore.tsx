@@ -1,134 +1,734 @@
-import { View, Text, ScrollView, TextInput, Pressable } from "react-native";
+import React, {
+  useCallback,
+  useRef,
+  useState,
+} from "react";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
 import { StatusBar } from "expo-status-bar";
-import { Image } from "expo-image";
-import { IconSearch, IconFlame, IconSparkles, IconTrendingUp } from "@tabler/icons-react-native";
-import { useState } from "react";
 
-const CATEGORIES = ["All", "Streetwear", "Minimalist", "Vintage", "Formal", "Y2K", "Athleisure"];
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const TRENDING_OUTFITS = [
-  { id: 1, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&q=80", title: "Urban Chic", likes: "2.4k" },
-  { id: 2, image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=500&q=80", title: "Summer Breeze", likes: "1.8k" },
-  { id: 3, image: "https://images.unsplash.com/photo-1434389678232-068a8ebce4ea?w=500&q=80", title: "Minimalist Fall", likes: "3.2k" },
-  { id: 4, image: "https://images.unsplash.com/photo-1550614000-4b95d466f289?w=500&q=80", title: "Oversized Fit", likes: "4.1k" },
+// ─── Mock Data ─────────────────────────────────────────────────────────────────
+
+const FOR_YOU_BANNERS = [
+  {
+    id: "1",
+    image:
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
+    label: "Style Match 98%",
+    title: "Autumn Essentials",
+    subtitle: "12 items perfectly matched",
+  },
+  {
+    id: "2",
+    image:
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80",
+    label: "Trending Now",
+    title: "Urban Chic",
+    subtitle: "Loved by 2.4k users",
+  },
+  {
+    id: "3",
+    image:
+      "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&q=80",
+    label: "Summer Pick",
+    title: "Breezy Vibes",
+    subtitle: "Perfect for warm days",
+  },
 ];
 
+const COMMUNITY_POSTS = [
+  {
+    id: "1",
+    user: "sarah_k",
+    avatar: "https://i.pravatar.cc/80?img=1",
+    image:
+      "https://images.unsplash.com/photo-1434389678232-068a8ebce4ea?w=400&q=80",
+    likes: 312,
+  },
+  {
+    id: "2",
+    user: "james_m",
+    avatar: "https://i.pravatar.cc/80?img=2",
+    image:
+      "https://images.unsplash.com/photo-1550614000-4b95d466f289?w=400&q=80",
+    likes: 198,
+  },
+  {
+    id: "3",
+    user: "priya_v",
+    avatar: "https://i.pravatar.cc/80?img=3",
+    image:
+      "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=400&q=80",
+    likes: 445,
+  },
+  {
+    id: "4",
+    user: "alex_t",
+    avatar: "https://i.pravatar.cc/80?img=4",
+    image:
+      "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=400&q=80",
+    likes: 87,
+  },
+];
+
+const ALL_GROUPS = [
+  {
+    id: "1",
+    name: "Minimalist Style",
+    members: 3200,
+    description: "Clean looks, timeless pieces & effortless fashion.",
+    avatars: [
+      "https://i.pravatar.cc/40?img=10",
+      "https://i.pravatar.cc/40?img=11",
+      "https://i.pravatar.cc/40?img=12",
+    ],
+    image: "https://i.pravatar.cc/80?img=10",
+    color: "#E8E4F3",
+  },
+  {
+    id: "2",
+    name: "Trending Fashion",
+    members: 5100,
+    description: "Explore the latest styles loved by the community.",
+    avatars: [
+      "https://i.pravatar.cc/40?img=20",
+      "https://i.pravatar.cc/40?img=21",
+      "https://i.pravatar.cc/40?img=22",
+    ],
+    image: "https://i.pravatar.cc/80?img=20",
+    color: "#F3E8E8",
+  },
+  {
+    id: "3",
+    name: "Streetwear & Urban",
+    members: 8700,
+    description: "Urban fits, sneakers & modern street fashion.",
+    avatars: [
+      "https://i.pravatar.cc/40?img=30",
+      "https://i.pravatar.cc/40?img=31",
+      "https://i.pravatar.cc/40?img=32",
+    ],
+    image: "https://i.pravatar.cc/80?img=30",
+    color: "#E8F3E8",
+  },
+  {
+    id: "4",
+    name: "Y2K Revival",
+    members: 4200,
+    description: "Bringing back the early 2000s aesthetic.",
+    avatars: [
+      "https://i.pravatar.cc/40?img=40",
+      "https://i.pravatar.cc/40?img=41",
+      "https://i.pravatar.cc/40?img=42",
+    ],
+    image: "https://i.pravatar.cc/80?img=40",
+    color: "#F3EBE8",
+  },
+];
+
+// ─── Add Post Modal ────────────────────────────────────────────────────────────
+
+function AddPostModal({
+  visible,
+  onClose,
+}: {
+  visible: boolean;
+  onClose: () => void;
+}) {
+  const [caption, setCaption] = useState("");
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+      <View style={{ flex: 1, backgroundColor: "#fff" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 20,
+            paddingTop: 20,
+            paddingBottom: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: "#F0F0F0",
+          }}
+        >
+          <TouchableOpacity onPress={onClose}>
+            <Text style={{ fontSize: 16, color: "#6B7280" }}>Cancel</Text>
+          </TouchableOpacity>
+          <Text style={{ fontSize: 17, fontWeight: "700", color: "#1D1A27" }}>
+            New Post
+          </Text>
+          <TouchableOpacity
+            onPress={onClose}
+            style={{
+              backgroundColor: "#1D1A27",
+              paddingHorizontal: 18,
+              paddingVertical: 8,
+              borderRadius: 20,
+            }}
+          >
+            <Text style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
+              Share
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ padding: 20 }}>
+          {/* Image placeholder */}
+          <TouchableOpacity
+            style={{
+              width: "100%",
+              height: 280,
+              backgroundColor: "#F5F5F7",
+              borderRadius: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 20,
+              borderWidth: 2,
+              borderColor: "#E0E0E8",
+              borderStyle: "dashed",
+            }}
+          >
+            <Text style={{ fontSize: 40, marginBottom: 8 }}>📷</Text>
+            <Text
+              style={{ fontSize: 15, color: "#9CA3AF", fontWeight: "600" }}
+            >
+              Tap to add photo
+            </Text>
+          </TouchableOpacity>
+
+          <TextInput
+            placeholder="Write a caption..."
+            placeholderTextColor="#9CA3AF"
+            multiline
+            value={caption}
+            onChangeText={setCaption}
+            style={{
+              fontSize: 15,
+              color: "#1D1A27",
+              backgroundColor: "#F5F5F7",
+              borderRadius: 14,
+              padding: 16,
+              minHeight: 80,
+              textAlignVertical: "top",
+            }}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ─── For You Tab ───────────────────────────────────────────────────────────────
+
+function ForYouTab() {
+  const [activeBanner, setActiveBanner] = useState(0);
+  const bannerRef = useRef<FlatList>(null);
+
+  const handleBannerScroll = useCallback((e: any) => {
+    const index = Math.round(
+      e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 32)
+    );
+    setActiveBanner(index);
+  }, []);
+
+  const renderBanner = useCallback(
+    ({ item }: { item: (typeof FOR_YOU_BANNERS)[0] }) => (
+      <Pressable
+        style={{
+          width: SCREEN_WIDTH - 32,
+          height: 230,
+          borderRadius: 20,
+          overflow: "hidden",
+          position: "relative",
+        }}
+      >
+        <Image
+          source={{ uri: item.image }}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+        <View
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.28)",
+            justifyContent: "flex-end",
+            padding: 18,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "rgba(255,255,255,0.2)",
+              alignSelf: "flex-start",
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              borderRadius: 20,
+              marginBottom: 6,
+              borderWidth: 1,
+              borderColor: "rgba(255,255,255,0.35)",
+            }}
+          >
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 11,
+                fontWeight: "700",
+                letterSpacing: 0.8,
+                textTransform: "uppercase",
+              }}
+            >
+              {item.label}
+            </Text>
+          </View>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 22,
+              fontWeight: "800",
+              marginBottom: 2,
+            }}
+          >
+            {item.title}
+          </Text>
+          <Text
+            style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: "500" }}
+          >
+            {item.subtitle}
+          </Text>
+        </View>
+      </Pressable>
+    ),
+    []
+  );
+
+  return (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 100 }}
+    >
+      {/* Banner Carousel */}
+      <View style={{ marginTop: 16, paddingHorizontal: 16 }}>
+        <FlatList
+          ref={bannerRef}
+          data={FOR_YOU_BANNERS}
+          keyExtractor={(item) => item.id}
+          renderItem={renderBanner}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handleBannerScroll}
+          snapToInterval={SCREEN_WIDTH - 32}
+          decelerationRate="fast"
+          getItemLayout={(_, index) => ({
+            length: SCREEN_WIDTH - 32,
+            offset: (SCREEN_WIDTH - 32) * index,
+            index,
+          })}
+          initialNumToRender={1}
+        />
+
+        {/* Pagination dots */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            marginTop: 10,
+            gap: 6,
+          }}
+        >
+          {FOR_YOU_BANNERS.map((_, i) => (
+            <View
+              key={i}
+              style={{
+                width: i === activeBanner ? 18 : 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: i === activeBanner ? "#1D1A27" : "#D1D1DC",
+              }}
+            />
+          ))}
+        </View>
+      </View>
+
+      {/* Community Looks */}
+      <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
+        <Text
+          style={{ fontSize: 18, fontWeight: "800", color: "#1D1A27", marginBottom: 14 }}
+        >
+          Community Looks
+        </Text>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+          {COMMUNITY_POSTS.map((post) => (
+            <Pressable
+              key={post.id}
+              style={{
+                width: (SCREEN_WIDTH - 42) / 2,
+                borderRadius: 16,
+                overflow: "hidden",
+                backgroundColor: "#F5F5F7",
+              }}
+            >
+              <Image
+                source={{ uri: post.image }}
+                style={{ width: "100%", aspectRatio: 3 / 4 }}
+                resizeMode="cover"
+              />
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: 10,
+                  backgroundColor: "rgba(0,0,0,0.35)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <Image
+                  source={{ uri: post.avatar }}
+                  style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: "#fff" }}
+                />
+                <Text style={{ color: "#fff", fontSize: 12, fontWeight: "700", flex: 1 }}>
+                  @{post.user}
+                </Text>
+                <Text style={{ color: "#fff", fontSize: 11 }}>♥ {post.likes}</Text>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
+
+// ─── Group Card ────────────────────────────────────────────────────────────────
+
+function GroupCard({
+  group,
+  joined,
+  onJoin,
+  onPress,
+}: {
+  group: (typeof ALL_GROUPS)[0];
+  joined: boolean;
+  onJoin: () => void;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        backgroundColor: "#fff",
+        borderRadius: 20,
+        padding: 14,
+        marginBottom: 12,
+        flexDirection: "row",
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOpacity: 0.06,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 3,
+      }}
+    >
+      {/* Group Avatar */}
+      <Image
+        source={{ uri: group.image }}
+        style={{ width: 52, height: 52, borderRadius: 26, marginRight: 12 }}
+      />
+
+      {/* Info */}
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 15, fontWeight: "700", color: "#1D1A27" }}>
+          {group.name}
+        </Text>
+        <Text style={{ fontSize: 12, color: "#6B7280", marginTop: 1 }}>
+          {group.members.toLocaleString()} members
+        </Text>
+        <Text
+          style={{ fontSize: 12, color: "#9CA3AF", marginTop: 3 }}
+          numberOfLines={2}
+        >
+          {group.description}
+        </Text>
+      </View>
+
+      {/* Member Avatars + Join */}
+      <View style={{ alignItems: "center", marginLeft: 8 }}>
+        <View style={{ flexDirection: "row", marginBottom: 8 }}>
+          {group.avatars.map((av, idx) => (
+            <Image
+              key={idx}
+              source={{ uri: av }}
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 11,
+                borderWidth: 1.5,
+                borderColor: "#fff",
+                marginLeft: idx === 0 ? 0 : -7,
+              }}
+            />
+          ))}
+        </View>
+        {joined ? (
+          <View
+            style={{
+              backgroundColor: "#E8F5E9",
+              borderRadius: 20,
+              paddingHorizontal: 14,
+              paddingVertical: 6,
+            }}
+          >
+            <Text style={{ fontSize: 12, fontWeight: "700", color: "#2E7D32" }}>
+              ✓ Joined
+            </Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation();
+              onJoin();
+            }}
+            style={{
+              backgroundColor: "#1D1A27",
+              borderRadius: 20,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <Text style={{ fontSize: 12, color: "#fff", fontWeight: "700" }}>
+              + Join
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </Pressable>
+  );
+}
+
+// ─── Groups Tab ────────────────────────────────────────────────────────────────
+
+function GroupsTab({ onGroupPress }: { onGroupPress: (group: (typeof ALL_GROUPS)[0]) => void }) {
+  const [joinedIds, setJoinedIds] = useState<string[]>([]);
+
+  const handleJoin = useCallback((id: string) => {
+    setJoinedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  }, []);
+
+  const joinedGroups = ALL_GROUPS.filter((g) => joinedIds.includes(g.id));
+  const discoverGroups = ALL_GROUPS.filter((g) => !joinedIds.includes(g.id));
+
+  return (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 100 }}
+    >
+      {/* Your Groups */}
+      {joinedGroups.length > 0 && (
+        <>
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: "800",
+              color: "#1D1A27",
+              marginBottom: 14,
+            }}
+          >
+            Your Groups
+          </Text>
+          {joinedGroups.map((g) => (
+            <GroupCard
+              key={g.id}
+              group={g}
+              joined
+              onJoin={() => handleJoin(g.id)}
+              onPress={() => onGroupPress(g)}
+            />
+          ))}
+          <View style={{ height: 8 }} />
+        </>
+      )}
+
+      {/* Discover Groups */}
+      <Text
+        style={{
+          fontSize: 22,
+          fontWeight: "800",
+          color: "#1D1A27",
+          marginBottom: 14,
+        }}
+      >
+        Discover Groups
+      </Text>
+      {discoverGroups.map((g) => (
+        <GroupCard
+          key={g.id}
+          group={g}
+          joined={false}
+          onJoin={() => handleJoin(g.id)}
+          onPress={() => onGroupPress(g)}
+        />
+      ))}
+    </ScrollView>
+  );
+}
+
+// ─── Explore Screen ────────────────────────────────────────────────────────────
+
+type ActiveTab = "foryou" | "groups";
+
 export default function ExploreScreen() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<ActiveTab>("foryou");
+  const [showAddPost, setShowAddPost] = useState(false);
+
+  const handleGroupPress = useCallback(
+    (group: (typeof ALL_GROUPS)[0]) => {
+      router.push({
+        pathname: "/(root)/(social)/group-detail" as any,
+        params: { id: group.id, name: group.name, image: group.image },
+      });
+    },
+    [router]
+  );
 
   return (
     <SwipeTabWrapper tabIndex={2}>
       <AppGradientBackground>
         <StatusBar style="dark" />
-        <SafeAreaView className="flex-1" edges={["top"]}>
-          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-            {/* Header */}
-            <View className="px-6 pt-6 pb-4">
-              <Text className="text-3xl font-bold text-[#1D1A27] tracking-tight">Explore</Text>
-              <Text className="text-[#6B7280] text-base mt-1">Discover your next signature look</Text>
-            </View>
-
-            {/* Search Bar */}
-            <View className="px-6 mb-6">
-              <View className="flex-row items-center bg-white/60 border border-white/40 rounded-2xl px-4 py-3 shadow-sm overflow-hidden">
-                <IconSearch size={20} color="#9CA3AF" />
-                <TextInput 
-                  placeholder="Search styles, brands, or users..." 
-                  placeholderTextColor="#9CA3AF"
-                  className="flex-1 ml-3 text-[#1D1A27] font-medium text-base"
-                />
-              </View>
-            </View>
-
-            {/* Categories (Horizontal) */}
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false} 
-              className="pl-6 mb-8"
-              contentContainerStyle={{ paddingRight: 40 }}
-            >
-              {CATEGORIES.map((category, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => setActiveCategory(category)}
-                  className={`mr-3 px-5 py-2.5 rounded-full border ${
-                    activeCategory === category 
-                      ? "bg-[#1D1A27] border-[#1D1A27]" 
-                      : "bg-white/40 border-white/60"
-                  }`}
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          {/* ── Header ── */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 20,
+              paddingTop: 10,
+              paddingBottom: 6,
+            }}
+          >
+            {/* Tabs */}
+            <View style={{ flexDirection: "row", gap: 18, flex: 1 }}>
+              <TouchableOpacity onPress={() => setActiveTab("foryou")}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: activeTab === "foryou" ? "800" : "500",
+                    color: activeTab === "foryou" ? "#1D1A27" : "#9CA3AF",
+                  }}
                 >
-                  <Text 
-                    className={`font-semibold ${
-                      activeCategory === category ? "text-white" : "text-[#4B5563]"
-                    }`}
-                  >
-                    {category}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+                  For you
+                </Text>
+                {activeTab === "foryou" && (
+                  <View
+                    style={{
+                      height: 2.5,
+                      backgroundColor: "#1D1A27",
+                      borderRadius: 2,
+                      marginTop: 3,
+                    }}
+                  />
+                )}
+              </TouchableOpacity>
 
-            {/* AI Curated Hero */}
-            <View className="px-6 mb-10">
-              <View className="flex-row items-center mb-4">
-                <IconSparkles size={20} color="#8B5CF6" />
-                <Text className="text-lg font-bold text-[#1D1A27] ml-2">AI Curated For You</Text>
-              </View>
-              
-              <Pressable className="w-full h-64 rounded-3xl overflow-hidden relative shadow-md border border-white/20">
-                <Image 
-                  source={{ uri: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80" }}
-                  className="w-full h-full"
-                  contentFit="cover"
-                />
-                <View className="absolute inset-0 bg-black/30 justify-end p-6">
-                  <View className="bg-white/20 self-start px-3 py-1.5 rounded-full mb-2 border border-white/30">
-                    <Text className="text-white text-xs font-bold tracking-wider uppercase">Style Match 98%</Text>
-                  </View>
-                  <Text className="text-white text-2xl font-bold mb-1 shadow-sm">Autumn Essentials</Text>
-                  <Text className="text-white/80 text-sm font-medium">12 items perfectly matched to your wardrobe</Text>
-                </View>
-              </Pressable>
+              <TouchableOpacity onPress={() => setActiveTab("groups")}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: activeTab === "groups" ? "800" : "500",
+                    color: activeTab === "groups" ? "#1D1A27" : "#9CA3AF",
+                  }}
+                >
+                  Groups
+                </Text>
+                {activeTab === "groups" && (
+                  <View
+                    style={{
+                      height: 2.5,
+                      backgroundColor: "#1D1A27",
+                      borderRadius: 2,
+                      marginTop: 3,
+                    }}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
 
-            {/* Trending Section */}
-            <View className="px-6 mb-32">
-              <View className="flex-row items-center justify-between mb-4">
-                <View className="flex-row items-center">
-                  <IconFlame size={20} color="#EF4444" />
-                  <Text className="text-lg font-bold text-[#1D1A27] ml-2">Trending Now</Text>
-                </View>
-                <Pressable>
-                  <Text className="text-[#6B7280] font-semibold text-sm">See All</Text>
-                </Pressable>
-              </View>
-              
-              <View className="flex-row flex-wrap justify-between">
-                {TRENDING_OUTFITS.map((outfit) => (
-                  <Pressable key={outfit.id} className="w-[48%] mb-5">
-                    <View className="w-full aspect-[4/5] rounded-2xl overflow-hidden mb-2 bg-white/50 border border-white/40 shadow-sm relative">
-                      <Image 
-                        source={{ uri: outfit.image }}
-                        className="w-full h-full"
-                        contentFit="cover"
-                        transition={300}
-                      />
-                      <View className="absolute top-2 right-2 bg-white/80 px-2 py-1 rounded-full flex-row items-center">
-                        <IconTrendingUp size={12} color="#1D1A27" />
-                        <Text className="text-[#1D1A27] text-xs font-bold ml-1">{outfit.likes}</Text>
-                      </View>
-                    </View>
-                    <Text className="text-[#1D1A27] font-bold text-sm px-1">{outfit.title}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
+            {/* Right buttons */}
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <TouchableOpacity
+                onPress={() => setShowAddPost(true)}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: "#1D1A27",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: "#fff", fontSize: 20, lineHeight: 22, marginTop: -1 }}>
+                  +
+                </Text>
+              </TouchableOpacity>
 
-          </ScrollView>
+              <TouchableOpacity
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: "#F0F0F4",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 16 }}>⚙️</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Thin divider */}
+          <View
+            style={{ height: 1, backgroundColor: "rgba(0,0,0,0.06)", marginHorizontal: 0 }}
+          />
+
+          {/* ── Tab Content ── */}
+          {activeTab === "foryou" ? (
+            <ForYouTab />
+          ) : (
+            <GroupsTab onGroupPress={handleGroupPress} />
+          )}
         </SafeAreaView>
+
+        <AddPostModal
+          visible={showAddPost}
+          onClose={() => setShowAddPost(false)}
+        />
       </AppGradientBackground>
     </SwipeTabWrapper>
   );
