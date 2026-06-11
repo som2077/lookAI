@@ -48,7 +48,7 @@ export async function fetchEntitlement(
   userId: string,
   clerkToken: string,
 ): Promise<Entitlement | null> {
-  const supabase = createSupabaseClient(clerkToken);
+  const supabase = createSupabaseClient(() => Promise.resolve(clerkToken));
 
   const { data, error } = await supabase
     .from("entitlements")

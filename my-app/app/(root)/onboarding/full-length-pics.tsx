@@ -53,8 +53,7 @@ export default function FullLengthPicsScreen() {
 
     setUploading(true);
     try {
-      const token = await getToken({ template: "supabase" });
-      const supabase = createSupabaseClient(token);
+      const supabase = createSupabaseClient(() => getToken({ template: "supabase" }));
 
       for (const asset of selectedImages) {
         const ext = (

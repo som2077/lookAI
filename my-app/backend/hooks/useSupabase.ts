@@ -8,7 +8,7 @@ export const useSupabase = () => {
   const getTokenRef = useRef(getToken);
   getTokenRef.current = getToken;
 
-  const clientRef = useRef<SupabaseClient>(createSupabaseClient(null));
+  const clientRef = useRef<SupabaseClient>(createSupabaseClient());
   const [supabase, setSupabase] = useState<SupabaseClient>(
     () => clientRef.current,
   );
@@ -25,15 +25,15 @@ export const useSupabase = () => {
       setIsInitializing(true);
 
       try {
-        const token = isSignedIn
-          ? await getTokenRef.current({ template: "supabase" })
-          : null;
+        const getSupabaseToken = isSignedIn
+          ? () => getTokenRef.current({ template: "supabase" })
+          : undefined;
 
         if (!isMounted) {
           return;
         }
 
-        const newClient = createSupabaseClient(token);
+        const newClient = createSupabaseClient(getSupabaseToken);
         clientRef.current = newClient;
         setSupabase(newClient);
       } catch (error) {
@@ -45,7 +45,7 @@ export const useSupabase = () => {
           "Failed to initialize Supabase client with Clerk token",
           error,
         );
-        const fallback = createSupabaseClient(null);
+        const fallback = createSupabaseClient();
         clientRef.current = fallback;
         setSupabase(fallback);
       } finally {

@@ -53,7 +53,7 @@ export default function SignIn() {
       const { createdSessionId, setActive, authSessionResult } =
         await startSSOFlow({
           strategy: "oauth_google",
-          redirectUrl: Linking.createURL("/", { scheme: "myapp" }),
+          redirectUrl: Linking.createURL("/", { scheme: "look-ai" }),
         });
 
       if (authSessionResult?.type === "cancel") return;

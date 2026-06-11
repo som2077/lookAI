@@ -15,12 +15,8 @@ if (!supabaseAnonKey) {
 }
 
 export const createSupabaseClient = (
-  clerkToken?: string | null,
+  getToken?: () => Promise<string | null>,
 ): SupabaseClient => {
-  const authHeaders: Record<string, string> = clerkToken
-    ? { Authorization: `Bearer ${clerkToken}` }
-    : {};
-
   return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
@@ -29,7 +25,19 @@ export const createSupabaseClient = (
       detectSessionInUrl: false,
     },
     global: {
-      headers: authHeaders,
+      fetch: async (url, options = {}) => {
+        const headers = new Headers(options?.headers);
+        if (getToken) {
+          const clerkToken = await getToken();
+          if (clerkToken) {
+            headers.set("Authorization", `Bearer ${clerkToken}`);
+          }
+        }
+        return fetch(url, {
+          ...options,
+          headers,
+        });
+      },
     },
   });
 };
