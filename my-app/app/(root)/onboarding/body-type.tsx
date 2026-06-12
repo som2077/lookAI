@@ -5,35 +5,33 @@ import {
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
 
 const maleBodyTypes: BodyTypeOption[] = [
   {
     id: "slim",
-    title: "Slim",
-    description: "Slim body type has a lean frame with low body fat.",
+    title: "Rectangle",
+    description: "Shoulders, waist and hips are roughly the same width.",
     image: require("@/assets/bodytypes/male/slim.png"),
   },
   {
     id: "athletic",
-    title: "Athletic",
-    description:
-      "Athletic body type has toned muscles, balanced proportions, and a strong appearance.",
+    title: "Inverted Triangle",
+    description: "Broad shoulders taper down to a narrow waist and hips.",
     image: require("@/assets/bodytypes/male/athletic.png"),
   },
   {
     id: "average",
-    title: "Average",
-    description:
-      "Average body type has balanced proportions with moderate body fat and muscle.",
+    title: "Trapezoid",
+    description: "Shoulders slightly wider than hips with a defined waist.",
     image: require("@/assets/bodytypes/male/average.png"),
   },
   {
     id: "plus",
-    title: "Plus",
-    description:
-      "A plus-size body looks strong, confident, and naturally curvier overall.",
+    title: "Oval",
+    description: "Broader midsection with a rounder, fuller torso shape.",
     image: require("@/assets/bodytypes/male/plus.png"),
   },
 ];
@@ -41,29 +39,26 @@ const maleBodyTypes: BodyTypeOption[] = [
 const femaleBodyTypes: BodyTypeOption[] = [
   {
     id: "slim",
-    title: "Slim",
-    description: "Slim body type has a lean frame with low body fat.",
+    title: "Rectangle",
+    description: "Shoulders, waist and hips are roughly the same width.",
     image: require("@/assets/bodytypes/female/slim.png"),
   },
   {
     id: "curvy",
-    title: "Curvy",
-    description:
-      "Curvy body type has defined curves with fuller hips, waist, and chest.",
+    title: "Hourglass",
+    description: "Fuller bust and hips with a clearly defined narrow waist.",
     image: require("@/assets/bodytypes/female/curvy.png"),
   },
   {
     id: "average",
-    title: "Average",
-    description:
-      "Average body type has balanced proportions with moderate body fat and muscle.",
+    title: "Trapezoid",
+    description: "Slightly wider hips than shoulders with gentle curves.",
     image: require("@/assets/bodytypes/female/average.png"),
   },
   {
     id: "plus",
-    title: "Plus",
-    description:
-      "A plus-size body looks strong, confident, and naturally curvier overall.",
+    title: "Oval",
+    description: "Broader midsection with a rounder, fuller torso shape.",
     image: require("@/assets/bodytypes/female/plus.png"),
   },
 ];
@@ -73,7 +68,6 @@ export default function BodyTypesScreen() {
   const [selectedBodyType, setSelectedBodyType] = useState<string | null>(
     bodyType || null,
   );
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const bodyTypes = useMemo(() => {
     if (!gender) return maleBodyTypes;
@@ -87,32 +81,29 @@ export default function BodyTypesScreen() {
   };
 
   return (
-    // <SafeAreaView className="flex-1 bg-white">
-    <View className="flex-1 px-5 pb-6 pt-2 ">
+    <View className="flex-1 px-6 pb-6 pt-2">
       <OnboardingHeader step={4} />
-      <Text className="text-4xl font-semibold px-3 tracking-tight text-[#1D1A27]">
+
+      <Text className="text-4xl font-semibold px-1 tracking-tight text-[#1D1A27]">
         Body types
       </Text>
-      <Text className="mt-2 text-left text-xl px-3 text-[#000000]">
+      <Text className="mt-2 text-base px-1 font-regular text-[#6B7280]">
         This will be used to calibrate your custom plan
       </Text>
 
       <FlatList
         data={bodyTypes}
         keyExtractor={(item) => item.id}
-        className="mt-8"
+        className="mt-6"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120, gap: 16 }}
+        contentContainerStyle={{ paddingBottom: 120, gap: 14 }}
         renderItem={({ item, index }) => (
           <BodyTypeCard
             item={item}
             index={index}
             selected={selectedBodyType === item.id}
-            expanded={expandedId === item.id}
-            onPress={() => {
-              setSelectedBodyType(item.id);
-              setExpandedId(item.id);
-            }}
+            expanded={selectedBodyType === item.id}
+            onPress={() => setSelectedBodyType(item.id)}
           />
         )}
       />
@@ -121,13 +112,17 @@ export default function BodyTypesScreen() {
         <TouchableOpacity
           activeOpacity={0.9}
           disabled={!selectedBodyType}
-          onPress={handleContinue}
-          className={`items-center rounded-2xl py-5 ${selectedBodyType ? "bg-[#000000]" : "bg-[#1B1623]"}`}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            handleContinue();
+          }}
+          className={`items-center rounded-2xl py-5 ${
+            selectedBodyType ? "bg-[#1D1A27]" : "bg-[#ffffff]"
+          }`}
         >
           <Text className="text-base font-semibold text-white">Continue</Text>
         </TouchableOpacity>
       </View>
     </View>
-    // </SafeAreaView>
   );
 }

@@ -1,7 +1,7 @@
 import Svg, { Circle } from "react-native-svg";
 import { View } from "react-native";
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 10;
 const SIZE = 36;
 const STROKE = 4;
 const RADIUS = (SIZE - STROKE) / 2;

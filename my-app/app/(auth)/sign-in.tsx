@@ -64,7 +64,9 @@ export default function SignIn() {
       }
 
       await setActive?.({ session: createdSessionId });
-      router.replace("/(root)/(tabs)");
+      // Navigation is handled by _layout.tsx's auth useEffect:
+      // - New user  → onboardingComplete = false → /(root)/onboarding
+      // - Returning → onboardingComplete = true  → /(root)/(tabs)
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -74,7 +76,7 @@ export default function SignIn() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <View className="flex-1 px-6 pb-20">
+      <View className="flex-1 px-5 pb-10">
         {/* ── Image + Text overlay ── */}
         <View className="flex-1 items-center justify-center">
           {/* Phone mockup image */}
@@ -95,7 +97,7 @@ export default function SignIn() {
         {/* ── Buttons & Terms ── */}
         <View>
           {error ? (
-            <Text className="mb-3 text-center text-sm text-red-500">
+            <Text className="mb-3 text-center text-sm font-regular text-red-500">
               {error}
             </Text>
           ) : null}
@@ -134,10 +136,10 @@ export default function SignIn() {
           </TouchableOpacity>
 
           {/* Terms */}
-          <Text className="mt-5 px-4 text-center text-sm leading-5 text-[#1b1b1b]">
+          <Text className="mt-2 px-5 text-center text-[11px] leading-5 font-regular text-[#1b1b1b]">
             By continuing, you accept our{" "}
             <Text className="font-semibold text-[#1D1A27] underline">
-              Terms of Service
+              Terms of conditions
             </Text>{" "}
             and acknowledge our{" "}
             <Text className="font-semibold text-[#1D1A27] underline">

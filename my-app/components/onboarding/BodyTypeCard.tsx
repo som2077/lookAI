@@ -1,14 +1,9 @@
-import { ChevronDown, ChevronRight, Check } from "lucide-react-native";
-import React, { useCallback, useEffect } from "react";
+import { Check } from "lucide-react-native";
+import React from "react";
 import { Image as ExpoImage } from "expo-image";
 import { Pressable, Text, View } from "react-native";
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 export type BodyTypeOption = {
   id: string;
@@ -28,86 +23,90 @@ type BodyTypeCardProps = {
 export const BodyTypeCard = React.memo(function BodyTypeCard({
   item,
   selected,
-  expanded,
   onPress,
   index,
 }: BodyTypeCardProps) {
-  const scale = useSharedValue(1);
-
-  useEffect(() => {
-    scale.value = withSpring(selected ? 1.01 : 1, {
-      damping: 14,
-      stiffness: 180,
-    });
-  }, [selected, scale]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const onPressIn = useCallback(() => {
-    scale.value = withSpring(0.985, { damping: 14, stiffness: 220 });
-  }, [scale]);
-
-  const onPressOut = useCallback(() => {
-    scale.value = withSpring(selected ? 1.01 : 1, {
-      damping: 14,
-      stiffness: 180,
-    });
-  }, [scale, selected]);
-
   return (
     <Animated.View
       entering={FadeInDown.duration(300).delay(index * 60)}
-      style={animatedStyle}
     >
       <Pressable
-        onPress={onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        className={`rounded-2xl border border-[#d3d3d3] bg-[#F2F4F7] ${
-          selected ? "bg-[#e0e1e9]" : "border-[#BCBCBC]"
-        }`}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          onPress();
+        }}
       >
-        {/* Header row */}
-        <View className="flex-row items-center justify-between px-4 py-4">
-          <View className="flex-1 pr-4">
-            <Text className="text-base font-semibold text-[#1D1A27]">
-              {item.title}
-            </Text>
-            <Text className="mt-1 text-sm leading-5 text-[#6B7280]">
-              {item.description}
-            </Text>
-          </View>
-
-          {/* Right icon */}
-          <View className="h-8 w-8 items-center justify-center">
-            {selected ? (
-              <Check size={20} color="#1B1623" strokeWidth={2.5} />
-            ) : expanded ? (
-              <ChevronDown size={20} color="#9CA3AF" />
-            ) : (
-              <ChevronRight size={20} color="#9CA3AF" />
-            )}
-          </View>
-        </View>
-
-        {/* Expanded image */}
-        {expanded && (
-          <Animated.View entering={FadeIn.duration(200)}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            borderRadius: 20,
+            borderWidth: selected ? 2 : 1.5,
+            borderColor: selected ? "#1D1A27" : "#E2E2E8",
+            backgroundColor: "#FFFFFF",
+            overflow: "hidden",
+            paddingRight: 16,
+          }}
+        >
+          {/* Image box — left side */}
+          <View
+            style={{
+              width: 100,
+              height: 100,
+              backgroundColor: "#FFFFFF",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <ExpoImage
               source={item.image}
               contentFit="contain"
               cachePolicy="memory-disk"
-              style={{
-                height: 300,
-                width: "100%",
-                borderBottomLeftRadius: 16,
-                borderBottomRightRadius: 16,
-              }}
+              style={{ width: 90, height: 90 }}
             />
-          </Animated.View>
-        )}
+          </View>
+
+          {/* Text — center */}
+          <View style={{ flex: 1, paddingLeft: 1 }}>
+            <Text
+              style={{
+                fontFamily: "TikTokSans16pt-SemiBold",
+                fontSize: 16,
+                color: "#1D1A27",
+              }}
+            >
+              {item.title}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "TikTokSans16pt-Regular",
+                fontSize: 12,
+                color: "#6B7280",
+                marginTop: 4,
+                lineHeight: 17,
+              }}
+            >
+              {item.description}
+            </Text>
+          </View>
+
+          {/* Radio / check — right side */}
+          <View
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              borderWidth: selected ? 0 : 2,
+              borderColor: "#D1D1D8",
+              backgroundColor: selected ? "#1D1A27" : "transparent",
+              alignItems: "center",
+              justifyContent: "center",
+              marginLeft: 12,
+            }}
+          >
+            {selected && <Check size={13} color="#FFFFFF" strokeWidth={3} />}
+          </View>
+        </View>
       </Pressable>
     </Animated.View>
   );

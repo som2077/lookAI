@@ -7,6 +7,7 @@ import {
   View,
   ViewToken,
 } from "react-native";
+import * as Haptics from "expo-haptics";
 
 const AGE_MIN = 13;
 const AGE_MAX = 70;
@@ -31,7 +32,10 @@ export function AgePicker({
       const centered = viewableItems.find(
         (item) => item.isViewable && item.item != null,
       );
-      if (centered?.item != null) onChange(centered.item as number);
+      if (centered?.item != null) {
+        Haptics.selectionAsync();
+        onChange(centered.item as number);
+      }
     },
   ).current;
 

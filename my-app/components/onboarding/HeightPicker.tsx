@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { FlatList, Image, Text, View, ViewToken } from "react-native";
+import * as Haptics from "expo-haptics";
 
 const HEIGHT_MIN = 140;
 const HEIGHT_MAX = 210;
@@ -24,7 +25,10 @@ export function HeightPicker({
       const centered = viewableItems.find(
         (item) => item.isViewable && item.item != null,
       );
-      if (centered?.item != null) onChange(centered.item as number);
+      if (centered?.item != null) {
+        Haptics.selectionAsync();
+        onChange(centered.item as number);
+      }
     },
   ).current;
 

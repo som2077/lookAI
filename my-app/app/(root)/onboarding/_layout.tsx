@@ -9,7 +9,8 @@ export default function OnboardingLayout() {
           headerShown: false,
           contentStyle: { backgroundColor: "#FFFFFF" },
           animation: "slide_from_right",
-          gestureEnabled: false,
+          gestureEnabled: true,
+          fullScreenGestureEnabled: true,
         }}
       />
     </SafeAreaView>

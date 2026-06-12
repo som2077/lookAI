@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { createSupabaseClient } from "@/backend/api/supabase";
+import * as Haptics from "expo-haptics";
+import { Info, Upload, X } from "lucide-react-native";
 
 const BUCKET = "full-length-pics";
 
@@ -24,6 +26,7 @@ export default function FullLengthPicsScreen() {
   const [uploading, setUploading] = useState(false);
 
   const handlePickImages = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
@@ -41,11 +44,20 @@ export default function FullLengthPicsScreen() {
     });
 
     if (!result.canceled) {
-      setSelectedImages(result.assets.slice(0, 2));
+      setSelectedImages((prev) => {
+        const combined = [...prev, ...result.assets];
+        return combined.slice(0, 2);
+      });
     }
   };
 
+  const removeImage = (indexToRemove: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedImages((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
+
   const uploadToSupabase = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (selectedImages.length === 0) {
       await handlePickImages();
       return;
@@ -53,7 +65,9 @@ export default function FullLengthPicsScreen() {
 
     setUploading(true);
     try {
-      const supabase = createSupabaseClient(() => getToken({ template: "supabase" }));
+      const supabase = createSupabaseClient(() =>
+        getToken({ template: "supabase" }),
+      );
 
       for (const asset of selectedImages) {
         const ext = (
@@ -94,81 +108,116 @@ export default function FullLengthPicsScreen() {
   };
 
   const handleSkip = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/(root)/onboarding/nickname" as any);
   };
 
   const showPreview = selectedImages.length > 0;
 
   return (
-    // <SafeAreaView className="flex-1 bg-white">
     <View className="flex-1 px-5 pb-6 pt-2">
       <OnboardingHeader step={6} />
 
-      <Text className="text-4xl font-semibold tracking-tight px-3 text-[#1D1A27]">
+      <Text className="text-4xl font-semibold tracking-tight px-1 text-[#1D1A27]">
         Full length pics
       </Text>
-      <Text className="mt-2 text-xl px-3 text-[#000000]">
+      <Text className="mt-2 text-base px-1 font-regular text-[#6B7280]">
         This helps AI understand your body shape and styling needs.
       </Text>
 
       {/* Image area: show selected previews or placeholder */}
-      <View className="mt-5 flex-1 items-center justify-center">
+      <View className="mt-8 flex-1 items-center justify-center">
         {showPreview ? (
-          <View className="flex-row gap-3">
+          <View className="flex-row justify-center gap-4 w-full px-2">
             {selectedImages.map((img, idx) => (
-              <Image
-                key={idx}
-                source={{ uri: img.uri }}
-                className="h-[300px] w-[190px] rounded-2xl"
-                resizeMode="cover"
-              />
+              <View key={idx} className="relative">
+                <Image
+                  source={{ uri: img.uri }}
+                  className="h-[280px] w-[150px] rounded-2xl border border-[#E5E7EB]"
+                  resizeMode="cover"
+                />
+                <TouchableOpacity
+                  onPress={() => removeImage(idx)}
+                  className="absolute -right-3 -top-3 h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-[#E5E7EB]"
+                >
+                  <X size={16} color="#1D1A27" />
+                </TouchableOpacity>
+              </View>
             ))}
+            {selectedImages.length < 2 && (
+              <TouchableOpacity
+                onPress={handlePickImages}
+                className="h-[280px] w-[150px] items-center justify-center rounded-2xl border-2 border-dashed border-[#D1D1D8] bg-[#F9F9FB]"
+              >
+                <View className="h-12 w-12 items-center justify-center rounded-full bg-[#ECEDF9]">
+                  <Upload size={24} color="#1D1A27" />
+                </View>
+                <Text className="mt-3 text-sm font-medium text-[#1D1A27]">
+                  Add More
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
-          <TouchableOpacity activeOpacity={0.8} onPress={handlePickImages}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handlePickImages}
+            className="w-full items-center justify-center rounded-3xl border-2 border-dashed border-[#D1D1D8] bg-[#FAFAFA] py-10"
+          >
             <Image
               source={require("@/assets/images/full-lenght.png")}
-              className="h-[370px] w-[370px]"
-              resizeMode="cover"
+              className="h-[200px] w-[200px] mb-6"
+              resizeMode="contain"
             />
+            <View className="flex-row items-center justify-center rounded-full bg-[#1D1A27] px-6 py-3">
+              <Upload size={18} color="#FFFFFF" />
+              <Text className="ml-2 text-sm font-semibold text-white">
+                Upload Photos
+              </Text>
+            </View>
+            <Text className="mt-3 text-xs font-regular text-[#9CA3AF]">
+              Max 2 photos • JPEG or PNG
+            </Text>
           </TouchableOpacity>
         )}
       </View>
 
       {/* Tips */}
-      <View className="mt-3 items-center gap-2">
-        <Text className="text-sm font-medium text-center text-[#000000]">
+      <View className="mt-6 flex-row items-start rounded-2xl bg-[#F5F4F8] p-4">
+        <Info size={20} color="#1D1A27" className="mt-0.5" />
+        <Text className="ml-3 flex-1 text-[13px] leading-5 font-regular text-[#6B7280]">
           Please upload a clear full-length photo with no close-ups, glasses,
           hats, AirPods, bags, pets, or phones.
         </Text>
       </View>
 
       {/* Buttons */}
-      <View className="mt-14 gap-4">
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={handleSkip}
-          className="items-center rounded-2xl bg-[#ECEDF9] py-5"
-        >
-          <Text className="text-lg font-bold text-[#000000]">Skip now</Text>
-        </TouchableOpacity>
-
+      <View className="mt-8 gap-3">
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={showPreview ? uploadToSupabase : handlePickImages}
           disabled={uploading}
-          className="items-center rounded-2xl bg-[#000000] py-5"
+          className="items-center justify-center rounded-2xl bg-[#1D1A27] py-5"
         >
           {uploading ? (
             <ActivityIndicator color="#ffffff" />
           ) : (
             <Text className="text-base font-semibold text-white">
-              {showPreview ? "Upload Image" : "Select Images"}
+              {showPreview ? "Continue" : "Select Images"}
             </Text>
           )}
         </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={handleSkip}
+          className="items-center justify-center py-3"
+        >
+          <Text className="text-sm font-semibold text-[#6B7280]">
+            Skip for now
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
-    // </SafeAreaView>
   );
 }

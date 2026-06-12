@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
@@ -16,11 +17,14 @@ const StyleChip = React.memo(function StyleChip({
   selected,
   onToggle,
 }: StyleChipProps) {
-  const handlePress = useCallback(() => onToggle(label), [onToggle, label]);
+  const handlePress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onToggle(label);
+  }, [onToggle, label]);
   return (
     <Pressable
       onPress={handlePress}
-      className={`rounded-full border px-4 py-3 ${
+      className={`rounded-full border px-5 py-3 ${
         selected ? "border-black bg-black" : "border-transparent bg-[#ECEDF9]"
       }`}
     >
@@ -83,7 +87,7 @@ export default function StylePreferenceScreen() {
       <Text className="mt-2 text-xl text-center text-[#000000]">
         Select fashion styles you like most.
       </Text>
-      <View className="flex-row flex-wrap gap-3 mt-8 items-center justify-center">
+      <View className="flex-row flex-wrap gap-[5px] mt-8 items-center justify-center">
         {styles.map((style) => (
           <StyleChip
             key={style}
@@ -93,7 +97,7 @@ export default function StylePreferenceScreen() {
           />
         ))}
       </View>
-      <Text className="mt-10  text-sm font-medium text-center text-[#000000]">
+      <Text className="mt-8  text-sm font-medium text-center text-[#000000]">
         Choose up to 5 styles that feel most like you.
       </Text>
       <ContinueButton

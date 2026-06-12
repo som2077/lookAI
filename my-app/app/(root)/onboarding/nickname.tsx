@@ -12,7 +12,7 @@ export default function NicknameScreen() {
 
   const handleContinue = () => {
     if (!nickname.trim()) return;
-    router.push("/(root)/onboarding/trust" as any);
+    router.push("/(root)/onboarding/comparison" as any);
   };
 
   return (

@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
@@ -41,13 +42,16 @@ export default function GenderScreen() {
         This will be used to calibrate your custom plan
       </Text>
 
-      <View className="mt-40 items-center gap-8">
+      <View className="mt-[80px] items-center gap-8">
         {GENDER_OPTIONS.map((o) => {
           const isSelected = gender === o.label;
           return (
             <Pressable
               key={o.label}
-              onPress={() => setGender(o.label as Gender)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setGender(o.label as Gender);
+              }}
               android_ripple={null}
               style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
               className="items-center"
