@@ -1,8 +1,4 @@
-import React, {
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -154,7 +150,11 @@ function AddPostModal({
   const [caption, setCaption] = useState("");
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+    >
       <View style={{ flex: 1, backgroundColor: "#fff" }}>
         <View
           style={{
@@ -206,9 +206,7 @@ function AddPostModal({
             }}
           >
             <Text style={{ fontSize: 40, marginBottom: 8 }}>📷</Text>
-            <Text
-              style={{ fontSize: 15, color: "#9CA3AF", fontWeight: "600" }}
-            >
+            <Text style={{ fontSize: 15, color: "#9CA3AF", fontWeight: "600" }}>
               Tap to add photo
             </Text>
           </TouchableOpacity>
@@ -243,7 +241,7 @@ function ForYouTab() {
 
   const handleBannerScroll = useCallback((e: any) => {
     const index = Math.round(
-      e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 32)
+      e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 32),
     );
     setActiveBanner(index);
   }, []);
@@ -308,14 +306,18 @@ function ForYouTab() {
             {item.title}
           </Text>
           <Text
-            style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: "500" }}
+            style={{
+              color: "rgba(255,255,255,0.8)",
+              fontSize: 13,
+              fontWeight: "500",
+            }}
           >
             {item.subtitle}
           </Text>
         </View>
       </Pressable>
     ),
-    []
+    [],
   );
 
   return (
@@ -370,7 +372,12 @@ function ForYouTab() {
       {/* Community Looks */}
       <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
         <Text
-          style={{ fontSize: 18, fontWeight: "800", color: "#1D1A27", marginBottom: 14 }}
+          style={{
+            fontSize: 18,
+            fontWeight: "800",
+            color: "#1D1A27",
+            marginBottom: 14,
+          }}
         >
           Community Looks
         </Text>
@@ -405,12 +412,27 @@ function ForYouTab() {
               >
                 <Image
                   source={{ uri: post.avatar }}
-                  style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: "#fff" }}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 11,
+                    borderWidth: 1.5,
+                    borderColor: "#fff",
+                  }}
                 />
-                <Text style={{ color: "#fff", fontSize: 12, fontWeight: "700", flex: 1 }}>
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 12,
+                    fontWeight: "700",
+                    flex: 1,
+                  }}
+                >
                   @{post.user}
                 </Text>
-                <Text style={{ color: "#fff", fontSize: 11 }}>♥ {post.likes}</Text>
+                <Text style={{ color: "#fff", fontSize: 11 }}>
+                  ♥ {post.likes}
+                </Text>
               </View>
             </Pressable>
           ))}
@@ -531,12 +553,16 @@ function GroupCard({
 
 // ─── Groups Tab ────────────────────────────────────────────────────────────────
 
-function GroupsTab({ onGroupPress }: { onGroupPress: (group: (typeof ALL_GROUPS)[0]) => void }) {
+function GroupsTab({
+  onGroupPress,
+}: {
+  onGroupPress: (group: (typeof ALL_GROUPS)[0]) => void;
+}) {
   const [joinedIds, setJoinedIds] = useState<string[]>([]);
 
   const handleJoin = useCallback((id: string) => {
     setJoinedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   }, []);
 
@@ -546,7 +572,11 @@ function GroupsTab({ onGroupPress }: { onGroupPress: (group: (typeof ALL_GROUPS)
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 100 }}
+      contentContainerStyle={{
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        paddingBottom: 100,
+      }}
     >
       {/* Your Groups */}
       {joinedGroups.length > 0 && (
@@ -614,7 +644,7 @@ export default function ExploreScreen() {
         params: { id: group.id, name: group.name, image: group.image },
       });
     },
-    [router]
+    [router],
   );
 
   return (
@@ -692,7 +722,14 @@ export default function ExploreScreen() {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: "#fff", fontSize: 20, lineHeight: 22, marginTop: -1 }}>
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 20,
+                    lineHeight: 22,
+                    marginTop: -1,
+                  }}
+                >
                   +
                 </Text>
               </TouchableOpacity>
@@ -714,7 +751,11 @@ export default function ExploreScreen() {
 
           {/* Thin divider */}
           <View
-            style={{ height: 1, backgroundColor: "rgba(0,0,0,0.06)", marginHorizontal: 0 }}
+            style={{
+              height: 1,
+              backgroundColor: "rgba(0,0,0,0.06)",
+              marginHorizontal: 0,
+            }}
           />
 
           {/* ── Tab Content ── */}

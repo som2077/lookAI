@@ -616,7 +616,7 @@ export const TrendChartCard = React.memo(function TrendChartCard({
         shadowOpacity: 0.02,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 4 },
-        elevation: 1,
+        elevation: 0.5,
       }}
     >
       <Text

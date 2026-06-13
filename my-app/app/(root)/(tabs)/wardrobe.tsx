@@ -12,7 +12,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { StatusBar } from "expo-status-bar";
-import Svg, { Circle } from "react-native-svg";
+import Svg, {
+  Circle,
+  Defs,
+  G,
+  LinearGradient,
+  Path,
+  Stop,
+} from "react-native-svg";
 import {
   IconPlus,
   IconHanger,
@@ -27,6 +34,7 @@ import {
   IconCamera,
   IconPhoto,
   IconX,
+  IconInfoCircle,
 } from "@tabler/icons-react-native";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
@@ -102,7 +110,6 @@ const GRID_GAP = 8;
 const GRID_PADDING = 14;
 const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
 
-// Pinterest masonry heights — cycles for natural variation
 const MASONRY_HEIGHTS = [
   230, 175, 260, 195, 210, 180, 250, 165, 240, 185, 220, 200,
 ];
@@ -287,9 +294,6 @@ const MOCK_ITEMS = MOCK_WARDROBE_ITEMS as ClothingItem[];
 
 // ─── Sub-Components ──────────────────────────────────────────────────────────
 
-// Category filter chips — smooth FlatList paging
-const CHIP_PAGE_HEIGHT = 160;
-
 const CategoryFilter = React.memo(function CategoryFilter({
   active,
   onSelect,
@@ -297,7 +301,6 @@ const CategoryFilter = React.memo(function CategoryFilter({
   active: CategoryId;
   onSelect: (id: CategoryId) => void;
 }) {
-  // Split categories into 3 rows for a true "Brick Masonry" tight-packing layout
   const rows: CategoryChip[][] = [[], [], []];
   CATEGORIES.forEach((cat, index) => {
     rows[index % 3].push(cat);
@@ -353,8 +356,11 @@ const CategoryFilter = React.memo(function CategoryFilter({
   );
 });
 
-// New 2x2 Stats Grid with Time Filters
+// ─── Time filters ─────────────────────────────────────────────────────────────
+
 const TIME_FILTERS = ["Today", "3day", "5day", "This week"];
+
+// ─── StatsCard with gradient arc matching reference image ─────────────────────
 
 const StatsCard = React.memo(function StatsCard({
   total,
@@ -369,7 +375,6 @@ const StatsCard = React.memo(function StatsCard({
 }) {
   const [activeFilter, setActiveFilter] = useState("Today");
 
-  // Mock data modifier based on filter to show interactivity
   const multiplier =
     activeFilter === "Today"
       ? 1
@@ -379,26 +384,457 @@ const StatsCard = React.memo(function StatsCard({
           ? 2
           : 2.5;
 
-  // Adjusted values based on filter
   const displayTotal = total;
   const displayWorn = Math.min(Math.round(worn * multiplier), total);
   const displayUnworn = Math.max(total - displayWorn, 0);
   const displayUsage = total > 0 ? Math.round((displayWorn / total) * 100) : 0;
 
-  // Usage logic: 'space remaining' or unused percentage
-  const usageRemaining = 100 - displayUsage;
-  const isUsageUp = usageRemaining >= 50;
+  // ── Arc geometry (matching reference image: 3 gradient concentric rings) ──
+  const arcW = 190;
+  const thickness = 23;
+  const arcGap = 3;
+  const r1 = 80; // outer ring centerline radius
+  const r2 = r1 - thickness - arcGap; // = 72  middle ring
+  const r3 = r2 - thickness - arcGap; // = 36  inner ring
+  const cx = arcW / 2; // = 140
+  const cy = r1 + 22; // = 130  (top padding = 22)
+  const arcH = 190;
+
+  // Opens at bottom — 70° gap, 290° span
+  const START_DEG = 235; // lower-left
+  const TOTAL_DEG = -290; // CW in Cartesian
+
+  const f1 = Math.max(
+    0.0001,
+    Math.min(displayWorn / (displayTotal || 1), 0.9999),
+  );
+  const f2 = Math.max(0.0001, Math.min(displayUsage / 100, 0.9999));
+  const f3 = Math.max(
+    0.0001,
+    Math.min(displayUnworn / (displayTotal || 1), 0.9999),
+  );
+
+  const makeArc = (r: number, f: number = 0.9999): string => {
+    const clampedF = Math.max(0.0001, Math.min(f, 0.9999));
+    const startRad = (START_DEG * Math.PI) / 180;
+    const endRad = ((START_DEG + clampedF * TOTAL_DEG) * Math.PI) / 180;
+    const x1 = cx + r * Math.cos(startRad);
+    const y1 = cy - r * Math.sin(startRad);
+    const x2 = cx + r * Math.cos(endRad);
+    const y2 = cy - r * Math.sin(endRad);
+    const largeArc = Math.abs(clampedF * TOTAL_DEG) > 180 ? 1 : 0;
+    return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+  };
+
+  // Icon anchor point at a given angle and radius
+  const getPoint = (r: number, deg: number) => {
+    const rad = (deg * Math.PI) / 180;
+    return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+  };
+
+  const flamePos = getPoint(r1, START_DEG);
+  const runnerPos = getPoint(r2, START_DEG);
+  const personPos = getPoint(r3, START_DEG);
 
   return (
     <View style={{ marginHorizontal: 20, marginBottom: 16 }}>
+      {/* ── Arc Gauge Card ── */}
+      <View
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: 28,
+          padding: 22,
+          borderWidth: 1,
+          borderColor: "#EBEBEB",
+          shadowColor: "#000",
+          shadowOpacity: 0.05,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 3 },
+          elevation: 2,
+        }}
+      >
+        {/* ── Gradient Horseshoe Rings ── */}
+        <View style={{ alignItems: "center", marginBottom: 24 }}>
+          <Svg width={arcW} height={arcH}>
+            <Defs>
+              {/* Outer ring: Red (left) → Orange (right) */}
+              <LinearGradient
+                id="wrdOuter"
+                x1={0}
+                y1={0}
+                x2={arcW}
+                y2={0}
+                gradientUnits="userSpaceOnUse"
+              >
+                <Stop offset="0%" stopColor="#FF1200" stopOpacity={1} />
+                <Stop offset="50%" stopColor="#FF5200" stopOpacity={1} />
+                <Stop offset="100%" stopColor="#FF8C00" stopOpacity={1} />
+              </LinearGradient>
+
+              {/* Middle ring: Yellow-Gold (left) → Orange (right) */}
+              <LinearGradient
+                id="wrdMiddle"
+                x1={0}
+                y1={0}
+                x2={arcW}
+                y2={0}
+                gradientUnits="userSpaceOnUse"
+              >
+                <Stop offset="0%" stopColor="#FFD200" stopOpacity={1} />
+                <Stop offset="50%" stopColor="#FFAA00" stopOpacity={1} />
+                <Stop offset="100%" stopColor="#FF7200" stopOpacity={1} />
+              </LinearGradient>
+
+              {/* Inner ring: Light Blue (top) → Blue (bottom) */}
+              <LinearGradient
+                id="wrdInner"
+                x1={0}
+                y1={cy - r3}
+                x2={0}
+                y2={cy + r3}
+                gradientUnits="userSpaceOnUse"
+              >
+                <Stop offset="0%" stopColor="#42D8FF" stopOpacity={1} />
+                <Stop offset="100%" stopColor="#1E88E5" stopOpacity={1} />
+              </LinearGradient>
+            </Defs>
+
+            {/* Background Tracks */}
+            <Path
+              d={makeArc(r1)}
+              fill="none"
+              stroke="#FFF0ED"
+              strokeWidth={thickness}
+              strokeLinecap="round"
+            />
+            <Path
+              d={makeArc(r2)}
+              fill="none"
+              stroke="#FFF7E6"
+              strokeWidth={thickness}
+              strokeLinecap="round"
+            />
+            <Path
+              d={makeArc(r3)}
+              fill="none"
+              stroke="#E6F7FF"
+              strokeWidth={thickness}
+              strokeLinecap="round"
+            />
+
+            {/* Outer ring — Red to Orange */}
+            <Path
+              d={makeArc(r1, f1)}
+              fill="none"
+              stroke="url(#wrdOuter)"
+              strokeWidth={thickness}
+              strokeLinecap="round"
+            />
+
+            {/* Middle ring — Yellow to Orange */}
+            <Path
+              d={makeArc(r2, f2)}
+              fill="none"
+              stroke="url(#wrdMiddle)"
+              strokeWidth={thickness}
+              strokeLinecap="round"
+            />
+
+            {/* Inner ring — Blue */}
+            <Path
+              d={makeArc(r3, f3)}
+              fill="none"
+              stroke="url(#wrdInner)"
+              strokeWidth={thickness}
+              strokeLinecap="round"
+            />
+
+            {/* ── Flame icon — outer ring end (lower-left) ── */}
+            <G
+              transform={`translate(${flamePos.x.toFixed(1)}, ${flamePos.y.toFixed(1)})`}
+            >
+              <Circle cx={0} cy={0} r={15} fill="#FF1200" />
+              {/* Flame outer */}
+              <Path
+                d="M 0,-8 C 4,-5 5,0 3,5 C 2,7 -2,7 -3,5 C -5,0 -4,-5 0,-8 Z"
+                fill="white"
+                opacity={0.95}
+              />
+              {/* Flame inner glow */}
+              <Path
+                d="M 0,-2 C 2,0 2,4 0,5.5 C -2,4 -2,0 0,-2 Z"
+                fill="#FF5200"
+                opacity={0.7}
+              />
+            </G>
+
+            {/* ── Runner icon — middle ring end (lower-left) ── */}
+            <G
+              transform={`translate(${runnerPos.x.toFixed(1)}, ${runnerPos.y.toFixed(1)})`}
+            >
+              <Circle cx={0} cy={0} r={15} fill="#FF9500" />
+              {/* Head */}
+              <Circle cx={2} cy={-7} r={3} fill="white" />
+              {/* Body */}
+              <Path
+                d="M 1,-4 L 2,2"
+                stroke="white"
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Forward arm */}
+              <Path
+                d="M 1.5,-3 L 6,-1"
+                stroke="white"
+                strokeWidth={2}
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Back arm */}
+              <Path
+                d="M 1.5,-3 L -3,0"
+                stroke="white"
+                strokeWidth={1.8}
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Front leg */}
+              <Path
+                d="M 2,2 L 6,7"
+                stroke="white"
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Back leg (bent) */}
+              <Path
+                d="M 2,2 L -1,5 L 0,8"
+                stroke="white"
+                strokeWidth={2}
+                strokeLinecap="round"
+                fill="none"
+              />
+            </G>
+
+            {/* ── Person with arms up — inner ring start (lower-right) ── */}
+            <G
+              transform={`translate(${personPos.x.toFixed(1)}, ${personPos.y.toFixed(1)})`}
+            >
+              <Circle cx={0} cy={0} r={15} fill="#1E88E5" />
+              {/* Head */}
+              <Circle cx={0} cy={-7} r={3} fill="white" />
+              {/* Body */}
+              <Path
+                d="M 0,-4 L 0,2"
+                stroke="white"
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Arms raised (V shape) */}
+              <Path
+                d="M -5,-7 L 0,-3 L 5,-7"
+                stroke="white"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+              {/* Left leg */}
+              <Path
+                d="M 0,2 L -3,8"
+                stroke="white"
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Right leg */}
+              <Path
+                d="M 0,2 L 3,8"
+                stroke="white"
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                fill="none"
+              />
+            </G>
+          </Svg>
+        </View>
+
+        {/* ── 3 Stat Pills below arc ── */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 24,
+          }}
+        >
+          {/* Worn */}
+          <View style={{ alignItems: "flex-start" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+                marginBottom: 4,
+              }}
+            >
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: "#FF1200",
+                }}
+              />
+              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
+                Worn items
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+              <Text style={{ fontSize: 24, fontWeight: "700", color: "#000" }}>
+                {displayWorn}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: "#666",
+                  fontWeight: "500",
+                  marginLeft: 2,
+                }}
+              >
+                /{displayTotal} items
+              </Text>
+            </View>
+          </View>
+
+          {/* Usage */}
+          <View style={{ alignItems: "flex-start" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+                marginBottom: 4,
+              }}
+            >
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: "#FFB020",
+                }}
+              />
+              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
+                Usage
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+              <Text style={{ fontSize: 24, fontWeight: "700", color: "#000" }}>
+                {displayUsage}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: "#666",
+                  fontWeight: "500",
+                  marginLeft: 2,
+                }}
+              >
+                %
+              </Text>
+            </View>
+          </View>
+
+          {/* Unworn */}
+          <View style={{ alignItems: "flex-start" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+                marginBottom: 4,
+              }}
+            >
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: "#1E88E5",
+                }}
+              />
+              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
+                Unworn items
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+              <Text style={{ fontSize: 24, fontWeight: "700", color: "#000" }}>
+                {displayUnworn}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: "#666",
+                  fontWeight: "500",
+                  marginLeft: 2,
+                }}
+              >
+                /{displayTotal} items
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Bottom Pill: Total items ── */}
+        <View
+          style={{
+            backgroundColor: "#F2F2F2",
+            borderRadius: 24,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontSize: 16, marginRight: 6 }}>👗</Text>
+          <Text style={{ fontSize: 15, color: "#4A4A4A", fontWeight: "500" }}>
+            Total items
+          </Text>
+          <Text
+            style={{
+              fontSize: 15,
+              fontWeight: "700",
+              color: "#000",
+              marginLeft: 6,
+            }}
+          >
+            {displayTotal}
+          </Text>
+          <Text
+            style={{
+              fontSize: 15,
+              color: "#888",
+              fontWeight: "500",
+              marginLeft: 2,
+            }}
+          >
+            /{displayTotal} Pieces
+          </Text>
+          <IconInfoCircle size={16} color="#888" style={{ marginLeft: 6 }} />
+        </View>
+      </View>
+
       {/* Time Filter Tabs */}
       <View
         style={{
           flexDirection: "row",
-          backgroundColor: "#F2F3F8",
-          borderRadius: 24,
+          backgroundColor: "#F8F7FC",
+          borderRadius: 15,
           padding: 4,
-          marginBottom: 16,
+          marginTop: 16,
         }}
       >
         {TIME_FILTERS.map((filter) => (
@@ -408,15 +844,12 @@ const StatsCard = React.memo(function StatsCard({
             style={{
               flex: 1,
               paddingVertical: 12,
-              borderRadius: 20,
+              borderRadius: 12,
               backgroundColor:
                 activeFilter === filter ? "#FFFFFF" : "transparent",
+              borderColor: activeFilter === filter ? "#EBEBEB" : "transparent",
+              borderWidth: 0.5,
               alignItems: "center",
-              shadowColor: activeFilter === filter ? "#000" : "transparent",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: activeFilter === filter ? 0.05 : 0,
-              shadowRadius: 4,
-              elevation: activeFilter === filter ? 2 : 0,
             }}
           >
             <Text
@@ -431,212 +864,12 @@ const StatsCard = React.memo(function StatsCard({
           </Pressable>
         ))}
       </View>
-
-      {/* 2x2 Grid */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-        {/* Usage Card */}
-        <View
-          style={{
-            flex: 1,
-            minWidth: "45%",
-            backgroundColor: "#F4F5F9",
-            borderRadius: 24,
-            padding: 18,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <Text style={{ fontSize: 15, color: "#1D1A27", fontWeight: "400" }}>
-              Usage
-            </Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: isUsageUp ? "#10B981" : "#EF4444",
-                  marginRight: 2,
-                }}
-              >
-                {isUsageUp ? "▲" : "▼"}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: isUsageUp ? "#10B981" : "#EF4444",
-                }}
-              >
-                {usageRemaining}%
-              </Text>
-            </View>
-          </View>
-          <Text
-            style={{
-              fontSize: 44,
-              fontWeight: "400",
-              color: "#1D1A27",
-              letterSpacing: -1,
-            }}
-          >
-            {displayUsage}%
-          </Text>
-        </View>
-
-        {/* Total Card */}
-        <View
-          style={{
-            flex: 1,
-            minWidth: "45%",
-            backgroundColor: "#F4F5F9",
-            borderRadius: 24,
-            padding: 18,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <Text style={{ fontSize: 15, color: "#1D1A27", fontWeight: "400" }}>
-              Total
-            </Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={{ fontSize: 12, color: "#10B981", marginRight: 2 }}>
-                ▲
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: "#10B981",
-                }}
-              >
-                54
-              </Text>
-            </View>
-          </View>
-          <Text
-            style={{
-              fontSize: 44,
-              fontWeight: "400",
-              color: "#1D1A27",
-              letterSpacing: -1,
-            }}
-          >
-            {displayTotal}
-          </Text>
-        </View>
-
-        {/* Worn Card */}
-        <View
-          style={{
-            flex: 1,
-            minWidth: "45%",
-            backgroundColor: "#F4F5F9",
-            borderRadius: 24,
-            padding: 18,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <Text style={{ fontSize: 15, color: "#1D1A27", fontWeight: "400" }}>
-              Worn
-            </Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={{ fontSize: 12, color: "#10B981", marginRight: 2 }}>
-                ▲
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: "#10B981",
-                }}
-              >
-                77
-              </Text>
-            </View>
-          </View>
-          <Text
-            style={{
-              fontSize: 44,
-              fontWeight: "400",
-              color: "#1D1A27",
-              letterSpacing: -1,
-            }}
-          >
-            {displayWorn}
-          </Text>
-        </View>
-
-        {/* Unworn Card */}
-        <View
-          style={{
-            flex: 1,
-            minWidth: "45%",
-            backgroundColor: "#F4F5F9",
-            borderRadius: 24,
-            padding: 18,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <Text style={{ fontSize: 15, color: "#1D1A27", fontWeight: "400" }}>
-              Unworn
-            </Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={{ fontSize: 12, color: "#10B981", marginRight: 2 }}>
-                ▲
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: "#10B981",
-                }}
-              >
-                90
-              </Text>
-            </View>
-          </View>
-          <Text
-            style={{
-              fontSize: 44,
-              fontWeight: "400",
-              color: "#1D1A27",
-              letterSpacing: -1,
-            }}
-          >
-            {displayUnworn}
-          </Text>
-        </View>
-      </View>
     </View>
   );
 });
 
-// View mode toggle
+// ─── View mode toggle ─────────────────────────────────────────────────────────
+
 const ViewToggle = React.memo(function ViewToggle({
   viewMode,
   onToggle,
@@ -645,7 +878,6 @@ const ViewToggle = React.memo(function ViewToggle({
   onToggle: (mode: "grouped" | "grid") => void;
 }) {
   const isGrouped = viewMode === "grouped";
-
   return (
     <Pressable
       onPress={() => onToggle(isGrouped ? "grid" : "grouped")}
@@ -667,7 +899,8 @@ const ViewToggle = React.memo(function ViewToggle({
   );
 });
 
-// Pinterest-style masonry card — image only
+// ─── Pinterest masonry card ───────────────────────────────────────────────────
+
 const MasonryCard = React.memo(function MasonryCard({
   item,
   height,
@@ -689,13 +922,13 @@ const MasonryCard = React.memo(function MasonryCard({
         backgroundColor: bg,
       }}
     >
-      {/* Placeholder — swap with <Image source={{uri: item.imageUrl}} style={{flex:1}} /> when real photos available */}
       <View style={{ flex: 1, backgroundColor: bg }} />
     </Pressable>
   );
 });
 
-// Carousel card for grouped view
+// ─── Carousel card for grouped view ──────────────────────────────────────────
+
 const CarouselCard = React.memo(function CarouselCard({
   item,
 }: {
@@ -703,8 +936,6 @@ const CarouselCard = React.memo(function CarouselCard({
 }) {
   const router = useRouter();
   const bg = CATEGORY_BG[item.category] || "#F4F4F6";
-  const isWorn = item.wears > 0;
-
   return (
     <Pressable
       onPress={() => router.push(`/(root)/cloth-details/${item.id}` as never)}
@@ -718,13 +949,13 @@ const CarouselCard = React.memo(function CarouselCard({
         position: "relative",
       }}
     >
-      {/* Placeholder — swap with <Image source={{uri: item.imageUrl}} style={{flex:1}} /> when real photos available */}
       <View style={{ flex: 1, backgroundColor: bg }} />
     </Pressable>
   );
 });
 
-// Group section header
+// ─── Group section header ─────────────────────────────────────────────────────
+
 const GroupHeader = React.memo(function GroupHeader({
   category,
   count,
@@ -734,7 +965,6 @@ const GroupHeader = React.memo(function GroupHeader({
 }) {
   const color = CATEGORY_COLORS[category.id];
   const bg = CATEGORY_BG[category.id];
-
   return (
     <View
       style={{
@@ -749,7 +979,6 @@ const GroupHeader = React.memo(function GroupHeader({
       <Text style={{ fontSize: 16, fontWeight: "700", color: "#1D1A27" }}>
         {category.label}
       </Text>
-
       <View
         style={{
           backgroundColor: bg,
@@ -766,7 +995,8 @@ const GroupHeader = React.memo(function GroupHeader({
   );
 });
 
-// AI suggestion banner at the bottom
+// ─── AI suggestion banner ─────────────────────────────────────────────────────
+
 const AISuggestionBanner = React.memo(function AISuggestionBanner({
   unworn,
 }: {
@@ -824,7 +1054,8 @@ const AISuggestionBanner = React.memo(function AISuggestionBanner({
   );
 });
 
-// Empty state
+// ─── Empty state ──────────────────────────────────────────────────────────────
+
 const EmptyState = React.memo(function EmptyState({
   onAdd,
 }: {
@@ -969,6 +1200,7 @@ export default function WardrobeScreen() {
       },
     },
   ];
+
   const [activeCategory, setActiveCategory] = useState<CategoryId>("all");
   const [viewMode, setViewMode] = useState<"grouped" | "grid">("grouped");
 
@@ -987,11 +1219,10 @@ export default function WardrobeScreen() {
       (cat) =>
         cat.id !== "all" && allItems.some((item) => item.category === cat.id),
     );
-  }, [activeCategory]);
+  }, [activeCategory, allItems]);
 
   const total = allItems.length;
-  const worn =
-    summary.totalWorn || allItems.filter((i) => i.wears > 0).length;
+  const worn = summary.totalWorn || allItems.filter((i) => i.wears > 0).length;
   const unworn =
     summary.neverCount || allItems.filter((i) => i.wears === 0).length;
   const usage = summary.wornPercentage
@@ -1039,13 +1270,8 @@ export default function WardrobeScreen() {
 
   const listHeader = (
     <View style={{ marginTop: 4 }}>
-      {/* Stats Banner — on top */}
       <StatsCard total={total} worn={worn} unworn={unworn} usage={usage} />
-
-      {/* Category Filter chips — below banner */}
       <CategoryFilter active={activeCategory} onSelect={handleCategorySelect} />
-
-      {/* Count & view toggle row */}
       {activeCategory === "all" && (
         <View
           style={{
@@ -1079,26 +1305,19 @@ export default function WardrobeScreen() {
               alignItems: "center",
               justifyContent: "space-between",
               paddingHorizontal: 20,
-              // paddingTop: 10,
               paddingBottom: 15,
             }}
           >
             <View>
               <Text
-                style={{
-                  fontSize: 26,
-                  fontWeight: "500",
-                  color: "#000000",
-                }}
+                style={{ fontSize: 26, fontWeight: "500", color: "#000000" }}
               >
                 Wardrobe
               </Text>
             </View>
-
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
             >
-              {/* Add Button */}
               <Pressable
                 onPress={() => setShowAddMenu(true)}
                 style={{
@@ -1112,8 +1331,6 @@ export default function WardrobeScreen() {
               >
                 <IconPlus size={20} color="#FFFFFF" strokeWidth={2.5} />
               </Pressable>
-
-              {/* Saved / Heart Button */}
               <Pressable
                 onPress={handleSaved}
                 style={{
@@ -1156,7 +1373,6 @@ export default function WardrobeScreen() {
                     paddingHorizontal: 20,
                   }}
                 >
-                  {/* Handle bar */}
                   <View
                     style={{
                       width: 40,
@@ -1167,8 +1383,6 @@ export default function WardrobeScreen() {
                       marginBottom: 20,
                     }}
                   />
-
-                  {/* Title row */}
                   <View
                     style={{
                       flexDirection: "row",
@@ -1201,8 +1415,6 @@ export default function WardrobeScreen() {
                       </View>
                     </Pressable>
                   </View>
-
-                  {/* Options */}
                   {ADD_MENU_OPTIONS.map((opt) => {
                     const Icon = opt.icon;
                     return (
@@ -1271,7 +1483,6 @@ export default function WardrobeScreen() {
               contentContainerStyle={{ paddingBottom: 140 }}
             >
               {listHeader}
-
               {displayItems.length === 0 ? (
                 <EmptyState onAdd={handleAddClothes} />
               ) : (
@@ -1282,7 +1493,6 @@ export default function WardrobeScreen() {
                     gap: GRID_GAP,
                   }}
                 >
-                  {/* Left column */}
                   <View style={{ flex: 1 }}>
                     {displayItems
                       .filter((_, i) => i % 2 === 0)
@@ -1296,8 +1506,6 @@ export default function WardrobeScreen() {
                         />
                       ))}
                   </View>
-
-                  {/* Right column — offset down for Pinterest stagger */}
                   <View style={{ flex: 1, marginTop: 32 }}>
                     {displayItems
                       .filter((_, i) => i % 2 === 1)

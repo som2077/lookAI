@@ -73,35 +73,41 @@ export default function HomeScreen() {
     setActiveIndex(index);
   }, []);
 
-  const getItemLayout = useCallback((_data: any, index: number) => ({
-    length: SCREEN_WIDTH,
-    offset: SCREEN_WIDTH * index,
-    index,
-  }), []);
+  const getItemLayout = useCallback(
+    (_data: any, index: number) => ({
+      length: SCREEN_WIDTH,
+      offset: SCREEN_WIDTH * index,
+      index,
+    }),
+    [],
+  );
 
-  const renderCard = useCallback(({ item }: { item: CardKey }) => (
-    <View style={{ width: SCREEN_WIDTH, paddingHorizontal: H_PADDING }}>
-      {item === "wardrobe" ? (
-        <>
-          <WardrobeRingSummaryCard
-            wornPercentage={clampRatio(summary.wornPercentage)}
-            totalWorn={summary.totalWorn}
-            wearCount={summary.wearCount}
-            neverCount={summary.neverCount}
-            ringSegments={ringSegments}
-            streak={CURRENT_STREAK_DAYS}
-          />
-          <WardrobeFilterTabs />
-          <WardrobeMessageBar />
-        </>
-      ) : (
-        <>
-          <WeatherOutfitCard />
-          <LookAIBanner />
-        </>
-      )}
-    </View>
-  ), [summary, ringSegments]);
+  const renderCard = useCallback(
+    ({ item }: { item: CardKey }) => (
+      <View style={{ width: SCREEN_WIDTH, paddingHorizontal: H_PADDING }}>
+        {item === "wardrobe" ? (
+          <>
+            <WardrobeRingSummaryCard
+              wornPercentage={clampRatio(summary.wornPercentage)}
+              totalWorn={summary.totalWorn}
+              wearCount={summary.wearCount}
+              neverCount={summary.neverCount}
+              ringSegments={ringSegments}
+              streak={CURRENT_STREAK_DAYS}
+            />
+            <WardrobeFilterTabs />
+            <WardrobeMessageBar />
+          </>
+        ) : (
+          <>
+            <WeatherOutfitCard />
+            <LookAIBanner />
+          </>
+        )}
+      </View>
+    ),
+    [summary, ringSegments],
+  );
 
   // Header stays in place (translateY counteracts scroll), clamped to HEADER_HEIGHT
   const headerTranslateY = scrollY.interpolate({

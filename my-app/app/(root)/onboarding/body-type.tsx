@@ -20,13 +20,13 @@ const maleBodyTypes: BodyTypeOption[] = [
     id: "athletic",
     title: "Inverted Triangle",
     description: "Broad shoulders taper down to a narrow waist and hips.",
-    image: require("@/assets/bodytypes/male/athletic.png"),
+    image: require("@/assets/bodytypes/male/Athletic.png"),
   },
   {
     id: "average",
     title: "Trapezoid",
     description: "Shoulders slightly wider than hips with a defined waist.",
-    image: require("@/assets/bodytypes/male/average.png"),
+    image: require("@/assets/bodytypes/male/Average.png"),
   },
   {
     id: "plus",
@@ -47,19 +47,19 @@ const femaleBodyTypes: BodyTypeOption[] = [
     id: "curvy",
     title: "Hourglass",
     description: "Fuller bust and hips with a clearly defined narrow waist.",
-    image: require("@/assets/bodytypes/female/curvy.png"),
+    image: require("@/assets/bodytypes/female/Curvy.png"),
   },
   {
     id: "average",
     title: "Trapezoid",
     description: "Slightly wider hips than shoulders with gentle curves.",
-    image: require("@/assets/bodytypes/female/average.png"),
+    image: require("@/assets/bodytypes/female/Average.png"),
   },
   {
     id: "plus",
     title: "Oval",
     description: "Broader midsection with a rounder, fuller torso shape.",
-    image: require("@/assets/bodytypes/female/plus.png"),
+    image: require("@/assets/bodytypes/female/Plus.png"),
   },
 ];
 

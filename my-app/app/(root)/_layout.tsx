@@ -9,7 +9,10 @@ export default function RootLayout() {
       }}
     >
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="(social)" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen
+        name="(social)"
+        options={{ animation: "slide_from_right" }}
+      />
       <Stack.Screen name="onboarding" />
       <Stack.Screen
         name="log-outfit"
@@ -19,7 +22,10 @@ export default function RootLayout() {
         name="add-clothes"
         options={{ animation: "slide_from_bottom" }}
       />
-      <Stack.Screen name="calendar" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen
+        name="calendar"
+        options={{ animation: "slide_from_right" }}
+      />
       <Stack.Screen name="streak" options={{ animation: "slide_from_right" }} />
       <Stack.Screen name="score" options={{ animation: "slide_from_right" }} />
       <Stack.Screen
@@ -36,9 +42,18 @@ export default function RootLayout() {
         name="cloth-details"
         options={{ animation: "slide_from_right" }}
       />
-      <Stack.Screen name="trend-feed" options={{ animation: "slide_from_right" }} />
-      <Stack.Screen name="look-ai" options={{ animation: "slide_from_right" }} />
-      <Stack.Screen name="wardrobe-highlights" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen
+        name="trend-feed"
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen
+        name="look-ai"
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen
+        name="wardrobe-highlights"
+        options={{ animation: "slide_from_right" }}
+      />
       <Stack.Screen
         name="outfit-log-detail"
         options={{ animation: "slide_from_bottom" }}

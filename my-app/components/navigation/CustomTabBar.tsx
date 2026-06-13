@@ -12,6 +12,7 @@ import {
   type IconProps,
 } from "@tabler/icons-react-native";
 import { AddActionMenu } from "./AddActionMenu";
+import LottieView from "lottie-react-native";
 
 type TabIconComponent = React.ComponentType<IconProps>;
 type TabConfig = Record<string, TabIconComponent>;
@@ -181,6 +182,82 @@ export function CustomTabBar({
               };
 
               const label = options?.title ?? route.name; // Profile tab — avatar icon
+
+              if (route.name === "index") {
+                return (
+                  <AnimatedTabButton
+                    key={route.key}
+                    focused={focused}
+                    onPress={onPress}
+                    label={label}
+                    testID={options?.tabBarButtonTestID}
+                  >
+                    <LottieView
+                      source={require("../../assets/icons/home.json")}
+                      autoPlay={focused}
+                      loop={false}
+                      style={{ width: 28, height: 28 }}
+                      colorFilters={[
+                        {
+                          keypath: "**",
+                          color: focused ? "#000000" : "#000000",
+                        },
+                      ]}
+                    />
+                  </AnimatedTabButton>
+                );
+              }
+
+              if (route.name === "wardrobe") {
+                return (
+                  <AnimatedTabButton
+                    key={route.key}
+                    focused={focused}
+                    onPress={onPress}
+                    label={label}
+                    testID={options?.tabBarButtonTestID}
+                  >
+                    <LottieView
+                      source={require("../../assets/icons/wardrobe.json")}
+                      autoPlay={focused}
+                      loop={false}
+                      style={{ width: 28, height: 28 }}
+                      colorFilters={[
+                        {
+                          keypath: "**",
+                          color: focused ? "#000000" : "#9898A6",
+                        },
+                      ]}
+                    />
+                  </AnimatedTabButton>
+                );
+              }
+
+              if (route.name === "explore") {
+                return (
+                  <AnimatedTabButton
+                    key={route.key}
+                    focused={focused}
+                    onPress={onPress}
+                    label={label}
+                    testID={options?.tabBarButtonTestID}
+                  >
+                    <LottieView
+                      source={require("../../assets/icons/explore.json")}
+                      autoPlay={focused}
+                      loop={false}
+                      style={{ width: 28, height: 28 }}
+                      colorFilters={[
+                        {
+                          keypath: "**",
+                          color: focused ? "#000000" : "#9898A6",
+                        },
+                      ]}
+                    />
+                  </AnimatedTabButton>
+                );
+              }
+
               if (route.name === "profile") {
                 return (
                   <AnimatedTabButton

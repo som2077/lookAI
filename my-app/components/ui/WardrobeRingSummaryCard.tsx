@@ -65,7 +65,7 @@ export function WardrobeRingSummaryCard({
 
   return (
     <View
-      className="mt-3 bg-[#ffffff] border border-[#E9EBF8] rounded-[24px] py-4 px-3"
+      className="mt-2 bg-[#ffffff] border border-[#E9EBF8] rounded-[24px] py-4 px-3"
       style={{
         shadowColor: "#000",
         shadowOpacity: 0.02,
@@ -170,7 +170,9 @@ export function WardrobeRingSummaryCard({
               height: 80,
             }}
           >
-            <IconFlameFilled size={20} color="#1D1A27" />
+            <View className="h-10 w-10 items-center justify-center rounded-full  bg-[#F8F7FC]">
+              <IconFlameFilled size={20} color="#1D1A27" />
+            </View>
           </View>
         </View>
 

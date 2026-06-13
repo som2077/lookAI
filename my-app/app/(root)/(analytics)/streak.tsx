@@ -5,42 +5,47 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Share,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { Image as ExpoImage } from "expo-image";
+import LottieView from "lottie-react-native";
 import {
   CURRENT_STREAK_DAYS,
-  LONGEST_STREAK_DAYS,
 } from "@/constants/streak";
 import {
-  IconFlameFilled,
   IconArrowLeft,
-  IconTrophy,
-  IconCalendarStats,
-  IconShirt,
-  IconTargetArrow,
+  IconShare,
+  IconCheck,
 } from "@tabler/icons-react-native";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
-const MOCK_WEEKLY: { day: string; done: boolean; today?: boolean }[] = [
-  { day: "Mon", done: true },
-  { day: "Tue", done: true },
-  { day: "Wed", done: false },
-  { day: "Thu", done: true },
-  { day: "Fri", done: true },
-  { day: "Sat", done: false },
-  { day: "Sun", done: true, today: true },
+const MOCK_WEEKLY = [
+  { day: "SUN", done: true, isFuture: false },
+  { day: "MON", done: true, isFuture: false },
+  { day: "TUE", done: true, isFuture: false },
+  { day: "WED", done: true, isFuture: false },
+  { day: "THU", done: true, isFuture: false },
+  { day: "FRI", done: false, isFuture: true },
+  { day: "SAT", done: false, isFuture: true },
 ];
 
-const MILESTONES: { days: number; label: string; emoji: string }[] = [
-  { days: 7,   label: "1 Week Fire",    emoji: "🔥" },
-  { days: 30,  label: "30-Day Legend",  emoji: "⚡" },
-  { days: 100, label: "Century Club",   emoji: "💎" },
-  { days: 365, label: "Year Royale",    emoji: "👑" },
+const MILESTONES = [
+  { days: 1,   label: "1 day" },
+  { days: 5,   label: "5 days" },
+  { days: 10,  label: "10 days" },
+  { days: 25,  label: "25 days" },
+  { days: 50,  label: "50 days" },
+  { days: 100, label: "100 days" },
+  { days: 150, label: "150 days" },
+  { days: 200, label: "200 days" },
+  { days: 250, label: "250 days" },
+  { days: 365, label: "365 days" },
 ];
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
@@ -48,12 +53,19 @@ const MILESTONES: { days: number; label: string; emoji: string }[] = [
 export default function StreakScreen() {
   const router = useRouter();
   const currentStreak = CURRENT_STREAK_DAYS;
-  const longestStreak = LONGEST_STREAK_DAYS;
-  const totalOutfits = 47;
-  const daysActive = 30;
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `I'm on a ${currentStreak} day streak of styling my outfits! 🔥 Join me on the app.`,
+      });
+    } catch (error) {
+      console.log("Error sharing:", error);
+    }
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F8FA" }} edges={["top"]}>
       <StatusBar style="dark" />
 
       {/* ── Header ── */}
@@ -61,585 +73,240 @@ export default function StreakScreen() {
         style={{
           flexDirection: "row",
           alignItems: "center",
+          justifyContent: "space-between",
           paddingHorizontal: 20,
-          paddingTop: 8,
+          paddingTop: 12,
           paddingBottom: 12,
         }}
       >
         <TouchableOpacity
           onPress={() => router.back()}
           activeOpacity={0.7}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: "#F4F4F6",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={{ padding: 8, marginLeft: -8 }}
         >
-          <IconArrowLeft size={20} color="#1D1A27" />
+          <IconArrowLeft size={24} color="#1D1A27" />
         </TouchableOpacity>
-        <Text
-          style={{
-            marginLeft: 12,
-            fontSize: 20,
-            fontWeight: "800",
-            color: "#1D1A27",
-          }}
+
+        <TouchableOpacity
+          onPress={handleShare}
+          activeOpacity={0.7}
+          style={{ padding: 8, marginRight: -8 }}
         >
-          Streak
-        </Text>
+          <IconShare size={24} color="#1D1A27" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 60 }}
       >
-
-        {/* ── Hero Flame Card ── */}
-        <View
-          style={{
-            marginHorizontal: 20,
-            marginTop: 8,
-            borderRadius: 32,
-            backgroundColor: "#FF4B26",
-            overflow: "hidden",
-            padding: 28,
-            alignItems: "center",
-          }}
-        >
-          {/* Decorative large circle blobs */}
-          <View
-            style={{
-              position: "absolute",
-              top: -40,
-              right: -40,
-              width: 180,
-              height: 180,
-              borderRadius: 90,
-              backgroundColor: "rgba(255,255,255,0.06)",
-            }}
-          />
-          <View
-            style={{
-              position: "absolute",
-              bottom: -30,
-              left: -30,
-              width: 130,
-              height: 130,
-              borderRadius: 65,
-              backgroundColor: "rgba(255,255,255,0.05)",
-            }}
-          />
-
-          {/* Flame icon with glow ring */}
-          <View
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              backgroundColor: "rgba(255,255,255,0.15)",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 16,
-            }}
-          >
-            <View
-              style={{
-                width: 76,
-                height: 76,
-                borderRadius: 38,
-                backgroundColor: "rgba(255,255,255,0.2)",
-                alignItems: "center",
-                justifyContent: "center",
+        {/* ── Hero Streak Section ── */}
+        <View style={{ alignItems: "center", marginTop: 24, paddingHorizontal: 20 }}>
+          {/* Large Fire Illustration with Number Overlay */}
+          <View style={{ width: 180, height: 200, alignItems: "center", justifyContent: "flex-end" }}>
+            <LottieView
+              source={{
+                uri: "https://lottie.host/90aa36ae-cfef-49e5-bd8e-8c4c54fc2004/df47Z2J4nI.json",
               }}
-            >
-              <IconFlameFilled size={42} color="#FFFFFF" />
-            </View>
-          </View>
-
-          {/* Day count */}
-          <Text
-            style={{
-              fontSize: 72,
-              fontWeight: "900",
-              color: "#FFFFFF",
-              lineHeight: 76,
-            }}
-          >
-            {currentStreak}
-          </Text>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "700",
-              color: "rgba(255,255,255,0.85)",
-              marginTop: 4,
-            }}
-          >
-            Day Streak 🔥
-          </Text>
-          <Text
-            style={{
-              fontSize: 13,
-              color: "rgba(255,255,255,0.65)",
-              marginTop: 10,
-              textAlign: "center",
-              lineHeight: 20,
-            }}
-          >
-            You're on fire! Log an outfit today{"\n"}to keep the streak alive.
-          </Text>
-
-          {/* CTA Button */}
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={{
-              marginTop: 22,
-              backgroundColor: "#FFFFFF",
-              borderRadius: 20,
-              paddingHorizontal: 28,
-              paddingVertical: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <IconShirt size={16} color="#FF4B26" />
+              autoPlay
+              loop
+              style={{ width: 180, height: 180, position: "absolute", top: 0 }}
+            />
+            
+            {/* Number Overlay */}
             <Text
               style={{
-                fontSize: 14,
-                fontWeight: "700",
-                color: "#FF4B26",
-              }}
-            >
-              Log Today's Outfit
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* ── Stats Row ── */}
-        <View
-          style={{
-            flexDirection: "row",
-            marginHorizontal: 20,
-            marginTop: 16,
-            gap: 12,
-          }}
-        >
-          {/* Current Streak */}
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#FFFFFF",
-              borderRadius: 24,
-              borderWidth: 1,
-              borderColor: "#F0EEF8",
-              padding: 16,
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOpacity: 0.03,
-              shadowRadius: 8,
-              shadowOffset: { width: 0, height: 2 },
-              elevation: 1,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "#FFF0EB",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 10,
-              }}
-            >
-              <IconFlameFilled size={20} color="#FF4B26" />
-            </View>
-            <Text
-              style={{
-                fontSize: 26,
-                fontWeight: "800",
-                color: "#1D1A27",
+                fontSize: 64,
+                fontWeight: "900",
+                color: "#FFFFFF",
+                textShadowColor: "rgba(255, 75, 38, 0.5)",
+                textShadowOffset: { width: 0, height: 2 },
+                textShadowRadius: 8,
+                marginBottom: 16,
               }}
             >
               {currentStreak}
             </Text>
-            <Text style={{ fontSize: 11, color: "#9B9BAF", fontWeight: "600", marginTop: 2 }}>
-              Current
-            </Text>
           </View>
 
-          {/* Best Streak */}
-          <View
+          <Text style={{ fontSize: 26, fontWeight: "800", color: "#1D1A27", marginTop: 16 }}>
+            {currentStreak} day streak!
+          </Text>
+          <Text
             style={{
-              flex: 1,
-              backgroundColor: "#FFFFFF",
-              borderRadius: 24,
-              borderWidth: 1,
-              borderColor: "#F0EEF8",
-              padding: 16,
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOpacity: 0.03,
-              shadowRadius: 8,
-              shadowOffset: { width: 0, height: 2 },
-              elevation: 1,
+              fontSize: 15,
+              color: "#5A5A6A",
+              textAlign: "center",
+              marginTop: 10,
+              lineHeight: 22,
+              paddingHorizontal: 20,
+              fontWeight: "500",
             }}
           >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "#EEF2FF",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 10,
-              }}
-            >
-              <IconTrophy size={20} color="#6366F1" />
-            </View>
-            <Text
-              style={{
-                fontSize: 26,
-                fontWeight: "800",
-                color: "#1D1A27",
-              }}
-            >
-              {longestStreak}
-            </Text>
-            <Text style={{ fontSize: 11, color: "#9B9BAF", fontWeight: "600", marginTop: 2 }}>
-              Best
-            </Text>
-          </View>
-
-          {/* Total Outfits */}
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#FFFFFF",
-              borderRadius: 24,
-              borderWidth: 1,
-              borderColor: "#F0EEF8",
-              padding: 16,
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOpacity: 0.03,
-              shadowRadius: 8,
-              shadowOffset: { width: 0, height: 2 },
-              elevation: 1,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "#ECFDF5",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 10,
-              }}
-            >
-              <IconCalendarStats size={20} color="#10B981" />
-            </View>
-            <Text
-              style={{
-                fontSize: 26,
-                fontWeight: "800",
-                color: "#1D1A27",
-              }}
-            >
-              {totalOutfits}
-            </Text>
-            <Text style={{ fontSize: 11, color: "#9B9BAF", fontWeight: "600", marginTop: 2 }}>
-              Outfits
-            </Text>
-          </View>
+            Amazing work! Come back tomorrow to keep your streak alive.
+          </Text>
         </View>
 
-        {/* ── This Week Activity ── */}
+        {/* ── Weekly Timeline ── */}
         <View
           style={{
             marginHorizontal: 20,
-            marginTop: 24,
+            marginTop: 40,
             backgroundColor: "#FFFFFF",
-            borderRadius: 28,
+            borderRadius: 16,
             borderWidth: 1,
             borderColor: "#F0EEF8",
-            padding: 20,
+            paddingVertical: 24,
+            paddingHorizontal: 12,
             shadowColor: "#000",
-            shadowOpacity: 0.03,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 2 },
-            elevation: 1,
+            shadowOpacity: 0.02,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 2,
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 18,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "700",
-                color: "#1D1A27",
-              }}
-            >
-              This Week
-            </Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", position: "relative" }}>
+            {/* Horizontal Line behind nodes */}
             <View
               style={{
-                backgroundColor: "#FFF0EB",
-                borderRadius: 12,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
+                position: "absolute",
+                top: 36, // approx middle of the 32px circle + text
+                left: 15,
+                right: 15,
+                height: 3,
+                backgroundColor: "#E2E2EA",
+                zIndex: 0,
               }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: "700",
-                  color: "#FF4B26",
-                }}
-              >
-                5 / 7 🔥
-              </Text>
-            </View>
-          </View>
+            />
+            {/* Active Orange Line segment (Approximation for 5 completed days) */}
+            <View
+              style={{
+                position: "absolute",
+                top: 36,
+                left: 15,
+                width: "60%", 
+                height: 3,
+                backgroundColor: "#F26D3D",
+                zIndex: 1,
+              }}
+            />
 
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            {MOCK_WEEKLY.map(({ day, done, today }) => (
-              <View key={day} style={{ alignItems: "center", gap: 8 }}>
+            {MOCK_WEEKLY.map((item, index) => (
+              <View key={item.day} style={{ alignItems: "center", zIndex: 2, width: 44 }}>
                 <Text
                   style={{
                     fontSize: 11,
-                    fontWeight: "600",
-                    color: today ? "#FF4B26" : "#9B9BAF",
+                    fontWeight: "700",
+                    color: item.isFuture ? "#D1D1DB" : "#F26D3D",
+                    marginBottom: 12,
                   }}
                 >
-                  {day}
+                  {item.day}
                 </Text>
-                <View
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 19,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: done
-                      ? "#FF4B26"
-                      : today
-                      ? "#FFF0EB"
-                      : "#F4F4F6",
-                    borderWidth: today && !done ? 1.5 : 0,
-                    borderColor: "#FF4B26",
-                  }}
-                >
-                  {done ? (
-                    <IconFlameFilled size={17} color="#FFFFFF" />
-                  ) : (
-                    <View
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 4,
-                        backgroundColor: today ? "#FF4B26" : "#D1D1DB",
-                      }}
-                    />
-                  )}
-                </View>
+                {item.done ? (
+                  <View
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 15,
+                      backgroundColor: "#F26D3D",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <IconCheck size={18} color="#FFFFFF" strokeWidth={3} />
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 15,
+                      backgroundColor: "#FFFFFF",
+                      borderWidth: 3,
+                      borderColor: "#E2E2EA",
+                    }}
+                  />
+                )}
               </View>
             ))}
           </View>
         </View>
 
-        {/* ── Milestones ── */}
-        <View style={{ marginHorizontal: 20, marginTop: 24 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 14,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "700",
-                color: "#1D1A27",
-              }}
-            >
-              Milestones
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <IconTargetArrow size={14} color="#9B9BAF" />
-              <Text style={{ fontSize: 12, color: "#9B9BAF", fontWeight: "600" }}>
-                {MILESTONES.filter((m) => currentStreak >= m.days).length} / {MILESTONES.length} reached
-              </Text>
-            </View>
+        {/* ── Milestones Grid ── */}
+        <View style={{ marginHorizontal: 20, marginTop: 48 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 24 }}>
+             <Text style={{ fontSize: 13, fontWeight: "800", color: "#8E8E9F", letterSpacing: 1.5, textTransform: "uppercase" }}>
+               MILESTONES
+             </Text>
+             <Text style={{ fontSize: 13, fontWeight: "700", color: "#F26D3D" }}>
+               1/10
+             </Text>
           </View>
 
-          <View style={{ gap: 12 }}>
-            {MILESTONES.map((m) => {
+          <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-start", gap: (SCREEN_WIDTH - 40 - (86 * 3)) / 2 }}>
+            {MILESTONES.map((m, index) => {
               const reached = currentStreak >= m.days;
-              const progress = Math.min(currentStreak / m.days, 1);
-              const barWidth = (SCREEN_WIDTH - 40 - 32) * progress;
-
               return (
                 <View
                   key={m.days}
                   style={{
-                    backgroundColor: reached ? "#FFF8F6" : "#FFFFFF",
-                    borderRadius: 24,
-                    borderWidth: 1,
-                    borderColor: reached ? "#FFD5CC" : "#F0EEF8",
-                    padding: 16,
-                    shadowColor: "#000",
-                    shadowOpacity: 0.02,
-                    shadowRadius: 6,
-                    shadowOffset: { width: 0, height: 1 },
-                    elevation: 1,
+                    width: 86,
+                    alignItems: "center",
+                    marginBottom: 32,
                   }}
                 >
-                  {/* Top row */}
                   <View
                     style={{
-                      flexDirection: "row",
+                      width: 86,
+                      height: 86,
+                      borderRadius: 43,
+                      backgroundColor: "#FFFFFF",
                       alignItems: "center",
-                      marginBottom: 12,
+                      justifyContent: "center",
+                      shadowColor: reached ? "rgba(242, 109, 61, 0.3)" : "rgba(0,0,0,0.05)",
+                      shadowOpacity: 1,
+                      shadowRadius: 10,
+                      shadowOffset: { width: 0, height: 4 },
+                      elevation: 2,
                     }}
                   >
+                    {/* Ring Progress approximation */}
                     <View
                       style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 22,
-                        backgroundColor: reached ? "#FF4B26" : "#F4F4F6",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Text style={{ fontSize: 20 }}>{m.emoji}</Text>
-                    </View>
-
-                    <View style={{ marginLeft: 12, flex: 1 }}>
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          fontWeight: "700",
-                          color: reached ? "#1D1A27" : "#9B9BAF",
-                        }}
-                      >
-                        {m.label}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 11,
-                          fontWeight: "600",
-                          color: reached ? "#FF7356" : "#C5C5D0",
-                          marginTop: 2,
-                        }}
-                      >
-                        {reached ? "✓ Completed" : `${m.days - currentStreak} days to go`}
-                      </Text>
-                    </View>
-
-                    <Text
-                      style={{
-                        fontSize: 13,
-                        fontWeight: "700",
-                        color: reached ? "#FF4B26" : "#C5C5D0",
-                      }}
-                    >
-                      {m.days}d
-                    </Text>
-                  </View>
-
-                  {/* Progress bar */}
-                  <View
-                    style={{
-                      height: 6,
-                      backgroundColor: "#F4F4F6",
-                      borderRadius: 3,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <View
-                      style={{
-                        height: 6,
-                        width: barWidth,
-                        backgroundColor: reached ? "#FF4B26" : "#FFBEB0",
-                        borderRadius: 3,
+                        position: "absolute",
+                        top: 5, left: 5, right: 5, bottom: 5,
+                        borderRadius: 40,
+                        borderWidth: 4,
+                        borderColor: reached ? "#F26D3D" : "#F4F4F6",
+                        borderTopColor: reached ? "#FF4B26" : "#EAEAEA",
+                        transform: [{ rotate: "45deg" }]
                       }}
                     />
+                    <Text
+                      style={{
+                        fontSize: 28,
+                        fontWeight: "900",
+                        color: reached ? "#F26D3D" : "#D1D1DB",
+                      }}
+                    >
+                      {m.days}
+                    </Text>
                   </View>
-
-                  {/* Progress label */}
                   <Text
                     style={{
-                      fontSize: 10,
-                      color: "#C5C5D0",
+                      marginTop: 12,
+                      fontSize: 12,
                       fontWeight: "600",
-                      marginTop: 6,
-                      textAlign: "right",
+                      color: reached ? "#1D1A27" : "#A1A1AA",
                     }}
                   >
-                    {Math.round(progress * 100)}%
+                    {m.label}
                   </Text>
                 </View>
               );
             })}
           </View>
-        </View>
-
-        {/* ── Motivational Footer ── */}
-        <View
-          style={{
-            marginHorizontal: 20,
-            marginTop: 24,
-            backgroundColor: "#1D1A27",
-            borderRadius: 28,
-            padding: 24,
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ fontSize: 28, marginBottom: 8 }}>✨</Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "700",
-              color: "#FFFFFF",
-              textAlign: "center",
-              lineHeight: 24,
-            }}
-          >
-            "Style is not about being noticed,{"\n"}it's about being remembered."
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.45)",
-              marginTop: 8,
-              fontWeight: "500",
-            }}
-          >
-            Keep logging. Keep glowing.
-          </Text>
         </View>
 
       </ScrollView>

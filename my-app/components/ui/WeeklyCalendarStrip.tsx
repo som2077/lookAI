@@ -56,24 +56,24 @@ const DayCell = React.memo(function DayCell({
     >
       <Text
         style={{
-          fontSize: 11,
+          fontSize: isActive ? 14 : 12,
           fontFamily: "TikTokSans16pt-Medium",
-          color: isActive ? "#1D1A27" : "#868693",
+          color: isActive ? "#000000" : "#868693",
         }}
       >
         {dayLabel}
       </Text>
       <View
-        className="mt-2 h-10 w-10 items-center justify-center rounded-full"
+        className={`mt-2 items-center justify-center rounded-full  ${isActive ? "h-12 w-12" : "h-10 w-10"}`}
         style={
           isActive
             ? {
                 backgroundColor: "#1D1A27",
-                shadowColor: "#000000",
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
-                shadowOffset: { width: 0, height: 1.5 },
-                elevation: 2,
+                // shadowColor: "#000000",
+                // shadowOpacity: 0.1,
+                // shadowRadius: 3,
+                // shadowOffset: { width: 0, height: 1.5 },
+                // elevation: 2,
               }
             : {
                 borderWidth: 1,
@@ -84,7 +84,7 @@ const DayCell = React.memo(function DayCell({
       >
         <Text
           style={{
-            fontSize: 13,
+            fontSize: isActive ? 15 : 13,
             fontFamily: "TikTokSans16pt-Bold",
             color: isActive ? "#FFFFFF" : "#1D1A27",
           }}
@@ -122,7 +122,7 @@ export function WeeklyCalendarStrip({
   );
 
   return (
-    <View className="px-[4px] py-1">
+    <View className="px-[5px] py-1">
       <View className="flex-row items-center justify-between">
         {weekDates.map((date, index) => (
           <DayCell

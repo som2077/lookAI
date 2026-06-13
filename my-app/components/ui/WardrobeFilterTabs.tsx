@@ -37,12 +37,10 @@ export function WardrobeFilterTabs({ onChange }: WardrobeFilterTabsProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "#E9EBF890",
-    borderRadius: 14,
-    borderColor: "#E9EBF8",
-    borderWidth: 1,
+    backgroundColor: "#F8F7FC",
     padding: 2,
     marginTop: 8,
+    borderRadius: 14,
   },
   tab: {
     flex: 1,
@@ -53,8 +51,15 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     backgroundColor: "#FFFFFF",
-    borderColor: "#E9EBF8",
-    borderWidth: 1,
+    // borderColor: "#E9EBF8",
+    // borderWidth: 1,
+    shadowColor: "#000000",
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1.5 },
+    elevation: 1,
+    borderWidth: 0.5,
+    borderColor: "#EBEBEB",
   },
   label: {
     fontSize: 14,

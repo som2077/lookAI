@@ -28,26 +28,15 @@ export const NotifyBanner = React.memo(function NotifyBanner() {
   if (isAnalyzing || lastOutfits.length > 0 || isDismissed) return null;
 
   return (
-    <View
-      className="mx-6  mt-2 mb-2 flex-row  border border-[#E9EBF8]  items-center justify-between bg-[#FFFFFF] rounded-[16px] px-4 py-4"
-      style={{
-        shadowColor: "#000000",
-        shadowOpacity: 0.04,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 1,
-      }}
-    >
+    <View className="mx-6  mt-2 mb-2 flex-row  border border-[#E9EBF8]  items-center justify-between bg-[#FFFFFF] rounded-[16px] px-4 py-4">
       <View className="flex-row items-center flex-1 pr-3">
         <IconBell size={24} color="#1D1A27" strokeWidth={1.5} />
         <Text
           className="ml-3 text-[#1D1A27] font-sans"
           style={{ fontSize: 12, lineHeight: 18, flex: 1 }}
         >
-          Feel free to leave this screen or use other apps.{"\n"}
-          We&apos;ll send you a notification when your analysis is ready.
-          {/* You can switch apps or turn off your phone.
-          We&apos;ll notify you when the analysis is done. */}
+          You can switch apps or turn off your phone. {"\n"}
+          We&apos;ll notify you when the analysis is done.
         </Text>
       </View>
       <Pressable onPress={() => setIsDismissed(true)} hitSlop={10}>
@@ -105,7 +94,7 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
             borderColor: "#FFFFFF",
             overflow: "hidden",
             backgroundColor: "#F3F4F6",
-            marginLeft: -24,
+            marginLeft: -30,
           }}
         >
           <ExpoImage
@@ -118,7 +107,7 @@ export const EmptyStyleBanner = React.memo(function EmptyStyleBanner() {
       </View>
       <Text
         className="text-[#313131] mt-1 text-center font-TikTokSans16pt-Medium"
-        style={{ fontSize: 14, lineHeight: 20 }}
+        style={{ fontSize: 12, lineHeight: 20 }}
       >
         Tap + add you first style look of the day
       </Text>

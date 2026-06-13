@@ -20,7 +20,7 @@ import {
   IconMapPin,
   IconRefresh,
   IconAlertCircle,
-  IconTemperature,
+  // IconTemperature,
   IconUvIndex,
 } from "@tabler/icons-react-native";
 import { useWeatherStore } from "@/backend/store/weather-store";
@@ -202,8 +202,16 @@ export const WeatherOutfitCard = React.memo(function WeatherOutfitCard() {
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(blinkAnim, { toValue: 0.2, duration: 800, useNativeDriver: true }),
-        Animated.timing(blinkAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(blinkAnim, {
+          toValue: 0.2,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blinkAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
       ]),
     );
     anim.start();
@@ -269,7 +277,9 @@ export const WeatherOutfitCard = React.memo(function WeatherOutfitCard() {
               </Text>
               {data.isLive && (
                 <>
-                  <Animated.View style={[styles.liveDot, { opacity: blinkAnim }]} />
+                  <Animated.View
+                    style={[styles.liveDot, { opacity: blinkAnim }]}
+                  />
                   <Text style={styles.liveText}>Live</Text>
                 </>
               )}
@@ -279,9 +289,7 @@ export const WeatherOutfitCard = React.memo(function WeatherOutfitCard() {
             <Text style={styles.tempText}>{data.temperatureCelsius}°C</Text>
 
             {/* Feels like */}
-            <Text style={styles.feelsLike}>
-              Feels like {data.feelsLike}°C
-            </Text>
+            <Text style={styles.feelsLike}>Feels like {data.feelsLike}°C</Text>
           </View>
 
           {/* Comfort ring */}
@@ -361,7 +369,7 @@ const styles = StyleSheet.create({
   topRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 23,
     marginBottom: 14,
   },
 
@@ -427,8 +435,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   ringTextBox: { alignItems: "center", justifyContent: "center" },
-  ringScore: { fontSize: 15, fontWeight: "800", color: "#1C1C1E", lineHeight: 20 },
-  ringLabel: { fontSize: 7, fontWeight: "600", color: "#9CA3AF", letterSpacing: 0.3 },
+  ringScore: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#1C1C1E",
+    lineHeight: 20,
+  },
+  ringLabel: {
+    fontSize: 7,
+    fontWeight: "600",
+    color: "#9CA3AF",
+    letterSpacing: 0.3,
+  },
 
   // Divider
   divider: {

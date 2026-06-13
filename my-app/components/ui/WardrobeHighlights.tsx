@@ -300,10 +300,10 @@ export const WardrobeHighlights = React.memo(function WardrobeHighlights() {
         className="bg-white rounded-[24px] border border-[#E9EBF8] px-5 pt-5 pb-4 mx-6"
         style={{
           shadowColor: "#000000",
-          shadowOpacity: 0.03,
+          shadowOpacity: 0.02,
           shadowRadius: 12,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 1.5,
+          shadowOffset: { width: 0, height: 1 },
+          elevation: 0.5,
         }}
       >
         {/* Graph meta values */}
@@ -527,7 +527,7 @@ export const WardrobeHighlights = React.memo(function WardrobeHighlights() {
                         shadowOpacity: 0.05,
                         shadowRadius: 3,
                         shadowOffset: { width: 0, height: 1.5 },
-                        elevation: 2,
+                        elevation: 1,
                         borderWidth: 0.5,
                         borderColor: "#EBEBEB",
                       }
