@@ -313,7 +313,9 @@ const CategoryFilter = React.memo(function CategoryFilter({
         key={cat.id}
         onPress={() => onSelect(cat.id)}
         style={{
-          backgroundColor: isActive ? "#1D1A27" : "#EEF0F5",
+          backgroundColor: isActive ? "#1D1A27" : "#FFFFFF",
+          borderColor: "#EBEBEB",
+          borderWidth: 0.5,
           borderRadius: 25,
           paddingHorizontal: 20,
           paddingVertical: 10,
@@ -390,15 +392,15 @@ const StatsCard = React.memo(function StatsCard({
   const displayUsage = total > 0 ? Math.round((displayWorn / total) * 100) : 0;
 
   // ── Arc geometry (matching reference image: 3 gradient concentric rings) ──
-  const arcW = 190;
-  const thickness = 23;
-  const arcGap = 3;
-  const r1 = 80; // outer ring centerline radius
-  const r2 = r1 - thickness - arcGap; // = 72  middle ring
-  const r3 = r2 - thickness - arcGap; // = 36  inner ring
-  const cx = arcW / 2; // = 140
-  const cy = r1 + 22; // = 130  (top padding = 22)
-  const arcH = 190;
+  const arcW = 160;
+  const thickness = 20;
+  const arcGap = 2;
+  const r1 = 70; // outer ring centerline radius
+  const r2 = r1 - thickness - arcGap; // = 48  middle ring
+  const r3 = r2 - thickness - arcGap; // = 26  inner ring
+  const cx = arcW / 2; // = 80
+  const cy = r1 + 10; // = 80
+  const arcH = 160;
 
   // Opens at bottom — 70° gap, 290° span
   const START_DEG = 235; // lower-left
@@ -437,27 +439,31 @@ const StatsCard = React.memo(function StatsCard({
   const personPos = getPoint(r3, START_DEG);
 
   return (
-    <View style={{ marginHorizontal: 20, marginBottom: 16 }}>
-      {/* ── Arc Gauge Card ── */}
-      <View
-        style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: 28,
-          padding: 22,
-          borderWidth: 1,
-          borderColor: "#EBEBEB",
-          shadowColor: "#000",
-          shadowOpacity: 0.05,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 3 },
-          elevation: 2,
-        }}
-      >
-        {/* ── Gradient Horseshoe Rings ── */}
-        <View style={{ alignItems: "center", marginBottom: 24 }}>
+    <View style={{ marginHorizontal: 20, marginBottom: 6 }}>
+      {/* ── Two Cards Row ── */}
+      <View style={{ flexDirection: "row", gap: 5 }}>
+        {/* ── Left Card: Rings ── */}
+        <View
+          style={{
+            flex: 30,
+            backgroundColor: "#FFFFFF90",
+            borderRadius: 24,
+            // paddingVertical: 0,
+            alignItems: "center",
+            // width: "-10%",
+            justifyContent: "center",
+            borderWidth: 1,
+            // marginRight: -10,
+            borderColor: "#EBEBEB",
+            shadowColor: "#FFFFFF",
+            shadowOpacity: 0.05,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 3 },
+            elevation: 2,
+          }}
+        >
           <Svg width={arcW} height={arcH}>
             <Defs>
-              {/* Outer ring: Red (left) → Orange (right) */}
               <LinearGradient
                 id="wrdOuter"
                 x1={0}
@@ -466,12 +472,10 @@ const StatsCard = React.memo(function StatsCard({
                 y2={0}
                 gradientUnits="userSpaceOnUse"
               >
-                <Stop offset="0%" stopColor="#FF1200" stopOpacity={1} />
-                <Stop offset="50%" stopColor="#FF5200" stopOpacity={1} />
-                <Stop offset="100%" stopColor="#FF8C00" stopOpacity={1} />
+                <Stop offset="0%" stopColor="#2C242F" stopOpacity={1} />
+                <Stop offset="50%" stopColor="#2C242F" stopOpacity={1} />
+                <Stop offset="100%" stopColor="#2C242F" stopOpacity={1} />
               </LinearGradient>
-
-              {/* Middle ring: Yellow-Gold (left) → Orange (right) */}
               <LinearGradient
                 id="wrdMiddle"
                 x1={0}
@@ -480,12 +484,10 @@ const StatsCard = React.memo(function StatsCard({
                 y2={0}
                 gradientUnits="userSpaceOnUse"
               >
-                <Stop offset="0%" stopColor="#FFD200" stopOpacity={1} />
-                <Stop offset="50%" stopColor="#FFAA00" stopOpacity={1} />
-                <Stop offset="100%" stopColor="#FF7200" stopOpacity={1} />
+                <Stop offset="0%" stopColor="#2C242F" stopOpacity={1} />
+                <Stop offset="50%" stopColor="#2C242F" stopOpacity={1} />
+                <Stop offset="100%" stopColor="#2C242F" stopOpacity={1} />
               </LinearGradient>
-
-              {/* Inner ring: Light Blue (top) → Blue (bottom) */}
               <LinearGradient
                 id="wrdInner"
                 x1={0}
@@ -494,8 +496,8 @@ const StatsCard = React.memo(function StatsCard({
                 y2={cy + r3}
                 gradientUnits="userSpaceOnUse"
               >
-                <Stop offset="0%" stopColor="#42D8FF" stopOpacity={1} />
-                <Stop offset="100%" stopColor="#1E88E5" stopOpacity={1} />
+                <Stop offset="0%" stopColor="#2C242F" stopOpacity={1} />
+                <Stop offset="100%" stopColor="#2C242F" stopOpacity={1} />
               </LinearGradient>
             </Defs>
 
@@ -503,21 +505,23 @@ const StatsCard = React.memo(function StatsCard({
             <Path
               d={makeArc(r1)}
               fill="none"
-              stroke="#FFF0ED"
+              stroke="#FFFFFF"
+              // color="#EBEB"
+              // borderWidth={0.5}
               strokeWidth={thickness}
               strokeLinecap="round"
             />
             <Path
               d={makeArc(r2)}
               fill="none"
-              stroke="#FFF7E6"
+              stroke="#FFFFFF"
               strokeWidth={thickness}
               strokeLinecap="round"
             />
             <Path
               d={makeArc(r3)}
               fill="none"
-              stroke="#E6F7FF"
+              stroke="#FFFFFF"
               strokeWidth={thickness}
               strokeLinecap="round"
             />
@@ -549,139 +553,147 @@ const StatsCard = React.memo(function StatsCard({
               strokeLinecap="round"
             />
 
-            {/* ── Flame icon — outer ring end (lower-left) ── */}
+            {/* ── Flame icon ── */}
             <G
               transform={`translate(${flamePos.x.toFixed(1)}, ${flamePos.y.toFixed(1)})`}
             >
-              <Circle cx={0} cy={0} r={15} fill="#FF1200" />
-              {/* Flame outer */}
-              <Path
-                d="M 0,-8 C 4,-5 5,0 3,5 C 2,7 -2,7 -3,5 C -5,0 -4,-5 0,-8 Z"
-                fill="white"
-                opacity={0.95}
-              />
-              {/* Flame inner glow */}
-              <Path
-                d="M 0,-2 C 2,0 2,4 0,5.5 C -2,4 -2,0 0,-2 Z"
-                fill="#FF5200"
-                opacity={0.7}
-              />
+              <Circle cx={0} cy={0} r={thickness / 2} fill="#FF1200" />
+              <G transform="scale(0.6)">
+                <Path
+                  d="M 0,-8 C 4,-5 5,0 3,5 C 2,7 -2,7 -3,5 C -5,0 -4,-5 0,-8 Z"
+                  fill="white"
+                  opacity={0.95}
+                />
+                <Path
+                  d="M 0,-2 C 2,0 2,4 0,5.5 C -2,4 -2,0 0,-2 Z"
+                  fill="#FF5200"
+                  opacity={0.7}
+                />
+              </G>
             </G>
 
-            {/* ── Runner icon — middle ring end (lower-left) ── */}
+            {/* ── Runner icon ── */}
             <G
               transform={`translate(${runnerPos.x.toFixed(1)}, ${runnerPos.y.toFixed(1)})`}
             >
-              <Circle cx={0} cy={0} r={15} fill="#FF9500" />
-              {/* Head */}
-              <Circle cx={2} cy={-7} r={3} fill="white" />
-              {/* Body */}
-              <Path
-                d="M 1,-4 L 2,2"
-                stroke="white"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                fill="none"
-              />
-              {/* Forward arm */}
-              <Path
-                d="M 1.5,-3 L 6,-1"
-                stroke="white"
-                strokeWidth={2}
-                strokeLinecap="round"
-                fill="none"
-              />
-              {/* Back arm */}
-              <Path
-                d="M 1.5,-3 L -3,0"
-                stroke="white"
-                strokeWidth={1.8}
-                strokeLinecap="round"
-                fill="none"
-              />
-              {/* Front leg */}
-              <Path
-                d="M 2,2 L 6,7"
-                stroke="white"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                fill="none"
-              />
-              {/* Back leg (bent) */}
-              <Path
-                d="M 2,2 L -1,5 L 0,8"
-                stroke="white"
-                strokeWidth={2}
-                strokeLinecap="round"
-                fill="none"
-              />
+              <Circle cx={0} cy={0} r={thickness / 2} fill="#FF9500" />
+              <G transform="scale(0.6)">
+                <Circle cx={2} cy={-7} r={3} fill="white" />
+                <Path
+                  d="M 1,-4 L 2,2"
+                  stroke="white"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path
+                  d="M 1.5,-3 L 6,-1"
+                  stroke="white"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path
+                  d="M 1.5,-3 L -3,0"
+                  stroke="white"
+                  strokeWidth={1.8}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path
+                  d="M 2,2 L 6,7"
+                  stroke="white"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path
+                  d="M 2,2 L -1,5 L 0,8"
+                  stroke="white"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </G>
             </G>
 
-            {/* ── Person with arms up — inner ring start (lower-right) ── */}
+            {/* ── Person (stand) icon ── */}
             <G
               transform={`translate(${personPos.x.toFixed(1)}, ${personPos.y.toFixed(1)})`}
             >
-              <Circle cx={0} cy={0} r={15} fill="#1E88E5" />
-              {/* Head */}
-              <Circle cx={0} cy={-7} r={3} fill="white" />
-              {/* Body */}
-              <Path
-                d="M 0,-4 L 0,2"
-                stroke="white"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                fill="none"
-              />
-              {/* Arms raised (V shape) */}
-              <Path
-                d="M -5,-7 L 0,-3 L 5,-7"
-                stroke="white"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-              {/* Left leg */}
-              <Path
-                d="M 0,2 L -3,8"
-                stroke="white"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                fill="none"
-              />
-              {/* Right leg */}
-              <Path
-                d="M 0,2 L 3,8"
-                stroke="white"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                fill="none"
-              />
+              <Circle cx={0} cy={0} r={thickness / 2} fill="#1E88E5" />
+              <G transform="scale(0.6)">
+                <Circle cx={0} cy={-7} r={3} fill="white" />
+                <Path
+                  d="M 0,-4 L 0,2"
+                  stroke="white"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path
+                  d="M -5,-7 L 0,-3 L 5,-7"
+                  stroke="white"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+                <Path
+                  d="M 0,2 L -3,8"
+                  stroke="white"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path
+                  d="M 0,2 L 3,8"
+                  stroke="white"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </G>
             </G>
           </Svg>
         </View>
 
-        {/* ── 3 Stat Pills below arc ── */}
+        {/* ── Right Card: Stats Column ── */}
         <View
           style={{
-            flexDirection: "row",
+            flex: 24,
+            backgroundColor: "#FFFFFF90",
+            borderRadius: 24,
+            // paddingVertical: 10,
+            // width: "20%",
+            // paddingHorizontal: -15,
             justifyContent: "space-between",
-            marginBottom: 24,
+            // alignItems: "center",
+            // justifyContent: "center",
+            // marginLeft: 10,
+            borderWidth: 1,
+
+            borderColor: "#EBEBEB",
+            shadowColor: "#FFFFFF",
+            shadowOpacity: 0.05,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 3 },
+            elevation: 2,
           }}
         >
           {/* Worn */}
-          <View style={{ alignItems: "flex-start" }}>
+          <View style={{ paddingVertical: 8, marginLeft: 25, marginTop: 5 }}>
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 5,
-                marginBottom: 4,
+                marginBottom: 2,
               }}
             >
               <View
                 style={{
-                  width: 8,
+                  width: 15,
                   height: 8,
                   borderRadius: 4,
                   backgroundColor: "#FF1200",
@@ -692,12 +704,12 @@ const StatsCard = React.memo(function StatsCard({
               </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-              <Text style={{ fontSize: 24, fontWeight: "700", color: "#000" }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
                 {displayWorn}
               </Text>
               <Text
                 style={{
-                  fontSize: 13,
+                  fontSize: 11,
                   color: "#666",
                   fontWeight: "500",
                   marginLeft: 2,
@@ -708,19 +720,27 @@ const StatsCard = React.memo(function StatsCard({
             </View>
           </View>
 
+          <View
+            style={{
+              height: 1,
+              backgroundColor: "#FFFFFF",
+              marginHorizontal: 10,
+            }}
+          />
+
           {/* Usage */}
-          <View style={{ alignItems: "flex-start" }}>
+          <View style={{ paddingVertical: 8, marginLeft: 25 }}>
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 5,
-                marginBottom: 4,
+                marginBottom: 2,
               }}
             >
               <View
                 style={{
-                  width: 8,
+                  width: 15,
                   height: 8,
                   borderRadius: 4,
                   backgroundColor: "#FFB020",
@@ -731,12 +751,12 @@ const StatsCard = React.memo(function StatsCard({
               </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-              <Text style={{ fontSize: 24, fontWeight: "700", color: "#000" }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
                 {displayUsage}
               </Text>
               <Text
                 style={{
-                  fontSize: 13,
+                  fontSize: 11,
                   color: "#666",
                   fontWeight: "500",
                   marginLeft: 2,
@@ -747,19 +767,27 @@ const StatsCard = React.memo(function StatsCard({
             </View>
           </View>
 
+          <View
+            style={{
+              height: 1,
+              backgroundColor: "#FFFFFF",
+              marginHorizontal: 10,
+            }}
+          />
+
           {/* Unworn */}
-          <View style={{ alignItems: "flex-start" }}>
+          <View style={{ paddingVertical: 8, marginLeft: 25, marginBottom: 5 }}>
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 5,
-                marginBottom: 4,
+                marginBottom: 2,
               }}
             >
               <View
                 style={{
-                  width: 8,
+                  width: 15,
                   height: 8,
                   borderRadius: 4,
                   backgroundColor: "#1E88E5",
@@ -770,12 +798,12 @@ const StatsCard = React.memo(function StatsCard({
               </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-              <Text style={{ fontSize: 24, fontWeight: "700", color: "#000" }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
                 {displayUnworn}
               </Text>
               <Text
                 style={{
-                  fontSize: 13,
+                  fontSize: 11,
                   color: "#666",
                   fontWeight: "500",
                   marginLeft: 2,
@@ -786,55 +814,17 @@ const StatsCard = React.memo(function StatsCard({
             </View>
           </View>
         </View>
-
-        {/* ── Bottom Pill: Total items ── */}
-        <View
-          style={{
-            backgroundColor: "#F2F2F2",
-            borderRadius: 24,
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text style={{ fontSize: 16, marginRight: 6 }}>👗</Text>
-          <Text style={{ fontSize: 15, color: "#4A4A4A", fontWeight: "500" }}>
-            Total items
-          </Text>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: "700",
-              color: "#000",
-              marginLeft: 6,
-            }}
-          >
-            {displayTotal}
-          </Text>
-          <Text
-            style={{
-              fontSize: 15,
-              color: "#888",
-              fontWeight: "500",
-              marginLeft: 2,
-            }}
-          >
-            /{displayTotal} Pieces
-          </Text>
-          <IconInfoCircle size={16} color="#888" style={{ marginLeft: 6 }} />
-        </View>
       </View>
-
       {/* Time Filter Tabs */}
       <View
         style={{
           flexDirection: "row",
           backgroundColor: "#F8F7FC",
+          borderColor: "#EBEBEB",
+          borderWidth: 0.5,
           borderRadius: 15,
           padding: 4,
-          marginTop: 16,
+          marginTop: 6,
         }}
       >
         {TIME_FILTERS.map((filter) => (
@@ -848,8 +838,17 @@ const StatsCard = React.memo(function StatsCard({
               backgroundColor:
                 activeFilter === filter ? "#FFFFFF" : "transparent",
               borderColor: activeFilter === filter ? "#EBEBEB" : "transparent",
+
               borderWidth: 0.5,
               alignItems: "center",
+              shadowColor: activeFilter === filter ? "#000" : "transparent",
+              shadowOpacity: activeFilter === filter ? 0.05 : 0,
+              shadowRadius: activeFilter === filter ? 10 : 0,
+              shadowOffset: {
+                width: 0,
+                height: activeFilter === filter ? 2 : 0,
+              },
+              elevation: activeFilter === filter ? 1 : 0,
             }}
           >
             <Text
@@ -1283,7 +1282,7 @@ export default function WardrobeScreen() {
           }}
         >
           <View>
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#1D1A27" }}>
+            <Text style={{ fontSize: 18, fontWeight: "600", color: "#1D1A27" }}>
               All Categories
             </Text>
           </View>
