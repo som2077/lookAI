@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { useCallback } from "react";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
@@ -25,8 +26,10 @@ const GENDER_OPTIONS = [
 ] as const;
 
 export default function GenderScreen() {
+  const posthog = usePostHog();
   const { gender, setGender } = useOnboardingState();
   const handleContinue = useCallback(() => {
+    posthog?.capture('onboarding_step_completed', { step: 'gender' });
     if (!gender) return;
 
     router.push("/(root)/onboarding/age");

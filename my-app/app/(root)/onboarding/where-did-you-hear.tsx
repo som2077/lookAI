@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
@@ -18,6 +19,7 @@ const hearOptions = [
 ];
 
 export default function WhereDidYouHearScreen() {
+  const posthog = usePostHog();
   const router = useRouter();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
@@ -35,6 +37,7 @@ export default function WhereDidYouHearScreen() {
   };
 
   const handleContinue = () => {
+    posthog?.capture('onboarding_step_completed', { step: 'where-did-you-hear' });
     if (selectedOptions.length === 0) return;
     router.push("/(root)/onboarding/trust" as any);
   };

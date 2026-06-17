@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -14,6 +15,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 export default function ComparisonScreen() {
+  const posthog = usePostHog();
   const router = useRouter();
 
   // Shared values for bar heights
@@ -62,6 +64,7 @@ export default function ComparisonScreen() {
   }));
 
   const handleContinue = () => {
+    posthog?.capture('onboarding_step_completed', { step: 'comparison' });
     router.push("/(root)/onboarding/where-did-you-hear" as any);
   };
 

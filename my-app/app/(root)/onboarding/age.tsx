@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 
@@ -7,6 +8,7 @@ import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
 
 export default function AgeScreen() {
+  const posthog = usePostHog();
   const { age, setAge } = useOnboardingState();
 
   return (

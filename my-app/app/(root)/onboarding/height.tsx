@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
@@ -6,6 +7,7 @@ import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import { useOnboardingState } from "@/backend/store/onboarding-store";
 
 export default function HeightScreen() {
+  const posthog = usePostHog();
   const { height, setHeight } = useOnboardingState();
   return (
     // <SafeAreaView className="flex-1">

@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { useRouter } from "expo-router";
 import { Text, TextInput, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
@@ -7,10 +8,12 @@ import { useOnboardingState } from "@/backend/store/onboarding-store";
 const MAX_LENGTH = 15;
 
 export default function NicknameScreen() {
+  const posthog = usePostHog();
   const router = useRouter();
   const { nickname, setNickname } = useOnboardingState();
 
   const handleContinue = () => {
+    posthog?.capture('onboarding_step_completed', { step: 'nickname' });
     if (!nickname.trim()) return;
     router.push("/(root)/onboarding/comparison" as any);
   };

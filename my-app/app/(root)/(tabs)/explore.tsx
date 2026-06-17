@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState, useEffect } from "react";
 import {
   Dimensions,
   FlatList,
@@ -13,6 +13,17 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import {
+  Plus,
+  Settings,
+  MoreHorizontal,
+  X,
+  Pin,
+  Share2,
+  Download,
+  Grid,
+} from "lucide-react-native";
+import { useScrollToHideTabBar } from "../../../hooks/useScrollToHideTabBar";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
 import { StatusBar } from "expo-status-bar";
@@ -56,6 +67,7 @@ const COMMUNITY_POSTS = [
     image:
       "https://images.unsplash.com/photo-1434389678232-068a8ebce4ea?w=400&q=80",
     likes: 312,
+    aspectRatio: 4 / 5,
   },
   {
     id: "2",
@@ -64,6 +76,7 @@ const COMMUNITY_POSTS = [
     image:
       "https://images.unsplash.com/photo-1550614000-4b95d466f289?w=400&q=80",
     likes: 198,
+    aspectRatio: 1,
   },
   {
     id: "3",
@@ -72,6 +85,7 @@ const COMMUNITY_POSTS = [
     image:
       "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=400&q=80",
     likes: 445,
+    aspectRatio: 2 / 3,
   },
   {
     id: "4",
@@ -80,6 +94,25 @@ const COMMUNITY_POSTS = [
     image:
       "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=400&q=80",
     likes: 87,
+    aspectRatio: 3 / 4,
+  },
+  {
+    id: "5",
+    user: "mia_w",
+    avatar: "https://i.pravatar.cc/80?img=5",
+    image:
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80",
+    likes: 532,
+    aspectRatio: 3 / 4,
+  },
+  {
+    id: "6",
+    user: "david_l",
+    avatar: "https://i.pravatar.cc/80?img=6",
+    image:
+      "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400&q=80",
+    likes: 211,
+    aspectRatio: 1,
   },
 ];
 
@@ -155,7 +188,7 @@ function AddPostModal({
       animationType="slide"
       presentationStyle="pageSheet"
     >
-      <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View style={{ flex: 1, backgroundColor: "#ffff" }}>
         <View
           style={{
             flexDirection: "row",
@@ -230,31 +263,97 @@ function AddPostModal({
         </View>
       </View>
     </Modal>
+    // </Modal>
   );
 }
+
+const CommunityPostCard = ({
+  post,
+  onMenuPress,
+  onCardPress,
+}: {
+  post: any;
+  onMenuPress: () => void;
+  onCardPress: () => void;
+}) => (
+  <View style={{ marginBottom: 16 }}>
+    <Pressable
+      onPress={onCardPress}
+      style={{
+        borderRadius: 16,
+        overflow: "hidden",
+        backgroundColor: "#F5F5F7",
+        borderColor: "#EBEBEB",
+        shadowColor: "#000000",
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 3 },
+        elevation: 1,
+      }}
+    >
+      <Image
+        source={{ uri: post.image }}
+        style={{ width: "100%", aspectRatio: post.aspectRatio || 3 / 4 }}
+        resizeMode="cover"
+      />
+    </Pressable>
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        marginTop: 3,
+        paddingRight: 4,
+      }}
+    >
+      <TouchableOpacity
+        onPress={onMenuPress}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <MoreHorizontal size={24} color="#1D1A27" />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
 
 // ─── For You Tab ───────────────────────────────────────────────────────────────
 
 function ForYouTab() {
+  const router = useRouter();
+  const { onScroll } = useScrollToHideTabBar();
   const [activeBanner, setActiveBanner] = useState(0);
   const bannerRef = useRef<FlatList>(null);
+  const [selectedPostOptions, setSelectedPostOptions] = useState<
+    (typeof COMMUNITY_POSTS)[0] | null
+  >(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (bannerRef.current) {
+        const nextIndex = (activeBanner + 1) % FOR_YOU_BANNERS.length;
+        bannerRef.current.scrollToIndex({ index: nextIndex, animated: true });
+      }
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [activeBanner]);
 
   const handleBannerScroll = useCallback((e: any) => {
     const index = Math.round(
-      e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 32),
+      e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 5),
     );
     setActiveBanner(index);
   }, []);
 
   const renderBanner = useCallback(
-    ({ item }: { item: (typeof FOR_YOU_BANNERS)[0] }) => (
+    ({ item, index }: { item: (typeof FOR_YOU_BANNERS)[0]; index: number }) => (
       <Pressable
         style={{
-          width: SCREEN_WIDTH - 32,
-          height: 230,
-          borderRadius: 20,
+          width: SCREEN_WIDTH - 10,
+          marginRight: index === FOR_YOU_BANNERS.length - 1 ? 0 : 5,
+          height: 270,
+          borderRadius: 25,
           overflow: "hidden",
           position: "relative",
+          // padding:
         }}
       >
         <Image
@@ -322,11 +421,13 @@ function ForYouTab() {
 
   return (
     <ScrollView
+      onScroll={onScroll}
+      scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 100 }}
+      contentContainerStyle={{ paddingBottom: "50%" }}
     >
       {/* Banner Carousel */}
-      <View style={{ marginTop: 16, paddingHorizontal: 16 }}>
+      <View style={{ marginTop: 15, paddingHorizontal: 5 }}>
         <FlatList
           ref={bannerRef}
           data={FOR_YOU_BANNERS}
@@ -336,11 +437,11 @@ function ForYouTab() {
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={handleBannerScroll}
-          snapToInterval={SCREEN_WIDTH - 32}
+          snapToInterval={SCREEN_WIDTH - 5}
           decelerationRate="fast"
           getItemLayout={(_, index) => ({
-            length: SCREEN_WIDTH - 32,
-            offset: (SCREEN_WIDTH - 32) * index,
+            length: SCREEN_WIDTH - 5,
+            offset: (SCREEN_WIDTH - 5) * index,
             index,
           })}
           initialNumToRender={1}
@@ -381,63 +482,146 @@ function ForYouTab() {
         >
           Community Looks
         </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-          {COMMUNITY_POSTS.map((post) => (
-            <Pressable
-              key={post.id}
-              style={{
-                width: (SCREEN_WIDTH - 42) / 2,
-                borderRadius: 16,
-                overflow: "hidden",
-                backgroundColor: "#F5F5F7",
-              }}
-            >
-              <Image
-                source={{ uri: post.image }}
-                style={{ width: "100%", aspectRatio: 3 / 4 }}
-                resizeMode="cover"
+        <View style={{ flexDirection: "row", gap: 5 }}>
+          <View style={{ flex: 1 }}>
+            {COMMUNITY_POSTS.filter((_, i) => i % 2 === 0).map((post) => (
+              <CommunityPostCard
+                key={post.id}
+                post={post}
+                onMenuPress={() => setSelectedPostOptions(post)}
+                onCardPress={() =>
+                  router.push({
+                    pathname: "/(root)/post/[id]",
+                    params: post as any,
+                  })
+                }
               />
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: 10,
-                  backgroundColor: "rgba(0,0,0,0.35)",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <Image
-                  source={{ uri: post.avatar }}
-                  style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: 11,
-                    borderWidth: 1.5,
-                    borderColor: "#fff",
-                  }}
-                />
-                <Text
-                  style={{
-                    color: "#fff",
-                    fontSize: 12,
-                    fontWeight: "700",
-                    flex: 1,
-                  }}
-                >
-                  @{post.user}
-                </Text>
-                <Text style={{ color: "#fff", fontSize: 11 }}>
-                  ♥ {post.likes}
-                </Text>
-              </View>
-            </Pressable>
-          ))}
+            ))}
+          </View>
+          <View style={{ flex: 1 }}>
+            {COMMUNITY_POSTS.filter((_, i) => i % 2 !== 0).map((post) => (
+              <CommunityPostCard
+                key={post.id}
+                post={post}
+                onMenuPress={() => setSelectedPostOptions(post)}
+                onCardPress={() =>
+                  router.push({
+                    pathname: "/(root)/post/[id]",
+                    params: post as any,
+                  })
+                }
+              />
+            ))}
+          </View>
         </View>
       </View>
+
+      <Modal
+        visible={!!selectedPostOptions}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setSelectedPostOptions(null)}
+        statusBarTranslucent={true}
+      >
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <Pressable
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+            onPress={() => setSelectedPostOptions(null)}
+          />
+          <SafeAreaView
+            edges={["bottom"]}
+            style={{
+              backgroundColor: "#ffffff",
+              borderTopLeftRadius: 30,
+              borderTopRightRadius: 30,
+              paddingTop: 20,
+              paddingBottom: 40,
+              paddingHorizontal: 24,
+              minHeight: 300,
+            }}
+          >
+            <View style={{ alignItems: "center", marginBottom: 15 }}>
+              <View
+                style={{
+                  width: 40,
+                  height: 5,
+                  borderRadius: 3,
+                  backgroundColor: "#E0E0E0",
+                }}
+              />
+            </View>
+
+            <View style={{ alignItems: "center", marginBottom: 20 }}>
+              {selectedPostOptions && (
+                <Image
+                  source={{ uri: selectedPostOptions.image }}
+                  style={{ width: 60, height: 80, borderRadius: 8 }}
+                />
+              )}
+              <Text
+                style={{
+                  marginTop: 16,
+                  fontSize: 15,
+                  color: "#1D1A27",
+                  fontWeight: "600",
+                }}
+              >
+                This look is inspired by your recent activity
+              </Text>
+            </View>
+
+            <View style={{ gap: 24, marginTop: 10 }}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+              >
+                <Pin size={24} color="#1D1A27" />
+                <Text
+                  style={{ fontSize: 18, fontWeight: "600", color: "#1D1A27" }}
+                >
+                  Save
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+              >
+                <Share2 size={24} color="#1D1A27" />
+                <Text
+                  style={{ fontSize: 18, fontWeight: "600", color: "#1D1A27" }}
+                >
+                  Share
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+              >
+                <Download size={24} color="#1D1A27" />
+                <Text
+                  style={{ fontSize: 18, fontWeight: "600", color: "#1D1A27" }}
+                >
+                  Download image
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+              >
+                <Grid size={24} color="#1D1A27" />
+                <Text
+                  style={{ fontSize: 18, fontWeight: "600", color: "#1D1A27" }}
+                >
+                  Add to collage
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -658,7 +842,7 @@ export default function ExploreScreen() {
               flexDirection: "row",
               alignItems: "center",
               paddingHorizontal: 20,
-              paddingTop: 10,
+              // paddingTop: 1,
               paddingBottom: 6,
             }}
           >
@@ -674,16 +858,17 @@ export default function ExploreScreen() {
                 >
                   For you
                 </Text>
-                {activeTab === "foryou" && (
+                {/* {activeTab === "foryou" && (
                   <View
                     style={{
-                      height: 2.5,
+                      // height: 2.5,
+                      fontSize: 16,
                       backgroundColor: "#1D1A27",
                       borderRadius: 2,
                       marginTop: 3,
                     }}
                   />
-                )}
+                )} */}
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => setActiveTab("groups")}>
@@ -696,7 +881,7 @@ export default function ExploreScreen() {
                 >
                   Groups
                 </Text>
-                {activeTab === "groups" && (
+                {/* {activeTab === "groups" && (
                   <View
                     style={{
                       height: 2.5,
@@ -705,36 +890,29 @@ export default function ExploreScreen() {
                       marginTop: 3,
                     }}
                   />
-                )}
+                )} */}
               </TouchableOpacity>
             </View>
 
             {/* Right buttons */}
-            <View style={{ flexDirection: "row", gap: 10 }}>
+            <View
+              style={{ flexDirection: "row", gap: 10, alignItems: "center",  }}
+            >
               <TouchableOpacity
                 onPress={() => setShowAddPost(true)}
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
+                  width: 38,
+                  height: 38,
+                  borderRadius: 30,
                   backgroundColor: "#1D1A27",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Text
-                  style={{
-                    color: "#fff",
-                    fontSize: 20,
-                    lineHeight: 22,
-                    marginTop: -1,
-                  }}
-                >
-                  +
-                </Text>
+                <Plus size={20} color="#FFFFFF" strokeWidth={2.5} />
               </TouchableOpacity>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={{
                   width: 36,
                   height: 36,
@@ -744,18 +922,18 @@ export default function ExploreScreen() {
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ fontSize: 16 }}>⚙️</Text>
-              </TouchableOpacity>
+                <Settings size={20} color="#1D1A27" strokeWidth={2} />
+              </TouchableOpacity> */}
             </View>
           </View>
 
           {/* Thin divider */}
           <View
-            style={{
-              height: 1,
-              backgroundColor: "rgba(0,0,0,0.06)",
-              marginHorizontal: 0,
-            }}
+          // style={{
+          //   height: 1,
+          //   backgroundColor: "rgba(0,0,0,0.06)",
+          //   marginHorizontal: 0,
+          // }}
           />
 
           {/* ── Tab Content ── */}

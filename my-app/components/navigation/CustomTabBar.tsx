@@ -13,6 +13,8 @@ import {
 } from "@tabler/icons-react-native";
 import { AddActionMenu } from "./AddActionMenu";
 import LottieView from "lottie-react-native";
+import { useUIStore } from "../../backend/store/ui-store";
+import { useEffect } from "react";
 
 type TabIconComponent = React.ComponentType<IconProps>;
 type TabConfig = Record<string, TabIconComponent>;
@@ -110,6 +112,16 @@ export function CustomTabBar({
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [menuVisible, setMenuVisible] = useState(false);
+  const isTabBarVisible = useUIStore((state) => state.isTabBarVisible);
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(translateY, {
+      toValue: isTabBarVisible ? 0 : 150,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [isTabBarVisible, translateY]);
 
   const handleNavigate = useCallback(
     (route: string) => {
@@ -119,16 +131,16 @@ export function CustomTabBar({
   );
 
   return (
-    <View
-      pointerEvents="box-none"
+    <Animated.View
+      pointerEvents={isTabBarVisible ? "box-none" : "none"}
       style={{
         position: "absolute",
         left: 0,
         right: 0,
         bottom: -50,
         backgroundColor: "#2C2C2E",
-        // borderWidth: 1,
         paddingBottom: 50,
+        transform: [{ translateY }],
       }}
     >
       {/* Dark background strip */}
@@ -338,6 +350,6 @@ export function CustomTabBar({
         onClose={() => setMenuVisible(false)}
         onNavigate={handleNavigate}
       />
-    </View>
+    </Animated.View>
   );
 }

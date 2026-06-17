@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ const LOADING_MESSAGES = [
 ];
 
 export default function SetupAccountScreen() {
+  const posthog = usePostHog();
   const { user } = useUser();
   const { supabase, isInitializing } = useSupabase();
   const { completeOnboarding, isSaving, error } = useOnboardingState();

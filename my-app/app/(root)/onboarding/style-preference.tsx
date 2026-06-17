@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import React, { useCallback } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
@@ -68,10 +69,12 @@ const styles = [
 ];
 
 export default function StylePreferenceScreen() {
+  const posthog = usePostHog();
   const router = useRouter();
   const { stylePreferences, toggleStyle } = useOnboardingState();
 
   const handleContinue = useCallback(() => {
+    posthog?.capture('onboarding_step_completed', { step: 'style-preference' });
     if (stylePreferences.length !== 5) return;
 
     router.push("/(root)/onboarding/full-length-pics");

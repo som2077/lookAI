@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { useRouter } from "expo-router";
 import { Image, Text, View } from "react-native";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
@@ -6,10 +7,12 @@ import { useOnboardingState } from "@/backend/store/onboarding-store";
 import { Lock } from "lucide-react-native";
 
 export default function TrustScreen() {
+  const posthog = usePostHog();
   const router = useRouter();
   const { error } = useOnboardingState();
 
   const handleContinue = () => {
+    posthog?.capture('onboarding_step_completed', { step: 'trust' });
     router.push("/(root)/onboarding/setup-account" as never);
   };
 

@@ -1,3 +1,4 @@
+import { usePostHog } from 'posthog-react-native';
 import { useAuth } from "@clerk/clerk-expo";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -18,6 +19,7 @@ import { Info, Upload, X } from "lucide-react-native";
 const BUCKET = "full-length-pics";
 
 export default function FullLengthPicsScreen() {
+  const posthog = usePostHog();
   const router = useRouter();
   const { getToken, userId } = useAuth();
   const [selectedImages, setSelectedImages] = useState<

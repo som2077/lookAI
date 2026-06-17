@@ -22,6 +22,7 @@ import {
 import { useFonts } from "expo-font";
 import { FONT_ASSETS } from "@/constants/fonts";
 import * as NavigationBar from "expo-navigation-bar";
+import { PostHogProvider } from "posthog-react-native";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -230,17 +231,22 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView className="flex-1">
-      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <SafeAreaProvider>
-          <StatusBar style="dark" />
-          <OnboardingProvider>
-            <AppErrorBoundary>
-              <RootNavigator />
-              <ErrorStateView onRetry={checkConnectivity} />
-            </AppErrorBoundary>
-          </OnboardingProvider>
-        </SafeAreaProvider>
-      </ClerkProvider>
+      <PostHogProvider
+        apiKey="phc_o2qT8hofFXzTgfyCLkDXw7CLoCeiq2g3zprd5jF3MWok"
+        options={{ host: "https://us.i.posthog.com" }}
+      >
+        <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+          <SafeAreaProvider>
+            <StatusBar style="dark" />
+            <OnboardingProvider>
+              <AppErrorBoundary>
+                <RootNavigator />
+                <ErrorStateView onRetry={checkConnectivity} />
+              </AppErrorBoundary>
+            </OnboardingProvider>
+          </SafeAreaProvider>
+        </ClerkProvider>
+      </PostHogProvider>
     </GestureHandlerRootView>
   );
 }

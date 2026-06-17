@@ -37,6 +37,7 @@ import {
   IconInfoCircle,
 } from "@tabler/icons-react-native";
 import { SwipeTabWrapper } from "../../../components/navigation/SwipeTabWrapper";
+import { useScrollToHideTabBar } from "../../../hooks/useScrollToHideTabBar";
 import { useWardrobeSummary } from "@/backend/hooks/useWardrobeSummary";
 import { MOCK_WARDROBE_ITEMS } from "@/constants/mock-wardrobe-items";
 import { useUserWardrobeStore } from "@/backend/store/user-wardrobe-store";
@@ -314,11 +315,12 @@ const CategoryFilter = React.memo(function CategoryFilter({
         onPress={() => onSelect(cat.id)}
         style={{
           backgroundColor: isActive ? "#1D1A27" : "#FFFFFF",
-          borderColor: "#EBEBEB",
+          borderColor: "#F8F7FC",
           borderWidth: 0.5,
           borderRadius: 25,
           paddingHorizontal: 20,
           paddingVertical: 10,
+          marginTop: 5,
         }}
       >
         <Text
@@ -340,8 +342,8 @@ const CategoryFilter = React.memo(function CategoryFilter({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{
         flexDirection: "column",
-        gap: 5,
-        paddingHorizontal: 20,
+        // gap: 6,
+        paddingHorizontal: 10,
       }}
       style={{ marginBottom: 16 }}
     >
@@ -393,7 +395,7 @@ const StatsCard = React.memo(function StatsCard({
 
   // ── Arc geometry (matching reference image: 3 gradient concentric rings) ──
   const arcW = 160;
-  const thickness = 20;
+  const thickness = 15;
   const arcGap = 2;
   const r1 = 70; // outer ring centerline radius
   const r2 = r1 - thickness - arcGap; // = 48  middle ring
@@ -440,26 +442,238 @@ const StatsCard = React.memo(function StatsCard({
 
   return (
     <View style={{ marginHorizontal: 20, marginBottom: 6 }}>
+      {/* Time Filter Tabs */}
+      <View
+        style={{
+          flexDirection: "row",
+          backgroundColor: "#F8F7FC",
+          // borderColor: "#E9EBF8",
+          // borderWidth: 0.5,
+          borderRadius: 13,
+
+          padding: 1,
+          // marginTop: ,
+          marginBottom: 5,
+          shadowColor: "#000000",
+          shadowOpacity: 0.05,
+          shadowRadius: 3,
+          shadowOffset: { width: 0, height: 1.5 },
+          elevation: 1,
+          borderWidth: 0.5,
+          borderColor: "#EBEBEB",
+        }}
+      >
+        {TIME_FILTERS.map((filter) => (
+          <Pressable
+            key={filter}
+            onPress={() => setActiveFilter(filter)}
+            style={{
+              flex: 1,
+              paddingVertical: 10,
+              borderRadius: 12,
+              backgroundColor:
+                activeFilter === filter ? "#FFFFFF" : "transparent",
+              borderColor: activeFilter === filter ? "#EBEBEB" : "transparent",
+              alignItems: "center",
+              borderWidth: 0.5,
+
+              shadowColor: activeFilter === filter ? "#000" : "transparent",
+              shadowOpacity: activeFilter === filter ? 0.05 : 0,
+              shadowRadius: activeFilter === filter ? 10 : 0,
+              shadowOffset: {
+                width: 0,
+                height: activeFilter === filter ? 2 : 0,
+              },
+              elevation: activeFilter === filter ? 1 : 0,
+            }}
+          >
+            <Text
+              style={{
+                // fontSize: 14,
+                fontSize: 14,
+                fontFamily: "TikTokSans16pt-Medium",
+                // color: "#1C1C1E",
+                fontWeight: activeFilter === filter ? "700" : "400",
+                color: "#1D1A27",
+              }}
+            >
+              {filter}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
       {/* ── Two Cards Row ── */}
-      <View style={{ flexDirection: "row", gap: 5 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 5,
+          backgroundColor: "#FFFFFF",
+          borderWidth: 1,
+          borderColor: "#EBEBEB",
+          // shadowColor: "#FFFFFF",
+          borderRadius: 24,
+          // shadowOpacity: 0.05,
+          // shadowRadius: 10,
+          // shadowOffset: { width: 0, height: 3 },
+          // elevation: 2,
+          shadowColor: "#000",
+          shadowOpacity: 0.02,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 1,
+        }}
+      >
+        {/* ── Right Card: Stats Column ── */}
+        <View
+          style={{
+            flex: 24,
+            // backgroundColor: "#FFFFFF90",
+            // borderRadius: 24,
+            // paddingVertical: 10,
+            // width: "20%",
+            // paddingHorizontal: -15,
+            justifyContent: "space-between",
+            // alignItems: "center",
+            // justifyContent: "center",
+            // marginLeft: 10,
+            // borderWidth: 1,
+          }}
+        >
+          {/* Worn */}
+          <View style={{ marginLeft: 25, marginTop: 20 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+                marginBottom: 2,
+              }}
+            >
+              <View
+                style={{
+                  width: 15,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: "#FF1200",
+                }}
+              />
+              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
+                Worn items
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
+                {displayWorn}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 11,
+                  color: "#666",
+                  fontWeight: "500",
+                  marginLeft: 2,
+                }}
+              >
+                /{displayTotal} items
+              </Text>
+            </View>
+          </View>
+
+          {/* Usage */}
+          <View style={{ marginLeft: 25, paddingVertical: 5 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+                marginBottom: 2,
+              }}
+            >
+              <View
+                style={{
+                  width: 15,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: "#FFB020",
+                }}
+              />
+              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
+                Usage
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
+                {displayUsage}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 11,
+                  color: "#666",
+                  fontWeight: "500",
+                  marginLeft: 2,
+                }}
+              >
+                %
+              </Text>
+            </View>
+          </View>
+
+          {/* Unworn */}
+          <View style={{ marginLeft: 25, marginBottom: 15 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+                marginBottom: 2,
+              }}
+            >
+              <View
+                style={{
+                  width: 15,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: "#1E88E5",
+                }}
+              />
+              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
+                Unworn items
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
+                {displayUnworn}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 11,
+                  color: "#666",
+                  fontWeight: "500",
+                  marginLeft: 2,
+                }}
+              >
+                /{displayTotal} items
+              </Text>
+            </View>
+          </View>
+        </View>
         {/* ── Left Card: Rings ── */}
         <View
           style={{
             flex: 30,
-            backgroundColor: "#FFFFFF90",
-            borderRadius: 24,
+            // backgroundColor: "#FFFFFF90",
+            // borderRadius: 24,
             // paddingVertical: 0,
             alignItems: "center",
             // width: "-10%",
             justifyContent: "center",
-            borderWidth: 1,
+            // borderWidth: 1,
             // marginRight: -10,
-            borderColor: "#EBEBEB",
-            shadowColor: "#FFFFFF",
-            shadowOpacity: 0.05,
-            shadowRadius: 10,
-            shadowOffset: { width: 0, height: 3 },
-            elevation: 2,
+            // borderColor: "#EBEBEB",
+            // shadowColor: "#FFFFFF",
+            // shadowOpacity: 0.05,
+            // shadowRadius: 10,
+            // shadowOffset: { width: 0, height: 3 },
+            // elevation: 2,
           }}
         >
           <Svg width={arcW} height={arcH}>
@@ -472,9 +686,9 @@ const StatsCard = React.memo(function StatsCard({
                 y2={0}
                 gradientUnits="userSpaceOnUse"
               >
-                <Stop offset="0%" stopColor="#2C242F" stopOpacity={1} />
-                <Stop offset="50%" stopColor="#2C242F" stopOpacity={1} />
-                <Stop offset="100%" stopColor="#2C242F" stopOpacity={1} />
+                <Stop offset="0%" stopColor="#2C242F10" stopOpacity={1} />
+                <Stop offset="50%" stopColor="#2C242F10" stopOpacity={1} />
+                <Stop offset="100%" stopColor="#2C242F10" stopOpacity={1} />
               </LinearGradient>
               <LinearGradient
                 id="wrdMiddle"
@@ -505,7 +719,7 @@ const StatsCard = React.memo(function StatsCard({
             <Path
               d={makeArc(r1)}
               fill="none"
-              stroke="#FFFFFF"
+              stroke="#F8F7FC"
               // color="#EBEB"
               // borderWidth={0.5}
               strokeWidth={thickness}
@@ -514,14 +728,14 @@ const StatsCard = React.memo(function StatsCard({
             <Path
               d={makeArc(r2)}
               fill="none"
-              stroke="#FFFFFF"
+              stroke="#F8F7FC"
               strokeWidth={thickness}
               strokeLinecap="round"
             />
             <Path
               d={makeArc(r3)}
               fill="none"
-              stroke="#FFFFFF"
+              stroke="#F8F7FC"
               strokeWidth={thickness}
               strokeLinecap="round"
             />
@@ -657,211 +871,6 @@ const StatsCard = React.memo(function StatsCard({
             </G>
           </Svg>
         </View>
-
-        {/* ── Right Card: Stats Column ── */}
-        <View
-          style={{
-            flex: 24,
-            backgroundColor: "#FFFFFF90",
-            borderRadius: 24,
-            // paddingVertical: 10,
-            // width: "20%",
-            // paddingHorizontal: -15,
-            justifyContent: "space-between",
-            // alignItems: "center",
-            // justifyContent: "center",
-            // marginLeft: 10,
-            borderWidth: 1,
-
-            borderColor: "#EBEBEB",
-            shadowColor: "#FFFFFF",
-            shadowOpacity: 0.05,
-            shadowRadius: 10,
-            shadowOffset: { width: 0, height: 3 },
-            elevation: 2,
-          }}
-        >
-          {/* Worn */}
-          <View style={{ paddingVertical: 8, marginLeft: 25, marginTop: 5 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 5,
-                marginBottom: 2,
-              }}
-            >
-              <View
-                style={{
-                  width: 15,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: "#FF1200",
-                }}
-              />
-              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
-                Worn items
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
-                {displayWorn}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: "#666",
-                  fontWeight: "500",
-                  marginLeft: 2,
-                }}
-              >
-                /{displayTotal} items
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#FFFFFF",
-              marginHorizontal: 10,
-            }}
-          />
-
-          {/* Usage */}
-          <View style={{ paddingVertical: 8, marginLeft: 25 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 5,
-                marginBottom: 2,
-              }}
-            >
-              <View
-                style={{
-                  width: 15,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: "#FFB020",
-                }}
-              />
-              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
-                Usage
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
-                {displayUsage}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: "#666",
-                  fontWeight: "500",
-                  marginLeft: 2,
-                }}
-              >
-                %
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#FFFFFF",
-              marginHorizontal: 10,
-            }}
-          />
-
-          {/* Unworn */}
-          <View style={{ paddingVertical: 8, marginLeft: 25, marginBottom: 5 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 5,
-                marginBottom: 2,
-              }}
-            >
-              <View
-                style={{
-                  width: 15,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: "#1E88E5",
-                }}
-              />
-              <Text style={{ fontSize: 13, color: "#666", fontWeight: "600" }}>
-                Unworn items
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: "#000" }}>
-                {displayUnworn}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: "#666",
-                  fontWeight: "500",
-                  marginLeft: 2,
-                }}
-              >
-                /{displayTotal} items
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-      {/* Time Filter Tabs */}
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: "#F8F7FC",
-          borderColor: "#EBEBEB",
-          borderWidth: 0.5,
-          borderRadius: 15,
-          padding: 4,
-          marginTop: 6,
-        }}
-      >
-        {TIME_FILTERS.map((filter) => (
-          <Pressable
-            key={filter}
-            onPress={() => setActiveFilter(filter)}
-            style={{
-              flex: 1,
-              paddingVertical: 12,
-              borderRadius: 12,
-              backgroundColor:
-                activeFilter === filter ? "#FFFFFF" : "transparent",
-              borderColor: activeFilter === filter ? "#EBEBEB" : "transparent",
-
-              borderWidth: 0.5,
-              alignItems: "center",
-              shadowColor: activeFilter === filter ? "#000" : "transparent",
-              shadowOpacity: activeFilter === filter ? 0.05 : 0,
-              shadowRadius: activeFilter === filter ? 10 : 0,
-              shadowOffset: {
-                width: 0,
-                height: activeFilter === filter ? 2 : 0,
-              },
-              elevation: activeFilter === filter ? 1 : 0,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: activeFilter === filter ? "600" : "400",
-                color: "#1D1A27",
-              }}
-            >
-              {filter}
-            </Text>
-          </Pressable>
-        ))}
       </View>
     </View>
   );
@@ -875,7 +884,7 @@ const ViewToggle = React.memo(function ViewToggle({
 }: {
   viewMode: "grouped" | "grid";
   onToggle: (mode: "grouped" | "grid") => void;
-}) {
+}) { 
   const isGrouped = viewMode === "grouped";
   return (
     <Pressable
@@ -883,8 +892,8 @@ const ViewToggle = React.memo(function ViewToggle({
       style={{
         width: 48,
         height: 48,
-        backgroundColor: "#F4F5F9",
-        borderRadius: 20,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 29,
         alignItems: "center",
         justifyContent: "center",
       }}
@@ -892,7 +901,7 @@ const ViewToggle = React.memo(function ViewToggle({
       {isGrouped ? (
         <IconList size={24} color="#1D1A27" strokeWidth={2.5} />
       ) : (
-        <IconLayoutGrid size={24} color="#1D1A27" strokeWidth={2.5} />
+        <IconLayoutGrid size={24} color="#1D1A27" strokeWidth={1.5} />
       )}
     </Pressable>
   );
@@ -919,6 +928,9 @@ const MasonryCard = React.memo(function MasonryCard({
         overflow: "hidden",
         marginBottom: GRID_GAP,
         backgroundColor: bg,
+        // marginTop:100,
+        // alignItems: "center",
+        // justifyContent:"center "
       }}
     >
       <View style={{ flex: 1, backgroundColor: bg }} />
@@ -1128,6 +1140,7 @@ const EmptyState = React.memo(function EmptyState({
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function WardrobeScreen() {
+  const { onScroll } = useScrollToHideTabBar();
   const router = useRouter();
   const { user } = useUser();
   const { summary } = useWardrobeSummary(user?.id);
@@ -1336,7 +1349,7 @@ export default function WardrobeScreen() {
                   width: 44,
                   height: 44,
                   borderRadius: 22,
-                  backgroundColor: "#EEF0F5",
+                  backgroundColor: "#FFFFFF",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -1399,7 +1412,7 @@ export default function WardrobeScreen() {
                     >
                       Add to Wardrobe
                     </Text>
-                    <Pressable onPress={() => setShowAddMenu(false)}>
+                    {/* <Pressable onPress={() => setShowAddMenu(false)}>
                       <View
                         style={{
                           width: 32,
@@ -1412,7 +1425,7 @@ export default function WardrobeScreen() {
                       >
                         <IconX size={16} color="#1D1A27" strokeWidth={2.5} />
                       </View>
-                    </Pressable>
+                    </Pressable> */}
                   </View>
                   {ADD_MENU_OPTIONS.map((opt) => {
                     const Icon = opt.icon;
@@ -1479,6 +1492,8 @@ export default function WardrobeScreen() {
             <ScrollView
               key="grid-view"
               showsVerticalScrollIndicator={false}
+              onScroll={onScroll}
+              scrollEventThrottle={16}
               contentContainerStyle={{ paddingBottom: 140 }}
             >
               {listHeader}
@@ -1531,6 +1546,8 @@ export default function WardrobeScreen() {
               renderItem={renderGroupedRow}
               contentContainerStyle={{ paddingBottom: 140 }}
               showsVerticalScrollIndicator={false}
+              onScroll={onScroll}
+              scrollEventThrottle={16}
               ListHeaderComponent={listHeader}
               ListEmptyComponent={<EmptyState onAdd={handleAddClothes} />}
               removeClippedSubviews={true}

@@ -3,6 +3,7 @@ import { Animated, Dimensions, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { AppGradientBackground } from "../../../components/ui/AppGradientBackground";
+import { useScrollToHideTabBar } from "../../../hooks/useScrollToHideTabBar";
 import { HomeHeader } from "../../../components/ui/HomeHeader";
 import { WeeklyCalendarStrip } from "../../../components/ui/WeeklyCalendarStrip";
 import type { RingProgressSegment } from "../../../components/ui/WardrobeRingSummaryCard";
@@ -124,6 +125,7 @@ export default function HomeScreen() {
   });
 
   const indicatorIndex = activeIndex === 0 ? 0 : 1;
+  const { onScroll: hideTabBarOnScroll } = useScrollToHideTabBar();
 
   return (
     <SwipeTabWrapper tabIndex={0}>
@@ -134,7 +136,7 @@ export default function HomeScreen() {
             contentContainerStyle={{ paddingBottom: 24 }}
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-              { useNativeDriver: true },
+              { useNativeDriver: true, listener: hideTabBarOnScroll },
             )}
             scrollEventThrottle={16}
           >
