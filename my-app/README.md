@@ -78,6 +78,7 @@ app/
 │   └── email.tsx           # OTP Validation screen
 └── (root)/                 # Authenticated workspace screens
     ├── _layout.tsx         # Global Auth Guard wrapper
+    ├── calendar.tsx        # Calendar: Outfit wear logs & scheduling
     ├── (ai-features)/      # AI & Recommendation engine UI
     │   ├── look-ai.tsx
     │   ├── outfit.tsx
@@ -86,6 +87,8 @@ app/
     │   ├── score.tsx
     │   └── streak.tsx
     ├── (social)/           # Social interaction & fashion feeds
+    │   ├── _layout.tsx
+    │   ├── group-detail.tsx
     │   └── trend-feed.tsx
     ├── (subscription)/     # In-app purchase paywalls
     │   ├── subscription.tsx
@@ -96,12 +99,14 @@ app/
     ├── (tabs)/             # Swipeable Bottom Tab navigation
     │   ├── _layout.tsx     
     │   ├── index.tsx       # Home: Highlights, trend feeds, stats
+    │   ├── explore.tsx     # Explore: Discover new outfits and trends
     │   ├── wardrobe.tsx    # Wardrobe: Pinterest masonry grid
-    │   ├── calendar.tsx    # Calendar: Outfit wear logs & scheduling
     │   └── profile.tsx     # Profile: Bio summary, body stats
     ├── add-clothes/        # Multi-step camera/upload wizard
+    ├── cloth-details/      # Detailed view for specific clothing items
     ├── log-outfit/         # Daily wearer logging wizard
-    └── onboarding/         # 6-step new user preference forms
+    ├── onboarding/         # 6-step new user preference forms
+    └── post/               # Creating and sharing fashion posts
 ```
 
 ---
